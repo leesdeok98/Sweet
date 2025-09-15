@@ -3,20 +3,31 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    public Player player; // Player Å¸ÀÔÀ¸·Î ¼±¾ð
+    public float gameTime;
+    public float maxGameTime = 5 * 60f;
+    public PoolManager pool;
+    public Player player; // Player Å¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     void Awake()
     {
-        // ½Ì±ÛÅæ ÃÊ±âÈ­
+        // ï¿½Ì±ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         if (instance == null)
             instance = this;
         else
             Destroy(gameObject);
     }
+        void Update()
+    {
+        gameTime += Time.deltaTime;
+
+        if (gameTime > maxGameTime) {
+            gameTime = maxGameTime;
+        }
+    }
 
     void Start()
     {
-        // ¾À¿¡¼­ Player ¿ÀºêÁ§Æ®¸¦ Ã£¾Æ Player ÄÄÆ÷³ÍÆ® ÇÒ´ç
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Player ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ Ã£ï¿½ï¿½ Player ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Ò´ï¿½
         if (player == null)
             player = GameObject.Find("Player").GetComponent<Player>();
     }
