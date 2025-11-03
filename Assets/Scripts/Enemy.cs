@@ -74,6 +74,13 @@ public class Enemy : MonoBehaviour
         if (anim != null)
             anim.SetTrigger("Dead");
 
-        Destroy(gameObject, 1f);
+        // ✅ Destroy 대신 비활성화
+        StartCoroutine(DeactivateAfterDelay(1f));
+    }
+
+    IEnumerator DeactivateAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        gameObject.SetActive(false);
     }
 }
