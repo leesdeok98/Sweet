@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public float speed;           // 이동 속도
+    public float speed;
     public float health;
     public float maxHealth;
     public RuntimeAnimatorController[] animCon;
-    public Rigidbody2D target;    // 추적할 대상 (Player)
-    bool isLive;    // 생존 여부
+    public Rigidbody2D target;    
+    bool isLive;
 
     Rigidbody2D rb;
     Animator anim;
@@ -26,19 +26,15 @@ public class Enemy : MonoBehaviour
     {
         if (!isLive) return;
 
-        // 플레이어 방향 벡터 구하기
         Vector2 dir = target.position - rb.position;
         Vector2 nextVec = dir.normalized * speed * Time.fixedDeltaTime;
-        // 이동
         rb.MovePosition(rb.position + nextVec);
-        // 물리 회전 방지
         rb.velocity = Vector2.zero;
     }
 
     void LateUpdate()
     {
         if (!isLive) return;
-        // 좌우 반전 (플레이어 기준)
         spriter.flipX = target.position.x < rb.position.x;
     }
 
@@ -51,10 +47,33 @@ public class Enemy : MonoBehaviour
 
     public void Init(SpawnData data)
     {
-//        anim.runtimeAnimatorController = animCon[data.spriteType];
         speed = data.speed;
         maxHealth = data.health;
         health = data.health;
+    }
 
+    // ✅ Bullet.cs에서 호출되는 피격 처리 함수
+    public void TakeDamage(float damage)
+    {
+        if (!isLive) return;
+
+        health -= damage;
+        Debug.Log($"Enemy hit! HP: {health}");
+
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        isLive = false;
+        rb.velocity = Vector2.zero;
+
+        if (anim != null)
+            anim.SetTrigger("Dead");
+
+        Destroy(gameObject, 1f);
     }
 }
