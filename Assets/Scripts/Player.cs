@@ -6,12 +6,21 @@ public class Player : MonoBehaviour
     public float speed = 5f; // 이동 속도
 
     private Rigidbody2D rigid;
+    SpriteRenderer spr;
 
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
+        spr = GetComponent<SpriteRenderer>();
     }
 
+    private void LateUpdate()
+    {
+        if (inputVec.x != 0)
+        {
+            spr.flipX = (inputVec.x < 0);
+        }
+    }
     void Update()
     {
         inputVec.x = Input.GetAxisRaw("Horizontal");

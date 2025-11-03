@@ -27,7 +27,12 @@ public class Reposition : MonoBehaviour
         switch (transform.tag)
         {
             case "Ground":
-                if (diffX > diffY)
+                if (Mathf.Abs(diffX - diffY) <= 0.1f)
+                {
+                    transform.Translate(Vector3.up * dirY * 40);
+                    transform.Translate(Vector3.right * dirX * 40);
+                }
+                else if (diffX > diffY)
                 {
                     transform.Translate(Vector3.right * dirX * 40);
                 }
@@ -37,9 +42,7 @@ public class Reposition : MonoBehaviour
                 }
                 break;
             case "Enemy":
-                if (coll.enabled){
-                    transform.Translate(playerDir * 25 + new Vector3(Random.Range(-3f, 3f), Random.Range(-3f, 3f), 0f));
-                }
+
                 break;
         }
     }
