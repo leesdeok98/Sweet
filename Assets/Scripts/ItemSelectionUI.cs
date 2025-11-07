@@ -5,30 +5,30 @@ using UnityEngine.UI;
 public class ItemSelectionUI : MonoBehaviour
 {
     [Header("UI")]
-    public GameObject panelRoot;      // ÀüÃ¼ ÆĞ³Î (È°¼º/ºñÈ°¼º)
-    public Button[] itemButtons;      // ¹öÆ° ¹è¿­ (Inspector¿¡¼­ ¹öÆ°µéÀ» ³Ö¾îµĞ´Ù)
-    public Image[] itemIcons;         // ¹öÆ° À§ ¾ÆÀÌÄÜµé (¿É¼Ç)
-    public Text[] itemLabels;         // ¹öÆ° À§ ÅØ½ºÆ®µé (¿É¼Ç)
-    //public Text titleText;
+    public GameObject panelRoot;      // ì•„ì´í…œ ì„ íƒì°½ ì „ì²´ íŒ¨ë„ (í™œì„±/ë¹„í™œì„± ì œì–´)
+    public Button[] itemButtons;      // ì•„ì´í…œ ì„ íƒ ë²„íŠ¼ ë°°ì—´
+    public Image[] itemIcons;         // ë²„íŠ¼ ìœ„ì˜ ì•„ì´í…œ ì•„ì´ì½˜ ì´ë¯¸ì§€
+    public Text[] itemLabels;         // ë²„íŠ¼ ìœ„ì˜ ì•„ì´í…œ ì´ë¦„ í…ìŠ¤íŠ¸
+    //public Text titleText;          // ì œëª© í…ìŠ¤íŠ¸ (í˜„ì¬ ì‚¬ìš© ì•ˆ í•¨)
 
     [Header("Items (example)")]
-    public List<ItemData> itemPool = new List<ItemData>(); // inspector·Î Ã¤¿ì°Å³ª ÄÚµå¿¡¼­ Ã¤¿ò
+    public List<ItemData> itemPool = new List<ItemData>(); // ì„ íƒ ê°€ëŠ¥í•œ ì•„ì´í…œ í’€
 
-    private List<ItemData> currentChoices = new List<ItemData>();
-    private bool isOpen = false;
+    private List<ItemData> currentChoices = new List<ItemData>(); // í˜„ì¬ ì„ íƒì°½ì— í‘œì‹œ ì¤‘ì¸ ì•„ì´í…œ 3ê°œ
+    private bool isOpen = false; // ì„ íƒì°½ ì—´ë¦¼ ì—¬ë¶€
 
     void Start()
     {
-        // Ã³À½¿¡ ÆĞ³ÎÀ» ¼û±è
+        // ì‹œì‘ ì‹œ íŒ¨ë„ ë¹„í™œì„±í™”
         if (panelRoot != null) panelRoot.SetActive(false);
 
-        // ¿¹½Ã ¾ÆÀÌÅÛÀÌ ºñ¾îÀÖÀ¸¸é ±âº» »ùÇÃ 3°³ »ı¼º (Inspector¿¡ ¾ÆÀÌÄÜ ³ÖÁö ¾Ê¾Ò´Ù¸é null)
+        // ì•„ì´í…œ í’€ ë¹„ì–´ ìˆìœ¼ë©´ ìƒ˜í”Œ ì•„ì´í…œ ìë™ ìƒì„±
         if (itemPool.Count == 0)
         {
             CreateSampleItems();
         }
 
-        // ¹öÆ°¿¡ ¸®½º³Ê ÃÊ±âÈ­
+        // ë²„íŠ¼ í´ë¦­ ì´ë²¤íŠ¸ ì´ˆê¸°í™” ë° ë“±ë¡
         for (int i = 0; i < itemButtons.Length; i++)
         {
             int idx = i;
@@ -37,121 +37,127 @@ public class ItemSelectionUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// ìƒ˜í”Œ ì•„ì´í…œ ë°ì´í„°ë¥¼ ìƒì„± (í…ŒìŠ¤íŠ¸ìš©)
+    /// </summary>
     void CreateSampleItems()
     {
         itemPool = new List<ItemData>();
 
         itemPool.Add(new ItemData
         {
-            itemName = "Ä«¶ó¸á Å¥ºê",
-            description = "±âº» °ø°İ ¼Óµµ +100%, 5ÃÊ°£ À¯Áö (Àç»ç¿ë ´ë±â 15ÃÊ)",
+            itemName = "ì¹´ë¼ë©œ íë¸Œ",
+            description = "ê¸°ë³¸ ì´ë™ ì†ë„ +100%, 5ì´ˆê°„ ì§€ì† (ì¿¨íƒ€ì„ 15ì´ˆ)",
             type = ItemData.ItemType.CaramelCube,
             value = 1.0f
         });
 
         itemPool.Add(new ItemData
         {
-            itemName = "½´°¡ ½Çµå",
-            description = "ÀÚµ¿ ¹æ¾î¸· »ı¼º (20ÃÊ¸¶´Ù 1È¸, ÃÖ´ë 1È¸ ÀúÀå)",
+            itemName = "ì„¤íƒ• ë°©íŒ¨",
+            description = "ìë™ ë°©ì–´ë§‰ ìƒì„± (20ì´ˆë§ˆë‹¤ 1íšŒ, ìµœëŒ€ 1íšŒ ì¤‘ì²©)",
             type = ItemData.ItemType.SugarShield,
             value = 50f
         });
 
         itemPool.Add(new ItemData
         {
-            itemName = "µş±â ÆËÄÚ¾î",
-            description = "±âº» °ø°İ ½Ã 30% È®·ü·Î »ç¹æÀ¸·Î Åº Ãß°¡ ¹ß»ç",
+            itemName = "ë”¸ê¸°íŒ ì½”ì–´",
+            description = "ê¸°ë³¸ ê³µê²© ì‹œ 30% í™•ë¥ ë¡œ ì¶”ê°€ íˆ¬ì‚¬ì²´ ë°œì‚¬",
             type = ItemData.ItemType.StrawberryPopCore,
             value = 1.3f
         });
 
         itemPool.Add(new ItemData
         {
-            itemName = "·Ñ¸µ ÃÊÄÚ¹Ù",
-            description = "5ÃÊ¸¶´Ù ±ä ÃÊÄÚ¹Ù°¡ ¹İÁö¸§ 2mÀÇ ¿øÇüÅÂ¸¦ ±×¸®°í »ç¶óÁü (µ¥¹ÌÁö 15, ÀÛÀº ³Ë¹é)",
+            itemName = "êµ´ëŸ¬ê°€ëŠ” ì´ˆì½”ë°”",
+            description = "5ì´ˆë§ˆë‹¤ ì´ˆì½”ë°” ì†Œí™˜, 2m ë²”ìœ„ì˜ ì  íƒ€ê²© (ê³µê²©ë ¥ 15)",
             type = ItemData.ItemType.RollingChocolateBar,
             value = 15f
         });
 
         itemPool.Add(new ItemData
         {
-            itemName = "ÄÚÄÚ¾Æ ÆÄ¿ì´õ",
-            description = "±âº» °ø°İ »öÀÌ °¥»öÀ¸·Î ¹Ù²î¸ç ÀÛÀº ³Ë¹é°ú 0.2ÃÊ °æÁ÷ Ãß°¡",
+            itemName = "ì½”ì½”ì•„ ê°€ë£¨",
+            description = "ê¸°ë³¸ ê³µê²©ì´ ë²”ìœ„ ê³µê²©ìœ¼ë¡œ ë³€ê²½, ë°˜ê²½ 0.2 ì¦ê°€",
             type = ItemData.ItemType.CocoaPowder,
             value = 5f
         });
 
         itemPool.Add(new ItemData
         {
-            itemName = "´«²É »çÅÁ",
-            description = "±âº» °ø°İ ½Ã 15% È®·ü·Î ÀûÀ» 1ÃÊ°£ ºù°á",
+            itemName = "ëˆˆì†¡ì´ ì‚¬íƒ•",
+            description = "ê¸°ë³¸ ê³µê²© ì‹œ 15% í™•ë¥ ë¡œ ì ì„ 1ì´ˆê°„ ì–¼ë¦¼",
             type = ItemData.ItemType.SnowflakeCandy,
             value = 0.15f
         });
 
         itemPool.Add(new ItemData
         {
-            itemName = "ÆËÇÎ Äµµğ",
-            description = "20% È®·ü·Î °ø°İ ¸íÁß ½Ã 8°³ÀÇ º°»çÅÁ Á¶°¢ÀÌ ¹İ°æ 2m·Î ÆÛÁü (°³´ç µ¥¹ÌÁö 2)",
+            itemName = "íŒí•‘ ìº”ë””",
+            description = "20% í™•ë¥ ë¡œ ê³µê²© ì‹œ 8ë°©í–¥ í­ë°œ ìƒì„± (í”¼í•´ 2)",
             type = ItemData.ItemType.PoppingCandy,
             value = 2f
         });
 
         itemPool.Add(new ItemData
         {
-            itemName = "´ÙÅ© Ä¨",
-            description = "°ø°İ·Â +30%",
+            itemName = "ë‹¤í¬ ì¹©",
+            description = "ê³µê²©ë ¥ +30%",
             type = ItemData.ItemType.DarkChip,
             value = 1.3f
         });
 
         itemPool.Add(new ItemData
         {
-            itemName = "¾ÆÀÌ½º Á©¸®",
-            description = "10% È®·ü·Î ÁÖº¯ Àû¿¡°Ô ³Ã±â È®»ê (¹üÀ§ 1.5m, ÃÊ´ç µ¥¹ÌÁö 2, 3ÃÊ Áö¼Ó, ¼Óµµ -50%)",
+            itemName = "ì•„ì´ìŠ¤ ì ¤ë¦¬",
+            description = "10% í™•ë¥ ë¡œ ì  ì£¼ìœ„ ì–¼ìŒ í­ë°œ ë°œìƒ (ë²”ìœ„ 1.5m, í”¼í•´ 2)",
             type = ItemData.ItemType.IcedJelly,
             value = 2f
         });
 
         itemPool.Add(new ItemData
         {
-            itemName = "½Ã·´ Åä³×ÀÌµµ",
-            description = "¸ÅÃÊ 4 µ¥¹ÌÁö¸¦ ÁÖ´Â ¹İ°æ 2mÀÇ Áö¼Ó ½Ã·´ »ı¼º",
+            itemName = "ì‹œëŸ½ í† ë„¤ì´ë„",
+            description = "ê³µê²© 4íšŒë§ˆë‹¤ ì‹œëŸ½ íšŒì˜¤ë¦¬ ì†Œí™˜ (ë²”ìœ„ 2m)",
             type = ItemData.ItemType.SyrupTornado,
             value = 4f
         });
 
         itemPool.Add(new ItemData
         {
-            itemName = "Çã´Ï ½ºÇÉ",
-            description = "È¸ÀüÇÏ´Â ²Ü 2°³ »ı¼º (°³´ç µ¥¹ÌÁö 5), Å¸°İ ½Ã 1ÃÊ°£ ÀÌµ¿¼Óµµ -30%",
+            itemName = "í—ˆë‹ˆ ìŠ¤í•€",
+            description = "íšŒì „ ê³µê²© 2íšŒ ì¶”ê°€ (í”¼í•´ 5), íƒ€ê²© í›„ 1ì´ˆê°„ ì´ë™ì†ë„ -30%",
             type = ItemData.ItemType.HoneySpin,
             value = 5f
         });
 
         itemPool.Add(new ItemData
         {
-            itemName = "¼³ÅÁ ÆøÁ×",
-            description = "25% È®·ü·Î ¹İ°æ 1m Æø¹ßÀ» ÀÏÀ¸Å°´Â ÆøÁ× Ãß°¡ ¹ß»ç (µ¥¹ÌÁö 12)",
+            itemName = "ì„¤íƒ• ì£½",
+            description = "25% í™•ë¥ ë¡œ ê³µê²© ì‹œ 1m ë²”ìœ„ ìŠ¬ë¡œìš° ì›¨ì´ë¸Œ ìƒì„± (ì§€ì† 12ì´ˆ)",
             type = ItemData.ItemType.SugarPorridge,
             value = 12f
         });
     }
 
-
+    /// <summary>
+    /// ì•„ì´í…œ ì„ íƒì°½ ì—´ê¸°
+    /// </summary>
     public void Open()
     {
         if (isOpen) return;
         isOpen = true;
 
-        // ½Ã°£ ÀÏ½ÃÁ¤Áö (°ÔÀÓ ·ÎÁ÷ ¸ØÃã)
+        // ê²Œì„ ì¼ì‹œì •ì§€
         Time.timeScale = 0f;
 
-        // ·£´ı ¶Ç´Â ¼ø¼­´ë·Î ¾ÆÀÌÅÛ 3°³ ¼±ÅÃ
+        // ëœë¤ìœ¼ë¡œ 3ê°œ ì•„ì´í…œ ì„ íƒ
         currentChoices.Clear();
         int choices = Mathf.Min(itemButtons.Length, itemPool.Count);
         List<int> used = new List<int>();
         System.Random r = new System.Random();
+
         for (int i = 0; i < choices; i++)
         {
             int idx;
@@ -160,14 +166,16 @@ public class ItemSelectionUI : MonoBehaviour
             currentChoices.Add(itemPool[idx]);
         }
 
-        // UI¿¡ ¹İ¿µ
+        // UI ê°±ì‹ 
         for (int i = 0; i < itemButtons.Length; i++)
         {
             if (i < currentChoices.Count)
             {
                 itemButtons[i].gameObject.SetActive(true);
-                if (itemIcons != null && i < itemIcons.Length) itemIcons[i].sprite = currentChoices[i].icon;
-                if (itemLabels != null && i < itemLabels.Length) itemLabels[i].text = currentChoices[i].itemName;
+                if (itemIcons != null && i < itemIcons.Length)
+                    itemIcons[i].sprite = currentChoices[i].icon;
+                if (itemLabels != null && i < itemLabels.Length)
+                    itemLabels[i].text = currentChoices[i].itemName;
             }
             else
             {
@@ -178,6 +186,9 @@ public class ItemSelectionUI : MonoBehaviour
         if (panelRoot != null) panelRoot.SetActive(true);
     }
 
+    /// <summary>
+    /// ì•„ì´í…œ ì„ íƒì°½ ë‹«ê¸°
+    /// </summary>
     public void Close()
     {
         if (!isOpen) return;
@@ -185,22 +196,25 @@ public class ItemSelectionUI : MonoBehaviour
 
         if (panelRoot != null) panelRoot.SetActive(false);
 
-        // °ÔÀÓ Àç°³
+        // ê²Œì„ ì¬ê°œ
         Time.timeScale = 1f;
     }
 
+    /// <summary>
+    /// ì•„ì´í…œ ì„ íƒ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ
+    /// </summary>
     void OnClickItem(int buttonIndex)
     {
         if (!isOpen) return;
         if (buttonIndex < 0 || buttonIndex >= currentChoices.Count) return;
 
         ItemData chosen = currentChoices[buttonIndex];
-        Debug.Log($"¼±ÅÃÇÑ ¾ÆÀÌÅÛ: {chosen.itemName}");
+        Debug.Log($"ì„ íƒëœ ì•„ì´í…œ: {chosen.itemName}");
 
-        // È¿°ú Àû¿ë (SkillManager È£Ãâ)
+        // ì„ íƒëœ ì•„ì´í…œ íš¨ê³¼ ì ìš©
         SkillManager.Instance.Apply(chosen);
 
-        // ´İ±â ¹× Àç°³
+        // ì°½ ë‹«ê¸° ë° ì‹œê°„ ì¬ê°œ
         Close();
     }
 }

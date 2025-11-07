@@ -11,7 +11,7 @@ public class SkillManager : MonoBehaviour
     }
 
     // 예시: 플레이어 참조 (Inspector에 연결)
-    public Player player; // 네 프로젝트의 플레이어 스크립트 타입에 맞게 변경
+    public Player player; // 네 프로젝트의 Player 스크립트 타입에 맞게 연결
 
     public void Apply(ItemData item)
     {
@@ -20,122 +20,117 @@ public class SkillManager : MonoBehaviour
         switch (item.type)
         {
             case ItemData.ItemType.CaramelCube:
-                ApplyHeal(item.value);
+                ApplySpeedBuff(item.value, 5f); // 이동속도 증가
                 break;
             case ItemData.ItemType.SugarShield:
-                ApplyShield(item.value, 10f);
+                ApplyShield(item.value, 20f); // 자동 쉴드 생성
                 break;
             case ItemData.ItemType.StrawberryPopCore:
-                ApplyAttackBuff(item.value, 10f);
+                ApplyExtraProjectile(item.value); // 추가 투사체
                 break;
             case ItemData.ItemType.RollingChocolateBar:
-                ApplySpeedBuff(item.value, 10f);
+                ApplyRollingBar(item.value, 5f); // 굴러가는 초코바 소환
                 break;
             case ItemData.ItemType.CocoaPowder:
-                ApplyBomb(item.value);
+                ApplyAreaAttack(item.value); // 공격 범위 확장
                 break;
             case ItemData.ItemType.SnowflakeCandy:
-                ApplyFreeze(item.value, 5f);
+                ApplyFreeze(item.value, 1f); // 빙결 공격
                 break;
             case ItemData.ItemType.PoppingCandy:
-                ApplySplashDamage(item.value);
+                ApplySplashDamage(item.value); // 폭발형 사탕 조각
                 break;
             case ItemData.ItemType.DarkChip:
-                ApplyDarkMode(item.value, 8f);
+                ApplyAttackBuff(item.value, 8f); // 공격력 상승
                 break;
             case ItemData.ItemType.IcedJelly:
-                ApplySlowEnemies(item.value, 5f);
+                ApplyColdSpread(item.value, 3f); // 냉기 확산
                 break;
             case ItemData.ItemType.SyrupTornado:
-                ApplySpinAttack(item.value, 6f);
+                ApplySyrupTornado(item.value); // 시럽 회오리 생성
                 break;
             case ItemData.ItemType.HoneySpin:
-                ApplyStickyEffect(item.value, 7f);
+                ApplyHoneySpin(item.value); // 회전 꿀 공격
                 break;
             case ItemData.ItemType.SugarPorridge:
-                ApplyExplosion(item.value);
+                ApplySugarWave(item.value); // 슬로우 웨이브 생성
                 break;
         }
     }
 
     // ──────────────────────────────
-    // 아래는 각각의 아이템 효과 예시 함수들
-    // (원하는 효과에 맞게 구현 변경 가능)
+    // 아이템별 효과 함수
     // ──────────────────────────────
 
-    void ApplyHeal(float amount)
+    void ApplySpeedBuff(float power, float duration)
     {
-        Debug.Log($"🍬 카라멜큐브: 체력 {amount} 회복!");
-        // 기본 공격 속도 +100%, 5초간 유지, 재사용 대기 15초
+        Debug.Log($"🏃‍♂️ 카라멜 큐브: 이동속도 +100% (지속 {duration}초)");
+        // 5초간 이동속도 +100%, 쿨타임 15초
     }
 
-    void ApplyShield(float shieldValue, float duration)
+    void ApplyShield(float shieldPower, float cooldown)
     {
-        Debug.Log($"🛡️ 슈가실드: {duration}초간 보호막 생성 (강도 {shieldValue})");
-        // 자동 방어막 생성 (20초마다 1회, 최대 1회 저장)
+        Debug.Log($"🛡️ 설탕 방패: 자동 방어막 생성 (쿨타임 {cooldown}초, 최대 1회)");
+        // 20초마다 자동 방어막 생성, 최대 1회 중첩
     }
 
-    void ApplyAttackBuff(float multiplier, float duration)
+    void ApplyExtraProjectile(float multiplier)
     {
-        Debug.Log($"🍓 딸기팝코어: 공격력 {multiplier}배 (지속 {duration}초)");
-        // 기본 공격 시 30% 확률로 사방으로 탄 추가 발사
+        Debug.Log($"🍓 딸기팝 코어: 추가 투사체 발사 (공격력 {multiplier * 100 - 100}% 증가)");
+        // 기본 공격 시 30% 확률로 추가 투사체 발사
     }
 
-    void ApplySpeedBuff(float multiplier, float duration)
+    void ApplyRollingBar(float damage, float interval)
     {
-        Debug.Log($"🍫 롤링초코바: 이동속도 {multiplier}배 (지속 {duration}초)");
-        // 5초마다 긴 초코바가 플레이어를 중심으로 반지름 2m의 원형태를 한번 그린 후 사라짐 (데미지 15, 작은 넉백 있음)
+        Debug.Log($"🍫 굴러가는 초코바: {interval}초마다 소환 (데미지 {damage})");
+        // 5초마다 초코바 생성, 반경 2m 내 적 타격
     }
 
-    void ApplyBomb(float damage)
+    void ApplyAreaAttack(float radius)
     {
-        Debug.Log($"💥 코코아파우더: 폭발 데미지 {damage}");
-        // 기본 공격 색깔이 갈색으로 바뀌고 넉백 추가 (작은 넉백 + 경직 0.2초)
+        Debug.Log($"☕ 코코아 가루: 공격 범위 +{radius * 0.2f}m 증가");
+        // 기본 공격이 범위 공격으로 변경, 반경 0.2m 증가
     }
 
-    void ApplyFreeze(float power, float duration)
+    void ApplyFreeze(float chance, float duration)
     {
-        Debug.Log($"❄️ 눈꽃사탕: 적 동결 ({duration}초)");
-        //기본공격 시 탄 테두리에 하늘빛이 나면서15 % 확률로 적을 1초간 빙결하는 탄 발사
+        Debug.Log($"❄️ 눈송이 사탕: {chance * 100}% 확률로 적을 {duration}초간 빙결");
+        // 기본 공격 시 15% 확률로 적 1초간 빙결
     }
 
     void ApplySplashDamage(float damage)
     {
-        Debug.Log($"🍭 팝핑캔디: 주변 범위 피해 {damage}");
-        //20% 확률로 기본 공격이 맞은 후 8개의 별사탕조각이 반지름 2m의 원 형태로 퍼짐(개당데미지 2)
-
+        Debug.Log($"🍭 팝핑 캔디: 폭발형 사탕 조각 (데미지 {damage}, 반경 2m)");
+        // 20% 확률로 공격 시 8방향 사탕 조각 생성 (각 2데미지)
     }
 
-    void ApplyDarkMode(float power, float duration)
+    void ApplyAttackBuff(float multiplier, float duration)
     {
-        Debug.Log($"🌑 다크칩: 어둠 강화모드 (지속 {duration}초)");
-        //공격력 +30%
+        Debug.Log($"🌑 다크칩: 공격력 +{(multiplier - 1f) * 100}% (지속 {duration}초)");
+        // 공격력 +30%
     }
 
-    void ApplySlowEnemies(float slowPower, float duration)
+    void ApplyColdSpread(float damage, float duration)
     {
-        Debug.Log($"🧊 아이스젤리: 적 속도 {slowPower} 감소 ({duration}초)");
-        //10% 확률로 주변 적에게 냉기를 확산 시키는 탄 발사 (범위 반지름 1.5m 원, 초당데미지 2,3초 유지 후 사라짐, 냉기 속에 있을때 속도 - 50 %)
+        Debug.Log($"🧊 아이스젤리: 냉기 확산 (반경 1.5m, 초당 피해 {damage}, {duration}초 지속)");
+        // 10% 확률로 냉기 폭발 발생, 냉기 속도 -50%
     }
 
-    void ApplySpinAttack(float damage, float duration)
+    void ApplySyrupTornado(float damage)
     {
-        Debug.Log($"🍯 시럽토네이도: 회전 공격 ({duration}초, 데미지 {damage})");
-        //주변 적에게 매 초마다 4 데미지를 주는 반지름 2m의 원형태 상시유지되는 시럽이 생김.
-
+        Debug.Log($"🌪️ 시럽토네이도: 회전 시럽 생성 (반경 2m, 초당 피해 {damage})");
+        // 공격 4회마다 반경 2m 시럽 회오리 생성
     }
 
-    void ApplyStickyEffect(float slowPower, float duration)
+    void ApplyHoneySpin(float damage)
     {
-        Debug.Log($"🐝 허니스핀: 적 느려짐 ({duration}초, 효과 {slowPower})");
-        //몸을 중심으로 상시유지되는 회전하는 꿀이 2개 생김. (개당데미지 5) 적에게 타격 시 1초간 이동속도 -30 %
-
+        Debug.Log($"🐝 허니스핀: 회전 꿀 생성 (데미지 {damage}, 타격 시 1초간 이동속도 -30%)");
+        // 몸 주위에 회전 꿀 2개 생성, 타격 시 적 이동속도 감소
     }
 
-    void ApplyExplosion(float damage)
+    void ApplySugarWave(float damage)
     {
-        Debug.Log($"🎆 설탕폭죽: 대폭발 데미지 {damage}");
-        //일반 공격 시 25% 확률로 광역공격을 하는 폭죽을 추가 발사 
-        //(타격 부분에서 반지름 1m 크기의 원형 범위폭발, 데미지 12)
+        Debug.Log($"🎆 설탕 죽: 슬로우 웨이브 생성 (데미지 {damage}, 반경 1m)");
+        // 공격 시 25% 확률로 광역 폭발 (반경 1m, 데미지 12)
     }
 }

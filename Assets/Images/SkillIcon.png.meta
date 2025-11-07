@@ -198,9 +198,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 3306
-        y: 1756
+        y: 1727
         width: 541
-        height: 927
+        height: 956
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -252,27 +252,6 @@ TextureImporter:
       bones: []
       spriteID: 63650fb206f46544db7da433beb0407a
       internalID: -1805200940
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SkillIcon_28
-      rect:
-        serializedVersion: 2
-        x: 3616
-        y: 1728
-        width: 30
-        height: 27
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 07d7376141c0d8047bf93c89afaf734d
-      internalID: -543684099
       vertices: []
       indices: 
       edges: []

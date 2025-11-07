@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public Vector2 inputVec; // ÇöÀç ÀÔ·Â ¹æÇâ
-    public float speed = 5f; // ÀÌµ¿ ¼Óµµ
+    // ë‚˜ ì´ì„±ë•ì€ ë°”ë³´ë‹¤ - ì„±ë•
+    public Vector2 inputVec; // ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ ï¿½ï¿½ï¿½ï¿½
+    public float speed = 5f; // ï¿½Ìµï¿½ ï¿½Óµï¿½
 
     private Rigidbody2D rigid;
     SpriteRenderer spr;
