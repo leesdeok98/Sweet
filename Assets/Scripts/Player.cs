@@ -36,4 +36,9 @@ public class Player : MonoBehaviour
         if (inputVec.x != 0)
             spr.flipX = (inputVec.x < 0);
     }
+
+    public void TakeDamage(float damage)
+    {
+        Debug.Log("플레이어가 " + damage + " 만큼 데미지를 입음");
+    }
 }

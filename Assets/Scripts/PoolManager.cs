@@ -40,4 +40,24 @@ public class PoolManager : MonoBehaviour
 
         return select;
     }
+
+    public void ClearAllEnemies()
+    {
+        Debug.Log("호출되엇다^^");
+        foreach (List<GameObject> pool in pools)
+        {
+            foreach (GameObject item in pool)
+            {
+                if (item.activeSelf)
+                {
+                    Debug.Log($"활성화된 몬스터: {item.name}, 태그: {item.tag}");
+                }
+
+                if (item.activeSelf && !item.CompareTag("Boss"))
+                {
+                    item.SetActive(false);
+                }
+            }
+        }
+    }
 }
