@@ -2,12 +2,14 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    // 나 이성덕은 바보다 - 성덕
-    public Vector2 inputVec; // ���� �Է� ����
-    public float speed = 5f; // �̵� �ӵ�
+    public Vector2 inputVec;
+    public float speed = 5f;
 
     private Rigidbody2D rigid;
-    SpriteRenderer spr;
+    private SpriteRenderer spr;
+
+    // 스킬 보유 상태
+    public bool hasIcedJellySkill = false;
 
     void Awake()
     {
@@ -15,13 +17,6 @@ public class Player : MonoBehaviour
         spr = GetComponent<SpriteRenderer>();
     }
 
-    private void LateUpdate()
-    {
-        if (inputVec.x != 0)
-        {
-            spr.flipX = (inputVec.x < 0);
-        }
-    }
     void Update()
     {
         inputVec.x = Input.GetAxisRaw("Horizontal");
@@ -32,5 +27,11 @@ public class Player : MonoBehaviour
     {
         Vector2 nextVec = inputVec.normalized * speed * Time.fixedDeltaTime;
         rigid.MovePosition(rigid.position + nextVec);
+    }
+
+    void LateUpdate()
+    {
+        if (inputVec.x != 0)
+            spr.flipX = (inputVec.x < 0);
     }
 }

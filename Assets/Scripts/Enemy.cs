@@ -1,30 +1,59 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public float speed;
+    [Header("Stats")]
+    public float speed = 5f;
     public float health;
     public float maxHealth;
+
+    [Header("Animation")]
     public RuntimeAnimatorController[] animCon;
-    public Rigidbody2D target;    
+
+    [Header("Target")]
+    public Rigidbody2D target;
+
     bool isLive;
 
     Rigidbody2D rb;
     Animator anim;
     SpriteRenderer spriter;
 
+    [HideInInspector] public bool isSlowed = false;
+    float originalSpeed;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriter = GetComponent<SpriteRenderer>();
+
+        // Inspector에서 설정한 speed를 originalSpeed로 저장
+        originalSpeed = speed;
+    }
+
+    void Start()
+    {
+        // GameManager와 Player가 준비될 때까지 기다리고 target 설정
+        if (GameManager.instance != null && GameManager.instance.player != null)
+        {
+            target = GameManager.instance.player.GetComponent<Rigidbody2D>();
+        }
+        else
+        {
+            Debug.LogError("GameManager or Player not ready! Enemy target not set.");
+        }
+
+        isLive = true;
+        health = maxHealth;
+        speed = originalSpeed;
+        isSlowed = false;
     }
 
     void FixedUpdate()
     {
-        if (!isLive) return;
+        if (!isLive || target == null) return;
 
         Vector2 dir = target.position - rb.position;
         Vector2 nextVec = dir.normalized * speed * Time.fixedDeltaTime;
@@ -34,25 +63,25 @@ public class Enemy : MonoBehaviour
 
     void LateUpdate()
     {
-        if (!isLive) return;
+        if (!isLive || target == null) return;
         spriter.flipX = target.position.x < rb.position.x;
-    }
-
-    void OnEnable()
-    {
-        target = GameManager.instance.player.GetComponent<Rigidbody2D>();
-        isLive = true;
-        health = maxHealth;
     }
 
     public void Init(SpawnData data)
     {
-        speed = data.speed;
-        maxHealth = data.health;
-        health = data.health;
+        if (data != null)
+        {
+            if (data.speed != 0f)
+            {
+                speed = data.speed;
+                originalSpeed = data.speed;
+            }
+
+            maxHealth = data.health != 0f ? data.health : maxHealth;
+            health = maxHealth;
+        }
     }
 
-    // ✅ Bullet.cs에서 호출되는 피격 처리 함수
     public void TakeDamage(float damage)
     {
         if (!isLive) return;
@@ -61,20 +90,15 @@ public class Enemy : MonoBehaviour
         Debug.Log($"Enemy hit! HP: {health}");
 
         if (health <= 0)
-        {
             Die();
-        }
     }
 
     void Die()
     {
         isLive = false;
         rb.velocity = Vector2.zero;
-
         if (anim != null)
             anim.SetTrigger("Dead");
-
-        // ✅ Destroy 대신 비활성화
         StartCoroutine(DeactivateAfterDelay(1f));
     }
 
@@ -82,5 +106,21 @@ public class Enemy : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         gameObject.SetActive(false);
+    }
+
+    public void ApplySlow(float slowAmount, float duration)
+    {
+        if (isSlowed) return;
+
+        isSlowed = true;
+        speed = originalSpeed * slowAmount;
+        StartCoroutine(RemoveSlowAfterDelay(duration));
+    }
+
+    IEnumerator RemoveSlowAfterDelay(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        speed = originalSpeed;
+        isSlowed = false;
     }
 }
