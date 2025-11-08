@@ -857,7 +857,7 @@ SpriteRenderer:
   m_Size: {x: 15.58, y: 14.1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &214333331
@@ -3240,8 +3240,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.0056332946}
-  m_Size: {x: 1, y: 1.0112666}
+  m_Offset: {x: 0, y: -0.026694655}
+  m_Size: {x: 0.6332059, y: 1.4936986}
   m_Direction: 0
 --- !u!50 &751445000
 Rigidbody2D:
@@ -3284,7 +3284,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputVec: {x: 0, y: 0}
   speed: 5
-  hasIcedJellySkill: 1
+  hasIcedJellySkill: 0
+  hasSugarShield: 0
+  hasDarkChip: 1
 --- !u!114 &751445002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5471,6 +5473,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 751445001}
+  darkChipEffectPrefab: {fileID: 4438335915085443169, guid: c211c8d5865897341a2e163dda394da2, type: 3}
 --- !u!114 &1648878447
 MonoBehaviour:
   m_ObjectHideFlags: 0

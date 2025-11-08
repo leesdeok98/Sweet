@@ -10,6 +10,8 @@ public class Player : MonoBehaviour
 
     // 스킬 보유 상태
     public bool hasIcedJellySkill = false;
+    public bool hasSugarShield = false;
+    public bool hasDarkChip = false;
 
     void Awake()
     {
