@@ -20,22 +20,21 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.CompareTag("Enemy")) return;
+        // Enemy 또는 Boss 태그만 통과
+        if (!collision.CompareTag("Enemy") && !collision.CompareTag("Boss")) return;
 
         Enemy hitEnemy = collision.GetComponent<Enemy>();
         if (hitEnemy != null)
         {
-            // 🔹 최종 데미지 계산 (모든 탄환이 multiplier 반영)
             int finalDamage = Mathf.RoundToInt(baseDamage * damageMultiplier);
             hitEnemy.TakeDamage(finalDamage);
 
-            // 아이스젤리 스킬 체크
+            // 아이스젤리 스킬
             if (SkillManager.Instance != null && SkillManager.Instance.player != null)
             {
                 if (SkillManager.Instance.player.hasIcedJellySkill && icedJellyPrefab != null)
                 {
-                    float roll = Random.value;
-                    if (roll <= icedJellyChance)
+                    if (Random.value <= icedJellyChance)
                         Instantiate(icedJellyPrefab, hitEnemy.transform.position, Quaternion.identity);
                 }
             }
@@ -43,4 +42,5 @@ public class Bullet : MonoBehaviour
 
         Destroy(gameObject);
     }
+
 }

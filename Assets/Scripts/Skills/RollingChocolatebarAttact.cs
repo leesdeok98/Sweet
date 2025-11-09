@@ -1,73 +1,66 @@
+using System.Collections;
 using UnityEngine;
 
-// 플레이어에 부착
-public class RollingChocolateBarSkill : MonoBehaviour
+public class RollingChocolateBarAttack : MonoBehaviour
 {
-    // 롤링 초코바 공격 프리팹 (Inspector에서 연결)
-    [Header("Skill Settings")]
-    public GameObject rollingChocolateBarPrefab;
-    public float cooldown = 5f; // 쿨타임 5초
-    public float skillDuration = 20f; // 롤링 초코바 애니메이션이 재생되는 시간 (필요에 따라 조절) // 아니 이거 원래 1f 였거든 근데 중간에 재생 되다가 끊기길래 20f까지 늘렸는데도 안됨
+    private int damage = 15;
+    private float knockbackForce = 2f;
 
-    private float timer; // 쿨타임 타이머
-    private Player player; // Player 컴포넌트 참조
+    Transform center;   // 플레이어
+    float duration;     // 한 바퀴 시간(초)
+    float startAngle;   // 시작 각도(옵션)
+    int laps;           // 몇 바퀴 도는지(기본 1)
 
-    void Awake()
+    public void InitializeAttack(int dmg, float kbForce)
     {
-        player = GetComponent<Player>();
-        timer = cooldown; // 게임 시작 시 바로 실행되도록 초기화
+        damage = dmg;
+        knockbackForce = kbForce;
     }
 
-    void Update()
+    // ★ 시계침 모드: 막대 피벗이 "한쪽 끝"에 있어야 함 (Sprite Editor에서 설정)
+    public void BeginOrbit(Transform center, float duration, float startAngleDeg = 0f, int laps = 1)
     {
-        // Player 스크립트의 bool 변수가 true일 때만 스킬 실행 로직 작동
-        if (player != null && player.hasRollingChocolateBar)
-        {
-            timer += Time.deltaTime;
+        this.center = center;
+        this.duration = Mathf.Max(0.01f, duration);
+        this.startAngle = startAngleDeg;
+        this.laps = Mathf.Max(1, laps);
 
-            if (timer >= cooldown)
-            {
-                ActivateSkill();
-                timer = 0f; // 타이머 리셋
-            }
-        }
+        // 플레이어에 붙여서 정확히 중심 고정
+        transform.SetParent(center);
+        transform.localPosition = Vector3.zero;               // 피벗(막대 한쪽 끝)이 플레이어 위치
+        transform.localRotation = Quaternion.Euler(0, 0, startAngle);
+
+        StartCoroutine(ClockHandRoutine());
     }
 
-    void ActivateSkill()
+    IEnumerator ClockHandRoutine()
     {
-        if (rollingChocolateBarPrefab == null)
+        float elapsed = 0f;
+        float totalAngle = 360f * laps;
+
+        while (elapsed < duration && center != null)
         {
-            Debug.LogError("RollingChocolateBar Prefab is not assigned in the inspector!");
-            return;
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            float angle = startAngle - Mathf.Lerp(0f, totalAngle, t);
+
+            // ★ 시계침: 반지름 방향으로 그대로 두기 (접선 +90도 회전 금지)
+            transform.localRotation = Quaternion.Euler(0f, 0f, angle);
+            yield return null;
         }
 
-        // 1. 플레이어 위치에 프리팹 생성
-        // 생성된 프리팹의 애니메이션이 원형태를 그리고 사라지는 역할을 담당합니다.
-        GameObject skillInstance = Instantiate(rollingChocolateBarPrefab, transform.position, Quaternion.identity);
+        Destroy(gameObject);
+    }
 
-
-        // 2. 공격 스크립트에 정보 전달 및 초기화
-        RollingChocolateBarAttack attackScript = skillInstance.GetComponent<RollingChocolateBarAttack>();
-        if (attackScript != null)
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (!collision.CompareTag("Enemy")) return;
+        var hitEnemy = collision.GetComponent<Enemy>();
+        if (hitEnemy != null)
         {
-            // 스케일 1,1,1로 설정 (크기는 프리팹 자체에서 조절)
-            //skillInstance.transform.localScale = Vector3.one;
-
-            // Player를 부모로 설정하여 Player를 따라다니도록 설정 (선택 사항, 애니메이션에 따라 필요 없을 수 있음)
-            skillInstance.transform.SetParent(transform);
-
-            // 데미지 및 넉백 설정 초기화
-            attackScript.InitializeAttack(15, 5f); // 15 데미지, 넉백 힘 5f (조절 가능)
+            hitEnemy.TakeDamage(damage);
+            Vector2 dir = (hitEnemy.transform.position - transform.position).normalized;
+            hitEnemy.ApplyKnockback(dir, knockbackForce);
         }
-        else
-        {
-            Debug.LogError("RollingChocolateBarPrefab is missing the RollingChocolateBarAttack script!");
-        }
-
-        // 3. 스킬 지속 시간 후 프리팹 파괴 로직 추가
-        Destroy(skillInstance, skillDuration); // skillDuration 시간 후에 생성된 오브젝트를 파괴합니다.
-
-        Debug.Log("Rolling Chocolate Bar Activated!");
     }
 }
-

@@ -26,6 +26,7 @@ public class IcedJellySkill : MonoBehaviour
                 {
                     enemy.TakeDamage(tickDamage);
                     enemy.ApplySlow(slowAmount, duration - elapsed);
+                    Debug.Log($"[IcedJelly] slow call: remain={(duration - elapsed):0.00}");
                 }
             }
 
@@ -39,6 +40,6 @@ public class IcedJellySkill : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, 1.5f);
+        Gizmos.DrawWireSphere(transform.position, 2.5f);
     }
 }

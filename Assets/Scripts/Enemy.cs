@@ -14,7 +14,7 @@ public class Enemy : MonoBehaviour
     public RuntimeAnimatorController[] animCon;
     public Rigidbody2D target;    // 추적할 대상 (Player)
 
-    bool isLive;    // 생존 여부
+    bool isLive;                  // 생존 여부
 
     Rigidbody2D rb;
     Animator anim;
@@ -24,8 +24,12 @@ public class Enemy : MonoBehaviour
     public bool isSlowed = false;
     float originalSpeed;
 
-    [Header("Knockback")] // 넉백 효과 
-    public float knockbackDuration = 0.1f; // 넉백 지속 시간
+    [Header("Knockback")] // 넉백 효과
+    public float knockbackDuration = 0.1f; // 넉백 유지 시간(필요시 사용)
+
+    // 슬로우 해제 코루틴 핸들
+    private Coroutine removeSlowRoutine;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -57,12 +61,13 @@ public class Enemy : MonoBehaviour
     {
         if (!isLive || target == null) return;
 
-        // 플레이어 방향 벡터 구하기
+        // 기본 추적 이동
         Vector2 dir = target.position - rb.position;
         Vector2 nextVec = dir.normalized * speed * Time.fixedDeltaTime;
-        // 이동
+
         rb.MovePosition(rb.position + nextVec);
-        // 물리 회전 방지
+
+        // 프로젝트 구조상 유지
         rb.velocity = Vector2.zero;
     }
 
@@ -75,33 +80,32 @@ public class Enemy : MonoBehaviour
 
     void OnEnable()
     {
-        target = GameManager.instance.player.GetComponent<Rigidbody2D>();
+        if (GameManager.instance != null && GameManager.instance.player != null)
+            target = GameManager.instance.player.GetComponent<Rigidbody2D>();
+
         isLive = true;
         health = maxHealth;
+
+        // 슬로우 상태 초기화 안전장치
+        if (removeSlowRoutine != null)
+        {
+            StopCoroutine(removeSlowRoutine);
+            removeSlowRoutine = null;
+        }
+        speed = originalSpeed;
+        isSlowed = false;
     }
 
     public void Init(SpawnData data)
     {
-
-        //if (data == null)
-        //{
-        //    if (data.speed != 0f)
-        //    {
-        //        speed = data.speed;
-        //        originalSpeed = data.speed;
-        //    }
-
-        //    maxHealth = data.health != 0f ? data.health : maxHealth;
-        //    health = maxHealth;
-        //}
-
-        //        anim.runtimeAnimatorController = animCon[data.spriteType];
-        speed = data.speed; 
+        speed = data.speed;
         originalSpeed = data.speed;
         maxHealth = data.health;
         health = data.health;
         dps = data.dps;
 
+        // 필요 시 애니메이션 타입 적용
+        // anim.runtimeAnimatorController = animCon[data.spriteType];
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -117,7 +121,6 @@ public class Enemy : MonoBehaviour
         if (!isLive) return;
 
         health -= damage;
-        Debug.Log($"Enemy hit! HP: {health}");
 
         if (health <= 0f)
             Die();
@@ -138,24 +141,45 @@ public class Enemy : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    // 🔧 슬로우: 갱신 가능(중복 호출 시 지속시간 리셋)
     public void ApplySlow(float slowAmount, float duration)
     {
-        if (isSlowed) return;
+        // 안전 클램프
+        slowAmount = Mathf.Clamp01(slowAmount);
+        duration = Mathf.Max(0.01f, duration);
 
-        isSlowed = true;
+        // ✅ 디버그에서 쓰는 이전 속도 기록 (오류 원인 해결)
+        float prevSpeed = speed;
+
+        // 즉시 속도 반영
         speed = originalSpeed * slowAmount;
-        StartCoroutine(RemoveSlowAfterDelay(duration));
+        isSlowed = true;
+
+        // 기존 해제 타이머가 있으면 끊고 새로 시작 (지속시간 갱신)
+        if (removeSlowRoutine != null)
+            StopCoroutine(removeSlowRoutine);
+
+        removeSlowRoutine = StartCoroutine(RemoveSlowAfterDelay(duration));
+
+        // 디버그 로그 (원하면 주석 처리해도 됨)
+        Debug.Log($"[Enemy] ApplySlow: amount={slowAmount:0.00}, dur={duration:0.00}, speed {prevSpeed:0.00} -> {speed:0.00}");
     }
 
     IEnumerator RemoveSlowAfterDelay(float duration)
     {
         yield return new WaitForSeconds(duration);
+
         speed = originalSpeed;
         isSlowed = false;
+        removeSlowRoutine = null;
+
+        // 디버그 로그 (원하면 주석 처리)
+        Debug.Log("[Enemy] Slow cleared -> speed restored to original");
     }
 
+    // 넉백
     public void ApplyKnockback(Vector2 direction, float force)
     {
-        rb.AddForce(direction * force, ForceMode2D.Impulse);
+        rb.AddForce(direction.normalized * force, ForceMode2D.Impulse);
     }
 }

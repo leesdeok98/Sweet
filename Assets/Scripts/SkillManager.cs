@@ -37,6 +37,9 @@ public class SkillManager : MonoBehaviour
             case ItemData.ItemType.DarkChip:
                 ApplyDarkChip(0.3f); // 30% 증가
                 break;
+            case ItemData.ItemType.RollingChocolateBar:
+                ApplyRollingChocolateBar();
+                break;
         }
     }
 

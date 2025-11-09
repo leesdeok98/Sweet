@@ -845,6 +845,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputVec: {x: 0, y: 0}
   speed: 5
+  hasIcedJellySkill: 0
+  hasSugarShield: 0
+  hasDarkChip: 0
+  hasRollingChocolateBar: 0
 --- !u!70 &686696039
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

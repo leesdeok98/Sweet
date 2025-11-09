@@ -1,73 +1,109 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
+// using Unity.VisualScripting.Antlr3.Runtime; // âŒ ë¶ˆí•„ìš”í•˜ë©´ ì œê±°
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
-using UnityEngine.SceneManagement; //ÀÌ°É ½á¾ß ¾À º¯°æ °¡´É
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Setting : MonoBehaviour
 {
+    [Header("Panels")]
+    [SerializeField] private GameObject pausePanel;        // ì¼ì‹œì •ì§€/ì„¤ì •
+    [SerializeField] private GameObject quitPanel;         // ì¢…ë£Œ í™•ì¸
+    [SerializeField] private GameObject mapSelectionPanel; // ë§µ ì„ íƒ
 
-    [SerializeField] private GameObject pausePanel; //¼³Á¤Ã¢
-    [SerializeField] private GameObject quitPanel; //°ÔÀÓÁ¾·á
-    [SerializeField] private GameObject mapSelectionPanel; // ¸Ê¼±ÅÃ
-    // Start is called before the first frame update
     void Start()
     {
-        pausePanel.SetActive(false); //Ã³À½¿¡ ¼³Á¤Ã¢ ¾Èº¸ÀÌ°Ô ÇØÁÜ
-        quitPanel.SetActive(false);
-        mapSelectionPanel.SetActive(false);
+        // ì²˜ìŒì—ëŠ” ëª¨ë‘ ë¹„í™œì„±í™”
+        if (pausePanel) pausePanel.SetActive(false);
+        if (quitPanel) quitPanel.SetActive(false);
+        if (mapSelectionPanel) mapSelectionPanel.SetActive(false);
+
+        // í˜¹ì‹œ íƒ€ì„ìŠ¤ì¼€ì¼ì´ ë©ˆì¶°ìˆì„ ìˆ˜ ìˆìœ¼ë‹ˆ ë³µêµ¬
+        Time.timeScale = 1f;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        // ESC ì²˜ë¦¬: ê°€ì¥ ìœ„(í™œì„±) íŒ¨ë„ì„ ìš°ì„ ì ìœ¼ë¡œ ë‹«ê¸°
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // 1) ë§µ ì„ íƒì´ ì—´ë ¤ ìˆìœ¼ë©´ ê·¸ê±°ë¶€í„° ë‹«ê¸°
+            if (mapSelectionPanel != null && mapSelectionPanel.activeSelf)
+            {
+                mapSelectionPanel.SetActive(false);
+                return;
+            }
 
+            // 2) ì¢…ë£Œ íŒ¨ë„ì´ ì—´ë ¤ ìˆìœ¼ë©´ ë‹«ê¸°
+            if (quitPanel != null && quitPanel.activeSelf)
+            {
+                CloseQuit();
+                return;
+            }
+
+            // 3) ì¼ì‹œì •ì§€/ì„¤ì • íŒ¨ë„ í† ê¸€
+            if (pausePanel != null && pausePanel.activeSelf)
+            {
+                CloseSetting();
+            }
+            else
+            {
+                SettingOpen();
+            }
+        }
     }
+
+    // === ì”¬ ì „í™˜ ===
     public void LoadNextScene()
     {
+        // ê²Œì„ ì¬ê°œ ìƒíƒœë¡œ ì „í™˜ í›„ ì”¬ ë¡œë“œ
+        Time.timeScale = 1f;
         SceneManager.LoadScene("Stage1");
     }
 
-    public void SettingLode() 
+    // === ì„¤ì •(ì¼ì‹œì •ì§€) ì—´ê¸°/ë‹«ê¸° ===
+    public void SettingOpen()
     {
-        pausePanel.SetActive(true);
+        if (pausePanel) pausePanel.SetActive(true);
+        Time.timeScale = 0f; // ê²Œì„ ì¼ì‹œì •ì§€
     }
 
     public void CloseSetting()
     {
-        pausePanel.SetActive(false); // ¼³Á¤ ÆĞ³Î ²ô±â
-        mapSelectionPanel.SetActive(false);
+        if (pausePanel) pausePanel.SetActive(false);
+        if (mapSelectionPanel) mapSelectionPanel.SetActive(false);
+        Time.timeScale = 1f; // ê²Œì„ ì¬ê°œ
     }
 
-    public void QuitGame()
-    {
-        Debug.Log("°ÔÀÓ Á¾·á ¹öÆ° Å¬¸¯µÊ!");
-
-#if UNITY_EDITOR
-        // À¯´ÏÆ¼ ¿¡µğÅÍ¿¡¼­ Play ¸ğµå Á¾·á
-        EditorApplication.isPlaying = false;
-#else
-        // ºôµåµÈ °ÔÀÓ¿¡¼­ Á¾·á
-        Application.Quit();
-#endif
-    }
-
+    // === ì¢…ë£Œ ===
     public void Quit()
     {
-        quitPanel.SetActive(true);
+        if (quitPanel) quitPanel.SetActive(true);
     }
 
     public void CloseQuit()
     {
-        quitPanel.SetActive(false); // ¼³Á¤ ÆĞ³Î ²ô±â
+        if (quitPanel) quitPanel.SetActive(false);
     }
+
+    public void QuitGame()
+    {
+        Debug.Log("ê²Œì„ ì¢…ë£Œ ë²„íŠ¼ í´ë¦­ë¨!");
+
+#if UNITY_EDITOR
+        EditorApplication.isPlaying = false; // ì—ë””í„°ì—ì„œ Play ì¢…ë£Œ
+#else
+        Application.Quit();                  // ë¹Œë“œì—ì„œ ì¢…ë£Œ
+#endif
+    }
+
+    // === ë§µ ì„ íƒ ===
     public void OnStartButtonClicked()
     {
-        // ¸Ê ¼±ÅÃ È­¸é ÆĞ³ÎÀ» È°¼ºÈ­
-        mapSelectionPanel.SetActive(true);
+        if (mapSelectionPanel) mapSelectionPanel.SetActive(true);
     }
 }
-
-
-

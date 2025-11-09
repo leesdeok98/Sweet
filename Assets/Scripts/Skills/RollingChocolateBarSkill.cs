@@ -1,40 +1,63 @@
 using UnityEngine;
 
-// 프리팹에 부착
-
-public class RollingChocolateBarAttack : MonoBehaviour
+// 플레이어에 부착
+public class RollingChocolateBarSkill : MonoBehaviour
 {
-    private int damage = 15;
-    private float knockbackForce = 2f;
+    [Header("Skill Settings")]
+    public GameObject rollingChocolateBarPrefab;
+    public float cooldown = 5f;
+    public float orbitDuration = 2f; // ★ 실제 한 바퀴 도는 시간(2초)
+    public float orbitRadius = 1.6f; // ★ 플레이어 기준 반지름(이미지 길이에 맞춰 조절)
 
-    // 스킬 프리팹 생성 시 초기 설정
-    public void InitializeAttack(int dmg, float kbForce)
+
+    private float timer;
+    private Player player;
+
+    void Awake()
     {
-        damage = dmg;
-        knockbackForce = kbForce;
+        player = GetComponent<Player>();
+        timer = cooldown; // 시작하자마자 가능하도록
     }
 
-    // 프리팹의 Collider2D (Is Trigger 체크된 원형 콜라이더 예상)가 적과 충돌했을 때
-    private void OnTriggerEnter2D(Collider2D collision)
+    void Update()
     {
-        // 1. 적(Enemy) 태그 확인
-        if (!collision.CompareTag("Enemy")) return;
-
-        Enemy hitEnemy = collision.GetComponent<Enemy>();
-        if (hitEnemy != null)
+        if (player != null && player.hasRollingChocolateBar)
         {
-            // 2. 데미지 적용
-            hitEnemy.TakeDamage(damage);
+            timer += Time.deltaTime;
+            if (timer >= cooldown)
+            {
+                ActivateSkill();
+                timer = 0f;
+            }
+        }
+    }
 
-            // 3. 넉백 적용
-            // 충돌 지점에서 적을 밀어낼 방향을 계산 (넉백 방향: 스킬 중심 -> 적 위치)
-            Vector2 knockbackDirection = (hitEnemy.transform.position - transform.position).normalized;
-            hitEnemy.ApplyKnockback(knockbackDirection, knockbackForce);
-
-            Debug.Log($"Enemy hit by Rolling Chocolate Bar! Damage: {damage}, Knockback: {knockbackForce}");
+    void ActivateSkill()
+    {
+        if (rollingChocolateBarPrefab == null)
+        {
+            Debug.LogError("RollingChocolateBar Prefab is not assigned in the inspector!");
+            return;
         }
 
-        // 이 스킬은 한 번의 애니메이션 동안 여러 적을 공격할 수 있도록 
-        // 충돌 시 Destroy(gameObject)를 호출하지 않습니다.
+        // 1) 플레이어 위치에 생성 + 플레이어의 자식으로 붙여서 추적 보장
+        GameObject skillInstance = Instantiate(rollingChocolateBarPrefab, transform.position, Quaternion.identity);
+        skillInstance.transform.SetParent(transform); // 플레이어 이동 따라감
+
+        // 2) 공격 스크립트 초기화 및 궤도 회전 시작
+        RollingChocolateBarAttack attackScript = skillInstance.GetComponent<RollingChocolateBarAttack>();
+        if (attackScript != null)
+        {
+            attackScript.InitializeAttack(15, 1.5f);
+            // 시작 각도(0도)에서 1바퀴(2초) 회전
+            attackScript.BeginOrbit(transform, orbitDuration, 0f, 1);
+
+        }
+        else
+        {
+            Debug.LogError("RollingChocolateBarPrefab is missing the RollingChocolateBarAttack script!");
+        }
+
+        Debug.Log("Rolling Chocolate Bar Activated!");
     }
 }
