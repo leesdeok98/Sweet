@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9d1514134bc4fbd41bb739b1b9a49231, type: 3}
-  m_Name: Rule Tile
+  m_Name: RandimTile
   m_EditorClassIdentifier: 
   m_DefaultSprite: {fileID: 0}
   m_DefaultGameObject: {fileID: 0}
@@ -18,20 +18,20 @@ MonoBehaviour:
   m_TilingRules:
   - m_Id: 0
     m_Sprites:
-    - {fileID: -883769988, guid: 30918fe147c053d499fe668a59a29859, type: 3}
-    - {fileID: -883769988, guid: 30918fe147c053d499fe668a59a29859, type: 3}
-    - {fileID: 1001222695, guid: 30918fe147c053d499fe668a59a29859, type: 3}
-    - {fileID: 1001222695, guid: 30918fe147c053d499fe668a59a29859, type: 3}
-    - {fileID: -1796259270, guid: 30918fe147c053d499fe668a59a29859, type: 3}
-    - {fileID: -1796259270, guid: 30918fe147c053d499fe668a59a29859, type: 3}
-    - {fileID: -1796259270, guid: 30918fe147c053d499fe668a59a29859, type: 3}
-    - {fileID: -205813802, guid: 30918fe147c053d499fe668a59a29859, type: 3}
-    - {fileID: -540962432, guid: 30918fe147c053d499fe668a59a29859, type: 3}
-    - {fileID: -819636729, guid: 30918fe147c053d499fe668a59a29859, type: 3}
+    - {fileID: 21300000, guid: 8cf8b89dfdd98084b9140b9de899668b, type: 3}
+    - {fileID: 21300000, guid: 8cf8b89dfdd98084b9140b9de899668b, type: 3}
+    - {fileID: 21300000, guid: 8cf8b89dfdd98084b9140b9de899668b, type: 3}
+    - {fileID: 21300000, guid: 8cf8b89dfdd98084b9140b9de899668b, type: 3}
+    - {fileID: 21300000, guid: 8cf8b89dfdd98084b9140b9de899668b, type: 3}
+    - {fileID: 21300000, guid: a349cef3eb23ce943b905738dbacb221, type: 3}
+    - {fileID: 21300000, guid: a349cef3eb23ce943b905738dbacb221, type: 3}
+    - {fileID: 21300000, guid: dbb4c017101d7f9439313c788a933a3a, type: 3}
+    - {fileID: 21300000, guid: dbb4c017101d7f9439313c788a933a3a, type: 3}
+    - {fileID: 21300000, guid: 5f7b7640dff7fed45b529f60ad2cd733, type: 3}
     m_GameObject: {fileID: 0}
     m_MinAnimationSpeed: 1
     m_MaxAnimationSpeed: 1
-    m_PerlinScale: 0.79
+    m_PerlinScale: 0.5
     m_Output: 1
     m_ColliderType: 1
     m_RandomTransform: 0

@@ -92,7 +92,7 @@ public class InfiniteScroll : MonoBehaviour
 
         for (int i = 0; i < tiles.Length; i++)
         {
-            Vector3 pos = tiles[i].transform.position;
+            Vector3 pos = tiles[i].transform.position;   
 
             // xÃà ÀÌµ¿
             if (pos.x < playerPos.x - unitSize * 1.5f)
