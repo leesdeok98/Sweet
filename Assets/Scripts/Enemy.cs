@@ -24,6 +24,8 @@ public class Enemy : MonoBehaviour
     public bool isSlowed = false;
     float originalSpeed;
 
+    [Header("Knockback")] // 넉백 효과 
+    public float knockbackDuration = 0.1f; // 넉백 지속 시간
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -150,5 +152,10 @@ public class Enemy : MonoBehaviour
         yield return new WaitForSeconds(duration);
         speed = originalSpeed;
         isSlowed = false;
+    }
+
+    public void ApplyKnockback(Vector2 direction, float force)
+    {
+        rb.AddForce(direction * force, ForceMode2D.Impulse);
     }
 }

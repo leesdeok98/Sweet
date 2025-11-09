@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -12,6 +13,7 @@ public class Player : MonoBehaviour
     public bool hasIcedJellySkill = false;
     public bool hasSugarShield = false;
     public bool hasDarkChip = false;
+    public bool hasRollingChocolateBar = false;
 
     void Awake()
     {

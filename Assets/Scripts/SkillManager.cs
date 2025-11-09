@@ -83,4 +83,13 @@ public class SkillManager : MonoBehaviour
             );
         }
     }
+
+    void ApplyRollingChocolateBar()
+    {
+        Debug.Log("롤링 초코바 획득!");
+        if (player != null)
+        {
+            player.hasRollingChocolateBar = true;
+        }
+    }
 }
