@@ -1,47 +1,71 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 
 public class InfiniteScroll : MonoBehaviour
 {
-    [Header("¬¸¡∂")]
+    [Header("Ï∞∏Ï°∞")]
     [SerializeField] private GameObject player;
-    [SerializeField] private GameObject[] tiles; // 3x3 ≈∏¿œ (√— 9∞≥)
+    [SerializeField] private GameObject[] tiles; // rows*cols Í∞úÏàòÎßåÌÅº ÎÑ£Í∏∞
 
-    [Header("º≥¡§∞™")]
-    [SerializeField] private float unitSize = 10f; // ≈∏¿œ «— ∫Ø ±Ê¿Ã
+    [Header("ÏÑ§Ï†ïÍ∞í")]
+    [SerializeField] private float unitSize = 10f;
     [SerializeField] private float moveSpeed = 10f;
 
-    private float halfSight;
+    [Header("Í∑∏Î¶¨Îìú ÌÅ¨Í∏∞")]
+    [SerializeField] private int cols = 3; // Í∞ÄÎ°ú ÌÉÄÏùº Ïàò
+    [SerializeField] private int rows = 4; // ÏÑ∏Î°ú ÌÉÄÏùº Ïàò(‚Üê Ìïú Ï§Ñ ÎäòÎ†∏Ïùå)
+
+    private float halfSightX, halfSightY;
     private Vector2[] border;
+    private Camera cam;
+
+    // Í≥ÑÏÇ∞Ïö©(Í∑∏Î¶¨Îìú Ï†àÎ∞ò/Ïù¥ÎèôÎüâ)
+    private float halfGridX, halfGridY, moveSpanX, moveSpanY;
 
     private void Start()
     {
-        // ƒ´∏ﬁ∂Û ¿˝π› ≥Ù¿Ã ±‚¡ÿ + ø©¿Ø ∞¯∞£
-        halfSight = Camera.main.orthographicSize + unitSize * 0.5f;
+        cam = Camera.main;
+
+        // Ïπ¥Î©îÎùº ÏãúÏïº + Ïó¨Ïú†(0.5ÌÉÄÏùº)
+        halfSightY = cam.orthographicSize + unitSize * 0.5f;
+        halfSightX = cam.orthographicSize * cam.aspect + unitSize * 0.5f;
+
+        // Í∑∏Î¶¨Îìú Ï†àÎ∞ò/Ïù¥ÎèôÎüâ(Ïó¥/Ìñâ Í∏∞Î∞ò)
+        halfGridX = cols * unitSize * 0.5f;
+        halfGridY = rows * unitSize * 0.5f;
+        moveSpanX = cols * unitSize;
+        moveSpanY = rows * unitSize;
 
         border = new Vector2[]
         {
-            new Vector2(-unitSize * 1.5f, unitSize * 1.5f),
-            new Vector2(unitSize * 1.5f, -unitSize * 1.5f)
+            new Vector2(-unitSize * 1.5f,  unitSize * 1.5f),
+            new Vector2( unitSize * 1.5f, -unitSize * 1.5f)
         };
 
-        // 3x3 ≈∏¿œ √ ±‚ πËƒ°
+        // ‚úÖ Ï¥àÍ∏∞ Î∞∞Ïπò: Ïßù/ÌôÄ Î™®Îëê Ï§ëÏã¨ Ï†ïÎ†¨ÎêòÎèÑÎ°ù Í≥ÑÏÇ∞
+        // (0,0)ÏùÑ ÌôîÎ©¥ Ï§ëÏïôÏóê ÎëêÍ≥† cols√órows Í≤©ÏûêÎ°ú Î∞∞Ïπò
+        float x0 = -(cols - 1) * 0.5f * unitSize;
+        float y0 = (rows - 1) * 0.5f * unitSize;
+
         int index = 0;
-        for (int y = 1; y >= -1; y--)
+        for (int r = 0; r < rows; r++)
         {
-            for (int x = -1; x <= 1; x++)
+            for (int c = 0; c < cols; c++)
             {
                 if (index >= tiles.Length) return;
-                tiles[index].transform.position = new Vector3(x * unitSize, y * unitSize, 0);
+                tiles[index].transform.position = new Vector3(
+                    x0 + c * unitSize,
+                    y0 - r * unitSize,
+                    0f
+                );
                 index++;
             }
         }
+
     }
 
     private void Update()
     {
         Vector3 delta = Vector3.zero;
-
-        // ¿‘∑¬ √≥∏Æ
         if (Input.GetKey(KeyCode.W)) delta += Vector3.up;
         if (Input.GetKey(KeyCode.S)) delta += Vector3.down;
         if (Input.GetKey(KeyCode.A)) delta += Vector3.left;
@@ -49,9 +73,8 @@ public class InfiniteScroll : MonoBehaviour
 
         delta *= moveSpeed * Time.deltaTime;
 
-        // «√∑π¿ÃæÓøÕ ƒ´∏ﬁ∂Û ¿Ãµø
         player.transform.position += delta;
-        Camera.main.transform.position += delta;
+        cam.transform.position += delta;
 
         CheckBoundary();
     }
@@ -60,51 +83,34 @@ public class InfiniteScroll : MonoBehaviour
     {
         Vector3 pos = player.transform.position;
 
-        // ¥Î∞¢º± ∆˜«‘ ∏µÁ √‡ √º≈©
-        if (border[1].x < pos.x + halfSight)
-        {
-            border[0] += Vector2.right * unitSize;
-            border[1] += Vector2.right * unitSize;
-        }
-        if (border[0].x > pos.x - halfSight)
-        {
-            border[0] -= Vector2.right * unitSize;
-            border[1] -= Vector2.right * unitSize;
-        }
-        if (border[0].y < pos.y + halfSight)
-        {
-            border[0] += Vector2.up * unitSize;
-            border[1] += Vector2.up * unitSize;
-        }
-        if (border[1].y > pos.y - halfSight)
-        {
-            border[0] -= Vector2.up * unitSize;
-            border[1] -= Vector2.up * unitSize;
-        }
+        if (border[1].x < pos.x + halfSightX)
+        { border[0] += Vector2.right * unitSize; border[1] += Vector2.right * unitSize; }
+        if (border[0].x > pos.x - halfSightX)
+        { border[0] -= Vector2.right * unitSize; border[1] -= Vector2.right * unitSize; }
 
-        // ≈∏¿œ ¿ÁπËƒ°
+        if (border[0].y < pos.y + halfSightY)
+        { border[0] += Vector2.up * unitSize; border[1] += Vector2.up * unitSize; }
+        if (border[1].y > pos.y - halfSightY)
+        { border[0] -= Vector2.up * unitSize; border[1] -= Vector2.up * unitSize; }
+
         ShiftTiles();
     }
 
     private void ShiftTiles()
     {
-        Vector3 playerPos = player.transform.position;
+        Vector3 p = player.transform.position;
 
         for (int i = 0; i < tiles.Length; i++)
         {
-            Vector3 pos = tiles[i].transform.position;   
+            Vector3 t = tiles[i].transform.position;
 
-            // x√‡ ¿Ãµø
-            if (pos.x < playerPos.x - unitSize * 1.5f)
-                tiles[i].transform.position += Vector3.right * unitSize * 3;
-            if (pos.x > playerPos.x + unitSize * 1.5f)
-                tiles[i].transform.position -= Vector3.right * unitSize * 3;
+            // Í∞ÄÎ°ú: 3Ïó¥ ‚Üí halfGridX = 1.5*unitSize, Ïù¥ÎèôÎüâ = 3*unitSize
+            if (t.x < p.x - halfGridX) tiles[i].transform.position += Vector3.right * moveSpanX;
+            if (t.x > p.x + halfGridX) tiles[i].transform.position -= Vector3.right * moveSpanX;
 
-            // y√‡ ¿Ãµø
-            if (pos.y < playerPos.y - unitSize * 1.5f)
-                tiles[i].transform.position += Vector3.up * unitSize * 3;
-            if (pos.y > playerPos.y + unitSize * 1.5f)
-                tiles[i].transform.position -= Vector3.up * unitSize * 3;
+            // ÏÑ∏Î°ú: 4Ìñâ ‚Üí halfGridY = 2.0*unitSize, Ïù¥ÎèôÎüâ = 4*unitSize
+            if (t.y < p.y - halfGridY) tiles[i].transform.position += Vector3.up * moveSpanY;
+            if (t.y > p.y + halfGridY) tiles[i].transform.position -= Vector3.up * moveSpanY;
         }
     }
 }

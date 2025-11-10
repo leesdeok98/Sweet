@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 
 public class RollingChocolateBarAttack : MonoBehaviour
@@ -6,10 +6,10 @@ public class RollingChocolateBarAttack : MonoBehaviour
     private int damage = 15;
     private float knockbackForce = 2f;
 
-    Transform center;   // ÇÃ·¹ÀÌ¾î
-    float duration;     // ÇÑ ¹ÙÄû ½Ã°£(ÃÊ)
-    float startAngle;   // ½ÃÀÛ °¢µµ(¿É¼Ç)
-    int laps;           // ¸î ¹ÙÄû µµ´ÂÁö(±âº» 1)
+    Transform center;   // í”Œë ˆì´ì–´
+    float duration;     // í•œ ë°”í€´ ì‹œê°„(ì´ˆ)
+    float startAngle;   // ì‹œì‘ ê°ë„(ì˜µì…˜)
+    int laps;           // ëª‡ ë°”í€´ ë„ëŠ”ì§€(ê¸°ë³¸ 1)
 
     public void InitializeAttack(int dmg, float kbForce)
     {
@@ -17,7 +17,7 @@ public class RollingChocolateBarAttack : MonoBehaviour
         knockbackForce = kbForce;
     }
 
-    // ¡Ú ½Ã°èÄ§ ¸ğµå: ¸·´ë ÇÇ¹şÀÌ "ÇÑÂÊ ³¡"¿¡ ÀÖ¾î¾ß ÇÔ (Sprite Editor¿¡¼­ ¼³Á¤)
+    // â˜… ì‹œê³„ì¹¨ ëª¨ë“œ: ë§‰ëŒ€ í”¼ë²—ì´ "í•œìª½ ë"ì— ìˆì–´ì•¼ í•¨ (Sprite Editorì—ì„œ ì„¤ì •)
     public void BeginOrbit(Transform center, float duration, float startAngleDeg = 0f, int laps = 1)
     {
         this.center = center;
@@ -25,9 +25,9 @@ public class RollingChocolateBarAttack : MonoBehaviour
         this.startAngle = startAngleDeg;
         this.laps = Mathf.Max(1, laps);
 
-        // ÇÃ·¹ÀÌ¾î¿¡ ºÙ¿©¼­ Á¤È®È÷ Áß½É °íÁ¤
+        // í”Œë ˆì´ì–´ì— ë¶™ì—¬ì„œ ì •í™•íˆ ì¤‘ì‹¬ ê³ ì •
         transform.SetParent(center);
-        transform.localPosition = Vector3.zero;               // ÇÇ¹ş(¸·´ë ÇÑÂÊ ³¡)ÀÌ ÇÃ·¹ÀÌ¾î À§Ä¡
+        transform.localPosition = Vector3.zero;               // í”¼ë²—(ë§‰ëŒ€ í•œìª½ ë)ì´ í”Œë ˆì´ì–´ ìœ„ì¹˜
         transform.localRotation = Quaternion.Euler(0, 0, startAngle);
 
         StartCoroutine(ClockHandRoutine());
@@ -44,7 +44,7 @@ public class RollingChocolateBarAttack : MonoBehaviour
             float t = Mathf.Clamp01(elapsed / duration);
             float angle = startAngle - Mathf.Lerp(0f, totalAngle, t);
 
-            // ¡Ú ½Ã°èÄ§: ¹İÁö¸§ ¹æÇâÀ¸·Î ±×´ë·Î µÎ±â (Á¢¼± +90µµ È¸Àü ±İÁö)
+            // â˜… ì‹œê³„ì¹¨: ë°˜ì§€ë¦„ ë°©í–¥ìœ¼ë¡œ ê·¸ëŒ€ë¡œ ë‘ê¸° (ì ‘ì„  +90ë„ íšŒì „ ê¸ˆì§€)
             transform.localRotation = Quaternion.Euler(0f, 0f, angle);
             yield return null;
         }

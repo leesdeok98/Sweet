@@ -6,7 +6,7 @@ public class RollingChocolateBarSkill : MonoBehaviour
     [Header("Skill Settings")]
     public GameObject rollingChocolateBarPrefab;
     public float cooldown = 5f;
-    public float orbitDuration = 2f; // ★ 실제 한 바퀴 도는 시간(2초)
+    public float orbitDuration = 1f; // ★ 실제 한 바퀴 도는 시간(2초)
     public float orbitRadius = 1.6f; // ★ 플레이어 기준 반지름(이미지 길이에 맞춰 조절)
 
 
