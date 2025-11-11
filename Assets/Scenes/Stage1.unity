@@ -24603,10 +24603,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputVec: {x: 0, y: 0}
   speed: 5
-  hasIcedJellySkill: 0
+  hasIcedJellySkill: 1
   hasSugarShield: 0
   hasDarkChip: 0
-  hasRollingChocolateBar: 1
+  hasRollingChocolateBar: 0
 --- !u!114 &751445002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24622,7 +24622,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 4765972778447892138, guid: 84717f3c43c75ab40b0fcc16571fee1f, type: 3}
   firePoint: {fileID: 1923159566}
   bulletSpeed: 10
-  fireRate: 0.8
+  fireRate: 0.2
 --- !u!114 &751445003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42917,7 +42917,7 @@ MonoBehaviour:
   - {fileID: 1212774831}
   - {fileID: 1725218201}
   unitSize: 10
-  moveSpeed: 10
+  moveSpeed: 8
   cols: 4
   rows: 3
 --- !u!4 &1254283307

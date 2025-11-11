@@ -129,7 +129,7 @@ MonoBehaviour:
   lifeTime: 3
   baseDamage: 5
   icedJellyPrefab: {fileID: 199759798538562915, guid: 13a81a6c40c0b534ba1aa551e264c3f9, type: 3}
-  icedJellyChance: 0.1
+  icedJellyChance: 1
 --- !u!58 &-1186312517586220965
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -164,4 +164,4 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.55
+  m_Radius: 1
