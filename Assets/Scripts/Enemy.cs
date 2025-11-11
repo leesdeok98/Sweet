@@ -14,11 +14,11 @@ public class Enemy : MonoBehaviour
     public RuntimeAnimatorController[] animCon;
     public Rigidbody2D target;    // 추적할 대상 (Player)
 
-    bool isLive;                  // 생존 여부
+    protected bool isLive;                  // 생존 여부
 
-    Rigidbody2D rb;
-    Animator anim;
-    SpriteRenderer spriter;
+    protected Rigidbody2D rb;
+    protected Animator anim;
+    protected SpriteRenderer spriter;
 
     [HideInInspector]
     public bool isSlowed = false;
@@ -57,7 +57,7 @@ public class Enemy : MonoBehaviour
         isSlowed = false;
     }
 
-    void FixedUpdate()
+    public virtual void FixedUpdate()
     {
         if (!isLive || target == null) return;
 
@@ -108,7 +108,7 @@ public class Enemy : MonoBehaviour
         // anim.runtimeAnimatorController = animCon[data.spriteType];
     }
 
-    private void OnCollisionStay2D(Collision2D collision)
+    public virtual void OnCollisionStay2D(Collision2D collision)
     {
         if (isLive && collision.gameObject.CompareTag("Player"))
         {

@@ -19,7 +19,12 @@ public class Spawner : MonoBehaviour
     }
     void Update()
     {
-        if (GameManager.instance.hasEnemiesCleared)
+        //if (GameManager.instance.hasEnemiesCleared)
+        //{
+        //    return;
+        //}
+
+        if (GameManager.instance.isGameWon || GameManager.instance.isGameOver)
         {
             return;
         }

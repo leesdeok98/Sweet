@@ -8,6 +8,13 @@ public class GameManager : MonoBehaviour
     [HideInInspector]
     public bool hasEnemiesCleared = false;
 
+    [HideInInspector]
+    public bool isGameWon = false;
+    [HideInInspector]
+    public bool isGameOver = false;
+
+    public float bossSpawnTIme = 300;
+
     public static GameManager instance;
     public float gameTime;
     public float maxGameTime = 5 * 60f;
@@ -45,10 +52,6 @@ public class GameManager : MonoBehaviour
             Debug.Log("제발 사라져라");
         }
 
-        if (gameTime > maxGameTime)
-        {
-            gameTime = maxGameTime;
-        }
         //gameTime += Time.deltaTime;
 
         //if (gameTime > maxGameTime) {
@@ -67,5 +70,21 @@ public class GameManager : MonoBehaviour
         // ������ Player ������Ʈ�� ã�� Player ������Ʈ �Ҵ�
         if (player == null)
             player = GameObject.Find("Player").GetComponent<Player>();
+    }
+
+    public void GameClear()
+    {
+        if (isGameWon || isGameOver) return;
+        isGameWon = true;
+        Debug.Log("게임 승리");
+        // 여기에 게임 승리 UI 띄우는 코드 넣으셈
+    }
+
+    public void GameOver()
+    {
+        if (isGameWon || isGameOver) return;
+        isGameOver = true;
+        Debug.Log("게임 패배");
+        // 여기에 게임 오버 UI 띄우는 코드 넣으셈 ㅋ
     }
 }

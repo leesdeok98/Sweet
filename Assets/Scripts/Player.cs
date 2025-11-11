@@ -43,4 +43,10 @@ public class Player : MonoBehaviour
     {
         Debug.Log("플레이어가 " + damage + " 만큼 데미지를 입음");
     }
+
+    void Die()
+    {
+        GameManager.instance.GameOver();
+        gameObject.SetActive(false);
+    }
 }
