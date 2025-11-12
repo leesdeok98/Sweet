@@ -1,0 +1,27 @@
+아이스젤리 이펙트.png
+size:1936,884
+filter:Linear,Linear
+pma:true
+결정1
+bounds:546,619,263,424
+offsets:1,1,265,426
+rotate:90
+결정2
+bounds:252,700,182,292
+offsets:1,1,184,294
+rotate:90
+결정3
+bounds:2,728,154,248
+offsets:1,1,156,250
+rotate:90
+고양이 손
+bounds:972,2,962,880
+offsets:1,2,964,883
+
+아이스젤리 이펙트_2.png
+size:1603,1574
+filter:Linear,Linear
+pma:true
+냉기
+bounds:2,2,1599,1570
+offsets:1,1,1605,1573

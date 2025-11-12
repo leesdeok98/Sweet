@@ -128,8 +128,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lifeTime: 3
   baseDamage: 5
-  icedJellyPrefab: {fileID: 199759798538562915, guid: 13a81a6c40c0b534ba1aa551e264c3f9, type: 3}
-  icedJellyChance: 0.3
+  icedJellySpinePrefab: {fileID: 1444121518579667591, guid: 31c6a6892256833419bac4d0c47158ef, type: 3}
+  icedJellyChance: 1
 --- !u!58 &-1186312517586220965
 CircleCollider2D:
   m_ObjectHideFlags: 0
