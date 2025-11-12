@@ -8,7 +8,7 @@ public class InfiniteScroll : MonoBehaviour
 
     [Header("설정값")]
     [SerializeField] private float unitSize = 10f;
-    [SerializeField] private float moveSpeed = 10f;
+    // [SerializeField] private float moveSpeed = 10f;
 
     [Header("그리드 크기")]
     [SerializeField] private int cols = 3; // 가로 타일 수
@@ -65,16 +65,16 @@ public class InfiniteScroll : MonoBehaviour
 
     private void Update()
     {
-        Vector3 delta = Vector3.zero;
-        if (Input.GetKey(KeyCode.W)) delta += Vector3.up;
-        if (Input.GetKey(KeyCode.S)) delta += Vector3.down;
-        if (Input.GetKey(KeyCode.A)) delta += Vector3.left;
-        if (Input.GetKey(KeyCode.D)) delta += Vector3.right;
+        // Vector3 delta = Vector3.zero;
+        // if (Input.GetKey(KeyCode.W)) delta += Vector3.up;
+        // if (Input.GetKey(KeyCode.S)) delta += Vector3.down;
+        // if (Input.GetKey(KeyCode.A)) delta += Vector3.left;
+        // if (Input.GetKey(KeyCode.D)) delta += Vector3.right;
 
-        delta *= moveSpeed * Time.deltaTime;
+        // delta *= moveSpeed * Time.deltaTime;
 
-        player.transform.position += delta;
-        cam.transform.position += delta;
+        // player.transform.position += delta;
+        // cam.transform.position += delta;
 
         CheckBoundary();
     }

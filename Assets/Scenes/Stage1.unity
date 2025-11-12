@@ -43050,7 +43050,6 @@ MonoBehaviour:
   - {fileID: 1212774831}
   - {fileID: 1725218201}
   unitSize: 10
-  moveSpeed: 8
   cols: 4
   rows: 3
 --- !u!4 &1254283307
