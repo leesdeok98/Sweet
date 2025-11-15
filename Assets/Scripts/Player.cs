@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
     public bool hasSugarShield = false;
     public bool hasDarkChip = false;
     public bool hasRollingChocolateBar = false;
-
+    public bool hasPoppingCandy = false;
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();

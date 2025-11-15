@@ -20151,7 +20151,7 @@ SpriteRenderer:
   m_Size: {x: 27.671066, y: 27.59}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &693121968
@@ -24964,12 +24964,13 @@ MonoBehaviour:
   inputVec: {x: 0, y: 0}
   speed: 5
   diepanel: {fileID: 91834491}
-  maxHealth: 10
-  health: 10
+  maxHealth: 100
+  health: 100
   hasIcedJellySkill: 0
   hasSugarShield: 0
   hasDarkChip: 0
   hasRollingChocolateBar: 0
+  hasPoppingCandy: 1
 --- !u!114 &751445002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24985,7 +24986,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 4765972778447892138, guid: 84717f3c43c75ab40b0fcc16571fee1f, type: 3}
   firePoint: {fileID: 1923159566}
   bulletSpeed: 10
-  fireRate: 0.5
+  fireRate: 1
 --- !u!114 &751445003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53837,11 +53838,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 751445001}
-  darkChipEffectPrefab: {fileID: 8358102944823119088, guid: 3bce94651fab6a442b4539f11bd7c52e, type: 3}
-  darkChipSpinePrefab: {fileID: 8358102944823119088, guid: 3bce94651fab6a442b4539f11bd7c52e, type: 3}
-  darkChipAnimName: animation
-  darkChipAnimLoop: 1
-  darkChipLocalOffset: {x: 0, y: 0.6, z: 0}
+  poppingColliderRadius: 0.6
+  poppingRange: 6
+  poppingShardSpeed: 11
+  poppingDamageFactor: 0.8
+  poppingSpinePrefab: {fileID: 2574234899682859121, guid: 0fd273bba794270429f261f05f25ec6e, type: 3}
+  poppingSpineAnim: animation
+  poppingSpineLoop: 0
+  poppingSpineOffset: {x: 0, y: 0, z: 0}
+  poppingSpineSortingOrder: 220
 --- !u!114 &1648878447
 MonoBehaviour:
   m_ObjectHideFlags: 0
