@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using UnityEditor.Experimental.GraphView;
+//using UnityEditor.Experimental.GraphView;    - 안쓰는 코드래서 주석처리 - 성덕
 
 public class StoryManager : MonoBehaviour
 {

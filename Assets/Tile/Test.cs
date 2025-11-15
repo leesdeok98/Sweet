@@ -8,11 +8,10 @@ public class InfiniteScroll : MonoBehaviour
 
     [Header("설정값")]
     [SerializeField] private float unitSize = 10f;
-    // [SerializeField] private float moveSpeed = 10f;
 
     [Header("그리드 크기")]
     [SerializeField] private int cols = 3; // 가로 타일 수
-    [SerializeField] private int rows = 4; // 세로 타일 수(← 한 줄 늘렸음)
+    [SerializeField] private int rows = 4; // 세로 타일 수
 
     private float halfSightX, halfSightY;
     private Vector2[] border;
@@ -24,6 +23,9 @@ public class InfiniteScroll : MonoBehaviour
     private void Start()
     {
         cam = Camera.main;
+        if (!cam) { Debug.LogError("[InfiniteScroll] Camera.main이 없습니다."); enabled = false; return; }
+        if (!player) { Debug.LogError("[InfiniteScroll] player 참조가 비었습니다."); enabled = false; return; }
+        if (tiles == null || tiles.Length == 0) { Debug.LogError("[InfiniteScroll] tiles 배열이 비었습니다."); enabled = false; return; }
 
         // 카메라 시야 + 여유(0.5타일)
         halfSightY = cam.orthographicSize + unitSize * 0.5f;
@@ -42,7 +44,6 @@ public class InfiniteScroll : MonoBehaviour
         };
 
         // ✅ 초기 배치: 짝/홀 모두 중심 정렬되도록 계산
-        // (0,0)을 화면 중앙에 두고 cols×rows 격자로 배치
         float x0 = -(cols - 1) * 0.5f * unitSize;
         float y0 = (rows - 1) * 0.5f * unitSize;
 
@@ -51,8 +52,10 @@ public class InfiniteScroll : MonoBehaviour
         {
             for (int c = 0; c < cols; c++)
             {
-                if (index >= tiles.Length) return;
-                tiles[index].transform.position = new Vector3(
+                if (index >= tiles.Length) break;
+                var t = tiles[index];
+                if (!t) { index++; continue; }                 // ★ 파괴/누락 슬롯 무시
+                t.transform.position = new Vector3(
                     x0 + c * unitSize,
                     y0 - r * unitSize,
                     0f
@@ -60,27 +63,18 @@ public class InfiniteScroll : MonoBehaviour
                 index++;
             }
         }
-
     }
 
     private void Update()
     {
-        // Vector3 delta = Vector3.zero;
-        // if (Input.GetKey(KeyCode.W)) delta += Vector3.up;
-        // if (Input.GetKey(KeyCode.S)) delta += Vector3.down;
-        // if (Input.GetKey(KeyCode.A)) delta += Vector3.left;
-        // if (Input.GetKey(KeyCode.D)) delta += Vector3.right;
-
-        // delta *= moveSpeed * Time.deltaTime;
-
-        // player.transform.position += delta;
-        // cam.transform.position += delta;
-
+        if (!player || tiles == null || tiles.Length == 0) return;  // ★ 안전 가드
         CheckBoundary();
     }
 
     private void CheckBoundary()
     {
+        if (!player) return; // ★
+
         Vector3 pos = player.transform.position;
 
         if (border[1].x < pos.x + halfSightX)
@@ -98,19 +92,37 @@ public class InfiniteScroll : MonoBehaviour
 
     private void ShiftTiles()
     {
-        Vector3 p = player.transform.position;
+        Vector3 p = player ? player.transform.position : Vector3.zero;
 
         for (int i = 0; i < tiles.Length; i++)
         {
-            Vector3 t = tiles[i].transform.position;
+            var tile = tiles[i];
+            if (!tile) continue;                                  // ★ 파괴/비활성/누락 슬롯 스킵
 
-            // 가로: 3열 → halfGridX = 1.5*unitSize, 이동량 = 3*unitSize
-            if (t.x < p.x - halfGridX) tiles[i].transform.position += Vector3.right * moveSpanX;
-            if (t.x > p.x + halfGridX) tiles[i].transform.position -= Vector3.right * moveSpanX;
+            Vector3 tpos = tile.transform.position;
 
-            // 세로: 4행 → halfGridY = 2.0*unitSize, 이동량 = 4*unitSize
-            if (t.y < p.y - halfGridY) tiles[i].transform.position += Vector3.up * moveSpanY;
-            if (t.y > p.y + halfGridY) tiles[i].transform.position -= Vector3.up * moveSpanY;
+            // 가로
+            if (tpos.x < p.x - halfGridX) tile.transform.position = new Vector3(tpos.x + moveSpanX, tpos.y, tpos.z);
+            else if (tpos.x > p.x + halfGridX) tile.transform.position = new Vector3(tpos.x - moveSpanX, tpos.y, tpos.z);
+
+            // 세로
+            tpos = tile.transform.position; // 가로 이동 반영 후 최신 좌표
+            if (tpos.y < p.y - halfGridY) tile.transform.position = new Vector3(tpos.x, tpos.y + moveSpanY, tpos.z);
+            else if (tpos.y > p.y + halfGridY) tile.transform.position = new Vector3(tpos.x, tpos.y - moveSpanY, tpos.z);
+        }
+    }
+
+    // (선택) 에디터에서 null 슬롯이 있으면 눈에 띄게 경고
+    private void OnValidate()
+    {
+        if (tiles == null) return;
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            if (tiles[i] == null)
+            {
+                // 에디터 콘솔만
+                Debug.unityLogger.LogWarning("[InfiniteScroll]", $"tiles[{i}] 가 비어있습니다(또는 파괴됨).");
+            }
         }
     }
 }

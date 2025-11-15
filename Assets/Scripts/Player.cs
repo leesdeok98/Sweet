@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
 
     private Rigidbody2D rigid;
     private SpriteRenderer spr;
+    [SerializeField] private GameObject diepanel;
 
     [Header("HP")]
     public float maxHealth = 100f;
@@ -23,13 +24,26 @@ public class Player : MonoBehaviour
     {
         rigid = GetComponent<Rigidbody2D>();
         spr = GetComponent<SpriteRenderer>();
-        health = Mathf.Clamp(health, 0f, maxHealth);
-        isLive = (health > 0f);
+
+        // ★ 항상 풀피로 시작 + 생존 상태 보장
+        health = maxHealth;
+        isLive = true;
+
+        if (diepanel) diepanel.SetActive(false);
+    }
+
+    void OnEnable()
+    {
+        // ★ 씬 재시작/부활 시 이동 가능 상태 보장
+        isLive = true;
+        if (rigid) rigid.velocity = Vector2.zero;
     }
 
     void Update()
     {
         if (!isLive) return;
+
+        // 이동 입력(Old Input Manager)
         inputVec.x = Input.GetAxisRaw("Horizontal");
         inputVec.y = Input.GetAxisRaw("Vertical");
     }
@@ -37,6 +51,7 @@ public class Player : MonoBehaviour
     void FixedUpdate()
     {
         if (!isLive) return;
+
         Vector2 nextVec = inputVec.normalized * speed * Time.fixedDeltaTime;
         rigid.MovePosition(rigid.position + nextVec);
     }
@@ -44,6 +59,7 @@ public class Player : MonoBehaviour
     void LateUpdate()
     {
         if (!isLive) return;
+
         if (inputVec.x != 0)
             spr.flipX = (inputVec.x < 0);
     }
@@ -52,7 +68,7 @@ public class Player : MonoBehaviour
     {
         if (!isLive) return;
 
-        // (옵션) 방어막이나 무적 처리 넣으려면 여기서 가드
+        // (옵션) 방어막/무적 체크 가능
         // if (hasSugarShield) return;
 
         health -= damage;
@@ -72,6 +88,7 @@ public class Player : MonoBehaviour
     void Die()
     {
         if (!isLive) return;
+
         isLive = false;
         if (rigid != null) rigid.velocity = Vector2.zero;
 
@@ -80,10 +97,11 @@ public class Player : MonoBehaviour
         else
             Debug.LogError("[Player] GameManager.instance가 null입니다.");
 
-        gameObject.SetActive(false);
+        if (diepanel) diepanel.SetActive(true);
+        Time.timeScale = 0f;  // 게임 일시정지
     }
 
-    // ===== 충돌 데미지: 물리 충돌(Non-Trigger)만 쓸 경우 이 메서드만 유지 =====
+    // 물리 충돌로 지속 피해를 받는 경우(Non-Trigger)
     void OnCollisionStay2D(Collision2D collision)
     {
         if (!isLive) return;
@@ -92,22 +110,18 @@ public class Player : MonoBehaviour
         Enemy enemy = collision.collider.GetComponent<Enemy>();
         if (enemy == null) return;
 
-        float dmg = enemy.dps * Time.deltaTime;  // 초당 dps를 물리 스텝만큼 나눠서 적용
+        // ★ 고정 틱 기반으로 일정 데미지
+        float dmg = enemy.dps * Time.fixedDeltaTime;
         if (dmg > 0f) TakeDamage(dmg);
     }
 
-    // ===== 트리거 충돌을 쓸 경우, 위 OnCollisionStay2D 대신 이걸 사용 =====
-    /*
-    void OnTriggerStay2D(Collider2D other)
+    // ★ 재시작/부활 시 호출하면 체력/상태 초기화(씬 리로드 없이도 사용 가능)
+    public void ResetForRetry()
     {
-        if (!isLive) return;
-        if (!other.CompareTag("Enemy")) return;
-
-        Enemy enemy = other.GetComponent<Enemy>();
-        if (enemy == null) return;
-
-        float dmg = enemy.dps * Time.deltaTime;
-        if (dmg > 0f) TakeDamage(dmg);
+        health = maxHealth;
+        isLive = true;
+        if (rigid) rigid.velocity = Vector2.zero;
+        if (diepanel) diepanel.SetActive(false);
+        Time.timeScale = 1f;
     }
-    */
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-// using Unity.VisualScripting.Antlr3.Runtime; // ❌ 불필요하면 제거
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -11,72 +10,100 @@ using UnityEngine.UI;
 public class Setting : MonoBehaviour
 {
     [Header("Panels")]
-    [SerializeField] private GameObject pausePanel;        // 일시정지/설정
-    [SerializeField] private GameObject quitPanel;         // 종료 확인
-    [SerializeField] private GameObject mapSelectionPanel; // 맵 선택
+    [SerializeField] private GameObject pausePanel;
+    [SerializeField] private GameObject quitPanel;
+    [SerializeField] private GameObject mapSelectionPanel;
+
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
 
     void Start()
     {
-        // 처음에는 모두 비활성화
         if (pausePanel) pausePanel.SetActive(false);
         if (quitPanel) quitPanel.SetActive(false);
         if (mapSelectionPanel) mapSelectionPanel.SetActive(false);
 
-        // 혹시 타임스케일이 멈춰있을 수 있으니 복구
         Time.timeScale = 1f;
+        AudioListener.pause = false;
+        Input.ResetInputAxes();                 // ★ 입력 축 초기화
+    }
+
+    void OnSceneLoaded(Scene s, LoadSceneMode m)
+    {
+        Time.timeScale = 1f;
+        AudioListener.pause = false;
+        Input.ResetInputAxes();                 // ★ 새 씬 로드 직후 한 번 더 초기화
+
+        if (pausePanel) pausePanel.SetActive(false);
+        if (quitPanel) quitPanel.SetActive(false);
+        if (mapSelectionPanel) mapSelectionPanel.SetActive(false);
     }
 
     void Update()
     {
-        // ESC 처리: 가장 위(활성) 패널을 우선적으로 닫기
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // 1) 맵 선택이 열려 있으면 그거부터 닫기
-            if (mapSelectionPanel != null && mapSelectionPanel.activeSelf)
-            {
-                mapSelectionPanel.SetActive(false);
-                return;
-            }
+            if (mapSelectionPanel != null && mapSelectionPanel.activeSelf) { mapSelectionPanel.SetActive(false); return; }
+            if (quitPanel != null && quitPanel.activeSelf) { CloseQuit(); return; }
 
-            // 2) 종료 패널이 열려 있으면 닫기
-            if (quitPanel != null && quitPanel.activeSelf)
-            {
-                CloseQuit();
-                return;
-            }
-
-            // 3) 일시정지/설정 패널 토글
-            if (pausePanel != null && pausePanel.activeSelf)
-            {
-                CloseSetting();
-            }
-            else
-            {
-                SettingOpen();
-            }
+            if (pausePanel != null && pausePanel.activeSelf) CloseSetting();
+            else SettingOpen();
         }
+    }
+
+    // === 다이패널에서 연결할 재시작 버튼 ===
+    public void RetryCurrentScene()
+    {
+        StartCoroutine(ReloadRoutine());
+    }
+
+    private IEnumerator ReloadRoutine()
+    {
+        // 1) 멈춤/사운드/입력 축 초기화
+        Time.timeScale = 1f;
+        AudioListener.pause = false;
+        Input.ResetInputAxes();                 // ★ 여기서도 초기화
+
+        // 2) UI 포커스가 키보드를 잡고 있던 경우 해제(선택)
+        var es = UnityEngine.EventSystems.EventSystem.current;
+        if (es) es.SetSelectedGameObject(null);
+
+        // 3) 한 프레임 쉬고 로드 (UI/포커스 정리 후 로드가 더 안정적)
+        yield return null;
+
+        var scene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(scene.buildIndex);
     }
 
     // === 씬 전환 ===
     public void LoadNextScene()
     {
-        // 게임 재개 상태로 전환 후 씬 로드
         Time.timeScale = 1f;
+        AudioListener.pause = false;
+        Input.ResetInputAxes();
         SceneManager.LoadScene("Stage1");
     }
 
-    // === 설정(일시정지) 열기/닫기 ===
+    // === 설정(일시정지) ===
     public void SettingOpen()
     {
         if (pausePanel) pausePanel.SetActive(true);
-        Time.timeScale = 0f; // 게임 일시정지
+        Time.timeScale = 0f;
     }
 
     public void CloseSetting()
     {
         if (pausePanel) pausePanel.SetActive(false);
         if (mapSelectionPanel) mapSelectionPanel.SetActive(false);
-        Time.timeScale = 1f; // 게임 재개
+        Time.timeScale = 1f;
+        Input.ResetInputAxes();                 // ★ 일시정지 해제 시에도 축 초기화
     }
 
     // === 종료 ===
@@ -93,11 +120,10 @@ public class Setting : MonoBehaviour
     public void QuitGame()
     {
         Debug.Log("게임 종료 버튼 클릭됨!");
-
 #if UNITY_EDITOR
-        EditorApplication.isPlaying = false; // 에디터에서 Play 종료
+        EditorApplication.isPlaying = false;
 #else
-        Application.Quit();                  // 빌드에서 종료
+        Application.Quit();
 #endif
     }
 
