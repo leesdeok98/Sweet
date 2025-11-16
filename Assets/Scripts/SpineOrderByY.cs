@@ -8,7 +8,7 @@ public class SpineOrderByY : MonoBehaviour
     public int baseOrder = 0;
 
     [Tooltip("Y값을 SortingOrder로 변환할 때의 스케일")]
-    public int scale = 100;
+    public int scale = 9;
 
     [Tooltip("고정할 Sorting Layer 이름 (비워두면 현재 레이어 유지)")]
     public string sortingLayerName = "";

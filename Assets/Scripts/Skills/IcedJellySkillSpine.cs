@@ -1,4 +1,4 @@
-﻿// IcedJellySkillSpine.cs
+﻿// IcedJellySkillSpine.cs (Sorting Controls 제거 버전)
 using System.Collections;
 using UnityEngine;
 using Spine.Unity;
@@ -7,37 +7,25 @@ using Spine.Unity;
 public class IcedJellySkillSpine : MonoBehaviour
 {
     [Header("Effect Logic")]
-    public float duration = 3f;          // 전체 유지시간
-    public float tickDamage = 2f;        // 틱 데미지
-    [Range(0f, 1f)] public float slowAmount = 0.5f; // 0.5 = 50% 감속
-    public float tickInterval = 1f;      // 몇 초마다 한 번 적용
-    public float radius = 1.5f;          // 적용 반경
-    public LayerMask enemyMask;          // Enemy 레이어 지정(Inspector)
+    public float duration = 3f;
+    public float tickDamage = 2f;
+    [Range(0f, 1f)] public float slowAmount = 0.5f;
+    public float tickInterval = 1f;
+    public float radius = 1.5f;
+    public LayerMask enemyMask;
 
     [Header("Spine")]
-    public string loopAnimation = "loop"; // 루프 애니 이름
+    public string loopAnimation = "loop";
     public float timeScale = 1f;
 
-    [Header("Follow (optional)")]
-    public bool followTarget = false;
-    public Transform target;
-    public Vector3 localOffset = Vector3.zero;
-
-    SkeletonAnimation skeleton;
-    float elapsed;
-
-    public void SetTarget(Transform t)
-    {
-        target = t;
-        followTarget = (t != null);
-    }
+    private SkeletonAnimation skeleton;
 
     void Awake()
     {
         skeleton = GetComponent<SkeletonAnimation>();
         skeleton.Initialize(true);
         skeleton.timeScale = timeScale;
-        skeleton.AnimationState.SetAnimation(0, loopAnimation, false);
+        skeleton.AnimationState.SetAnimation(0, loopAnimation, true);
     }
 
     void OnEnable()
@@ -47,17 +35,10 @@ public class IcedJellySkillSpine : MonoBehaviour
 
     IEnumerator RunRoutine()
     {
-        elapsed = 0f;
+        float elapsed = 0f;
 
         while (elapsed < duration)
         {
-            if (followTarget && target != null)
-            {
-                if (transform.parent != target) transform.SetParent(target);
-                transform.localPosition = localOffset;
-            }
-
-            // 범위 내 적에게 틱 적용
             var hits = Physics2D.OverlapCircleAll(transform.position, radius, enemyMask);
             for (int i = 0; i < hits.Length; i++)
             {

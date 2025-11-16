@@ -1,0 +1,23 @@
+시럽 토네이도.png
+size:1948,1643
+filter:Linear,Linear
+pma:true
+시럽 토네이도
+bounds:2,2,1764,1639
+offsets:2,2,1767,1642
+시럽1
+bounds:1768,1143,98,115
+offsets:5,1,107,145
+시럽2
+bounds:1768,1260,183,141
+offsets:2,1,186,143
+rotate:90
+시럽3
+bounds:1768,1025,74,116
+offsets:1,2,76,120
+시럽4
+bounds:1768,965,59,58
+offsets:1,1,62,60
+시럽5
+bounds:1768,1445,178,196
+offsets:1,1,180,198

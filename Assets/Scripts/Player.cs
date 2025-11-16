@@ -15,11 +15,13 @@ public class Player : MonoBehaviour
     private bool isLive = true;
 
     // 스킬 보유 상태 (필요 시 사용)
+    [Header("has skill")]
     public bool hasIcedJellySkill = false;
     public bool hasSugarShield = false;
     public bool hasDarkChip = false;
     public bool hasRollingChocolateBar = false;
     public bool hasPoppingCandy = false;
+    public bool hasSyrupTornado = false;
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();

@@ -3,49 +3,66 @@ using UnityEngine;
 
 public class PoppingCandyBurst : MonoBehaviour
 {
-    float colliderRadius = 0.6f;
-    float range = 6f;
-    float speed = 11f;
-    int damage = 5;
+    float colliderRadius;
+    float range;
+    float speed;
+    int damage;
 
-    bool spawned = false;
+    GameObject defaultShardPrefab;
+    GameObject[] shardPrefabs; // 기대 길이 8
 
-    // Bullet에서 호출
-    public void Initialize(float colliderRadius, float range, float speed, int damage)
+    bool spawned;
+
+    public void Initialize(
+        float colliderRadius, float range, float speed, int damage,
+        GameObject defaultShardPrefab, GameObject[] shardPrefabs)
     {
         this.colliderRadius = Mathf.Max(0.01f, colliderRadius);
         this.range = Mathf.Max(0.1f, range);
         this.speed = Mathf.Max(0.1f, speed);
         this.damage = Mathf.Max(1, damage);
+        this.defaultShardPrefab = defaultShardPrefab;
+        this.shardPrefabs = shardPrefabs;
     }
 
     void Start()
     {
-        SpawnIfNeeded();
+        if (!spawned) Spawn();
     }
 
-    void SpawnIfNeeded()
+    void Spawn()
     {
-        if (spawned) return;
         spawned = true;
 
-        // 8방향(0~315, 45도 간격)
         for (int i = 0; i < 8; i++)
         {
             float angle = i * 45f * Mathf.Deg2Rad;
             Vector2 dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 
-            GameObject shard = new GameObject($"PC_Sh{i}");
-            shard.transform.position = transform.position;
+            GameObject prefab = (shardPrefabs != null && i < shardPrefabs.Length) ? shardPrefabs[i] : null;
+            if (prefab == null) prefab = defaultShardPrefab;
 
-            var comp = shard.AddComponent<PoppingCandyShard>();
-            comp.Setup(dir, speed, range, damage, colliderRadius);
+            GameObject shardGO;
+            if (prefab != null)
+            {
+                shardGO = Instantiate(prefab, transform.position, Quaternion.identity, transform);
+                // 프리팹에 CircleCollider2D가 없다면 아래에서 자동 추가됨 (PoppingCandyShard.Awake)
+            }
+            else
+            {
+                // 최소 동작 보장: 비가시 샤드 자동 생성
+                shardGO = new GameObject($"PC_Sh{i}");
+                shardGO.transform.SetParent(transform);
+                var col = shardGO.AddComponent<CircleCollider2D>();
+                col.isTrigger = true;
+            }
 
-            // 부모로 묶어둠(정리용)
-            shard.transform.SetParent(transform);
+            var shard = shardGO.GetComponent<PoppingCandyShard>();
+            if (shard == null) shard = shardGO.AddComponent<PoppingCandyShard>();
+
+            shard.Setup(dir, speed, range, damage, colliderRadius);
         }
 
-        // 모든 자식이 자동 파괴되면 나도 파괴
-        Destroy(gameObject, range / speed + 0.05f);
+        Destroy(gameObject, range / speed + 0.1f);
     }
 }

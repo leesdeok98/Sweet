@@ -24970,7 +24970,8 @@ MonoBehaviour:
   hasSugarShield: 0
   hasDarkChip: 0
   hasRollingChocolateBar: 0
-  hasPoppingCandy: 1
+  hasPoppingCandy: 0
+  hasSyrupTornado: 0
 --- !u!114 &751445002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53838,15 +53839,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 751445001}
-  poppingColliderRadius: 0.6
-  poppingRange: 6
-  poppingShardSpeed: 11
+  syrupTornadoPrefab: {fileID: 2310070060321691167, guid: a82ec8fadc6d17947bd2ede781fe6b10, type: 3}
+  poppingColliderRadius: 0.3
+  poppingRange: 5
+  poppingShardSpeed: 15
   poppingDamageFactor: 0.8
-  poppingSpinePrefab: {fileID: 2574234899682859121, guid: 0fd273bba794270429f261f05f25ec6e, type: 3}
-  poppingSpineAnim: animation
-  poppingSpineLoop: 0
-  poppingSpineOffset: {x: 0, y: 0, z: 0}
-  poppingSpineSortingOrder: 220
+  poppingDefaultShardPrefab: {fileID: 8104335040265418109, guid: 77a853827b976644489bd25d09582e73, type: 3}
+  poppingShardPrefabs:
+  - {fileID: 8104335040265418109, guid: 77a853827b976644489bd25d09582e73, type: 3}
+  - {fileID: 8783855576479429892, guid: 14f03697900005941a16e550ce1bb4f0, type: 3}
+  - {fileID: 4450587939009413095, guid: 10bdb6bd44599dc47b48bd3695204182, type: 3}
+  - {fileID: 5419223574404654574, guid: d9654cb8d51ce304c8e1237f707543dd, type: 3}
+  - {fileID: 2046305304908438010, guid: ece41d3021566c348ba6fc81fcafdc74, type: 3}
+  - {fileID: 602878481925108109, guid: 1198467f65cf3704c8a9daf0b4e78122, type: 3}
+  - {fileID: 8337420281652448825, guid: 430edfe8e42fa114dbe322adb7506925, type: 3}
+  - {fileID: 2573533215926175062, guid: 51da079ab9b4a214aaf8fd33d696401b, type: 3}
+  darkChipPercent: 0.3
+  darkChipSpinePrefab: {fileID: 8358102944823119088, guid: 3bce94651fab6a442b4539f11bd7c52e, type: 3}
+  darkChipAnimName: animation
+  darkChipAnimLoop: 1
+  darkChipLocalOffset: {x: 0, y: 0.6, z: 0}
 --- !u!114 &1648878447
 MonoBehaviour:
   m_ObjectHideFlags: 0
