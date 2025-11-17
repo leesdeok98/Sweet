@@ -24964,8 +24964,8 @@ MonoBehaviour:
   inputVec: {x: 0, y: 0}
   speed: 5
   diepanel: {fileID: 91834491}
-  maxHealth: 100
-  health: 100
+  maxHealth: 1
+  health: 1
   hasIcedJellySkill: 0
   hasSugarShield: 0
   hasDarkChip: 0

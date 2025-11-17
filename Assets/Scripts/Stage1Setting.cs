@@ -1,8 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using UnityEngine.EventSystems; // UI Æ÷Ä¿½º ÇØÁ¦¿ë
+using UnityEngine.EventSystems;
 
 public class Stage1Setting : MonoBehaviour
 {
@@ -12,7 +11,7 @@ public class Stage1Setting : MonoBehaviour
 
     void OnEnable()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded; // ¾À ·Îµå½Ã »óÅÂ º¹±¸
+        SceneManager.sceneLoaded += OnSceneLoaded; // ì”¬ ë¡œë“œ ì´ë²¤íŠ¸ ë“±ë¡
     }
 
     void OnDisable()
@@ -24,7 +23,7 @@ public class Stage1Setting : MonoBehaviour
     {
         if (pausePanel) pausePanel.SetActive(false);
 
-        // È¤½Ã ¸ØÃçÀÖÀ» ¼ö ÀÖÀ¸´Ï º¹±¸ + ÀÔ·ÂÃà ¸®¼Â + UI Æ÷Ä¿½º ÇØÁ¦
+        // í™”ë©´ ë“¤ì–´ì˜¬ ë•Œ ê¸°ë³¸ ìƒíƒœ ì„¸íŒ…
         Time.timeScale = 1f;
         AudioListener.pause = false;
         Input.ResetInputAxes();
@@ -33,7 +32,7 @@ public class Stage1Setting : MonoBehaviour
 
     void OnSceneLoaded(Scene s, LoadSceneMode m)
     {
-        // Àç½ÃÀÛ/¾À ÀüÈ¯ Á÷ÈÄ¿¡µµ È®½ÇÈ÷ º¹±¸
+        // ì”¬ ì „í™˜ ì§í›„ ê¸°ë³¸ê°’ ì¬ì„¤ì •
         Time.timeScale = 1f;
         AudioListener.pause = false;
         Input.ResetInputAxes();
@@ -42,9 +41,40 @@ public class Stage1Setting : MonoBehaviour
         if (pausePanel) pausePanel.SetActive(false);
         isPaused = false;
 
-        // ¡Ú ÇÃ·¹ÀÌ¾î Ã¼·Â/»óÅÂ º¸Àå (DontDestroyOnLoad ´ëÀÀ)
+        // ğŸ”¹ GameManager ìƒíƒœ ì´ˆê¸°í™”
+        if (GameManager.instance != null)
+            GameManager.instance.ResetState();
+
+        // ğŸ”¹ Player ì°¾ê¸°
         var p = FindObjectOfType<Player>();
-        if (p) p.ResetForRetry();
+        if (p != null)
+        {
+            // HP/ìƒíƒœ ë¦¬ì…‹
+            p.ResetForRetry();
+
+            // ğŸ”¹ ì´ë²ˆ ì”¬(Canvas)ì—ì„œ ìƒˆë¡œ ìƒê¸´ "ì‚¬ë§ íŒ¨ë„"ì„ ì°¾ì•„ì„œ Playerì— ë‹¤ì‹œ ì—°ê²°
+            //    - Canvas ì´ë¦„: "Canvas"
+            //    - ì‚¬ë§ íŒ¨ë„ ì´ë¦„: "ì‚¬ë§ íŒ¨ë„"  (ìŠ¤í¬ë¦°ìƒ· ê¸°ì¤€)
+            var canvas = GameObject.Find("Canvas");
+            if (canvas != null)
+            {
+                var diePanelTr = canvas.transform.Find("ì‚¬ë§ íŒ¨ë„");
+                if (diePanelTr != null)
+                {
+                    p.SetDiePanel(diePanelTr.gameObject);
+                }
+                else
+                {
+                    Debug.LogWarning("[Stage1Setting] Canvas ì•ˆì—ì„œ 'ì‚¬ë§ íŒ¨ë„'ì„ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[Stage1Setting] 'Canvas' ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
+            }
+        }
+
+        // (í•„ìš”í•˜ë©´ ì—¬ê¸°ì„œ KillCounter.Instance.ResetCount() ê°™ì€ ê²ƒë„ í˜¸ì¶œ ê°€ëŠ¥)
     }
 
     void Update()
@@ -66,7 +96,7 @@ public class Stage1Setting : MonoBehaviour
             Time.timeScale = 1f;
             if (pausePanel) pausePanel.SetActive(false);
 
-            // ÀÏ½ÃÁ¤Áö ÇØÁ¦ ½Ã ÀÔ·Â Ãà/Æ÷Ä¿½º ÃÊ±âÈ­
+            // ì¬ê°œí•  ë•Œ ì…ë ¥/ì„ íƒ ì´ˆê¸°í™”
             Input.ResetInputAxes();
             var es = EventSystem.current; if (es) es.SetSelectedGameObject(null);
         }
@@ -86,20 +116,20 @@ public class Stage1Setting : MonoBehaviour
         StartCoroutine(GoMainRoutine());
     }
 
-    private System.Collections.IEnumerator GoMainRoutine()
+    private IEnumerator GoMainRoutine()
     {
         Time.timeScale = 1f;
         AudioListener.pause = false;
 
-        // ¡Ú ¸ŞÀÎ ³Ñ¾î°¡±â Àü¿¡ ³²¾ÆÀÖ´Â Player(¶Ç´Â ¿©·¯ °³) ÀüºÎ Á¦°Å
+        // í˜„ì¬ ì”¬ì— ë‚¨ì•„ ìˆëŠ” Player(ë˜ëŠ” ë³µìˆ˜) ì œê±°
         var players = FindObjectsOfType<Player>(true);
         foreach (var p in players)
             Destroy(p.gameObject);
 
-        // ¡Ú ÆÄ±«°¡ ÇÁ·¹ÀÓ ³¡¿¡ ¹İ¿µµÇ¹Ç·Î ÇÑ ÇÁ·¹ÀÓ ½¬°í ·Îµå
+        // íŒŒê´´ ë°˜ì˜ì„ ìœ„í•´ í•œ í”„ë ˆì„ ëŒ€ê¸°
         yield return null;
 
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        SceneManager.LoadScene("Main", LoadSceneMode.Single);
     }
 
     public void OnClickRetry()
@@ -109,13 +139,13 @@ public class Stage1Setting : MonoBehaviour
 
     private IEnumerator LoadRoutine(string sceneName)
     {
-        // Á¤Áö ÇØÁ¦/»ç¿îµå/ÀÔ·Â Ãà ÃÊ±âÈ­ + UI Æ÷Ä¿½º ÇØÁ¦
+        // ì”¬ ì „í™˜ ì „ ìƒíƒœ ì´ˆê¸°í™”
         Time.timeScale = 1f;
         AudioListener.pause = false;
         Input.ResetInputAxes();
         var es = EventSystem.current; if (es) es.SetSelectedGameObject(null);
 
-        // ÇÑ ÇÁ·¹ÀÓ ½¬°í ·Îµå(Ãà/Æ÷Ä¿½º ÃÊ±âÈ­ ¾ÈÁ¤È­)
+        // í•œ í”„ë ˆì„ ê±´ë„ˆë›°ê¸°(UI/ì…ë ¥ ì •ë¦¬ í›„ ë¡œë“œ)
         yield return null;
 
         yield return SceneManager.LoadSceneAsync(sceneName);

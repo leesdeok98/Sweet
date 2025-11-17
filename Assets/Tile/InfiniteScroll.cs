@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿// InfiniteScroll.cs
+using UnityEngine;
 
 public class InfiniteScroll : MonoBehaviour
 {
@@ -23,9 +24,35 @@ public class InfiniteScroll : MonoBehaviour
     private void Start()
     {
         cam = Camera.main;
-        if (!cam) { Debug.LogError("[InfiniteScroll] Camera.main이 없습니다."); enabled = false; return; }
-        if (!player) { Debug.LogError("[InfiniteScroll] player 참조가 비었습니다."); enabled = false; return; }
-        if (tiles == null || tiles.Length == 0) { Debug.LogError("[InfiniteScroll] tiles 배열이 비었습니다."); enabled = false; return; }
+        if (!cam)
+        {
+            Debug.LogError("[InfiniteScroll] Camera.main이 없습니다.");
+            enabled = false;
+            return;
+        }
+
+        // 🔹 player가 비어있으면 자동으로 씬에서 Player 찾기
+        if (!player)
+        {
+            var p = FindObjectOfType<Player>();
+            if (p != null)
+            {
+                player = p.gameObject;
+            }
+            else
+            {
+                Debug.LogError("[InfiniteScroll] player 참조가 비었고, 씬에서 Player도 못 찾았습니다.");
+                enabled = false;
+                return;
+            }
+        }
+
+        if (tiles == null || tiles.Length == 0)
+        {
+            Debug.LogError("[InfiniteScroll] tiles 배열이 비었습니다.");
+            enabled = false;
+            return;
+        }
 
         // 카메라 시야 + 여유(0.5타일)
         halfSightY = cam.orthographicSize + unitSize * 0.5f;
@@ -54,7 +81,12 @@ public class InfiniteScroll : MonoBehaviour
             {
                 if (index >= tiles.Length) break;
                 var t = tiles[index];
-                if (!t) { index++; continue; }                 // ★ 파괴/누락 슬롯 무시
+                if (!t)
+                {
+                    index++;
+                    continue; // 파괴/누락 슬롯 무시
+                }
+
                 t.transform.position = new Vector3(
                     x0 + c * unitSize,
                     y0 - r * unitSize,
@@ -67,13 +99,22 @@ public class InfiniteScroll : MonoBehaviour
 
     private void Update()
     {
-        if (!player || tiles == null || tiles.Length == 0) return;  // ★ 안전 가드
+        // 🔹 런타임 도중에 player가 없어졌다면 다시 한 번 찾아보기
+        if (!player)
+        {
+            var p = FindObjectOfType<Player>();
+            if (p != null)
+                player = p.gameObject;
+        }
+
+        if (!player || tiles == null || tiles.Length == 0) return;
+
         CheckBoundary();
     }
 
     private void CheckBoundary()
     {
-        if (!player) return; // ★
+        if (!player) return;
 
         Vector3 pos = player.transform.position;
 
@@ -97,18 +138,22 @@ public class InfiniteScroll : MonoBehaviour
         for (int i = 0; i < tiles.Length; i++)
         {
             var tile = tiles[i];
-            if (!tile) continue;                                  // ★ 파괴/비활성/누락 슬롯 스킵
+            if (!tile) continue; // 파괴/비활성/누락 슬롯 스킵
 
             Vector3 tpos = tile.transform.position;
 
             // 가로
-            if (tpos.x < p.x - halfGridX) tile.transform.position = new Vector3(tpos.x + moveSpanX, tpos.y, tpos.z);
-            else if (tpos.x > p.x + halfGridX) tile.transform.position = new Vector3(tpos.x - moveSpanX, tpos.y, tpos.z);
+            if (tpos.x < p.x - halfGridX)
+                tile.transform.position = new Vector3(tpos.x + moveSpanX, tpos.y, tpos.z);
+            else if (tpos.x > p.x + halfGridX)
+                tile.transform.position = new Vector3(tpos.x - moveSpanX, tpos.y, tpos.z);
 
             // 세로
             tpos = tile.transform.position; // 가로 이동 반영 후 최신 좌표
-            if (tpos.y < p.y - halfGridY) tile.transform.position = new Vector3(tpos.x, tpos.y + moveSpanY, tpos.z);
-            else if (tpos.y > p.y + halfGridY) tile.transform.position = new Vector3(tpos.x, tpos.y - moveSpanY, tpos.z);
+            if (tpos.y < p.y - halfGridY)
+                tile.transform.position = new Vector3(tpos.x, tpos.y + moveSpanY, tpos.z);
+            else if (tpos.y > p.y + halfGridY)
+                tile.transform.position = new Vector3(tpos.x, tpos.y - moveSpanY, tpos.z);
         }
     }
 
@@ -120,8 +165,10 @@ public class InfiniteScroll : MonoBehaviour
         {
             if (tiles[i] == null)
             {
-                // 에디터 콘솔만
-                Debug.unityLogger.LogWarning("[InfiniteScroll]", $"tiles[{i}] 가 비어있습니다(또는 파괴됨).");
+                Debug.unityLogger.LogWarning(
+                    "[InfiniteScroll]",
+                    $"tiles[{i}] 가 비어있습니다(또는 파괴됨)."
+                );
             }
         }
     }

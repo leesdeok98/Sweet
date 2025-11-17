@@ -2,16 +2,11 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-
     public float enmiesClearTime = 10f;
 
-    [HideInInspector]
-    public bool hasEnemiesCleared = false;
-
-    [HideInInspector]
-    public bool isGameWon = false;
-    [HideInInspector]
-    public bool isGameOver = false;
+    [HideInInspector] public bool hasEnemiesCleared = false;
+    [HideInInspector] public bool isGameWon = false;
+    [HideInInspector] public bool isGameOver = false;
 
     public float bossSpawnTIme = 300;
 
@@ -19,57 +14,60 @@ public class GameManager : MonoBehaviour
     public float gameTime;
     public float maxGameTime = 5 * 60f;
     public PoolManager pool;
-    public Player player; // Player Ÿ������ ����
+    public Player player; // Player 타입으로 참조
 
     void Awake()
     {
-        // �̱��� �ʱ�ȭ
+        // 싱글톤 초기화
         if (instance == null)
             instance = this;
         else
+        {
             Destroy(gameObject);
+            return;
+        }
     }
+
+    void Start()
+    {
+        // 게임 상태 초기화
+        ResetState();
+
+        // 플레이어 오브젝트 자동 할당 보강
+        if (player == null)
+        {
+            GameObject pObj = GameObject.Find("Player");
+            if (pObj != null)
+                player = pObj.GetComponent<Player>();
+        }
+    }
+
     void Update()
     {
-        if (GameManager.instance.hasEnemiesCleared)
-        {
-            return;
-        }
-
-        float currentGameTime = GameManager.instance.gameTime;
-
+        // 적 전부 제거 이미 했으면 더 이상 시간 계산 안 함
         if (hasEnemiesCleared)
-        {
             return;
-        }
 
         gameTime += Time.deltaTime;
 
         if (gameTime >= enmiesClearTime && !hasEnemiesCleared)
         {
-            pool.ClearAllEnemies();
-            hasEnemiesCleared = true;
-            Debug.Log("제발 사라져라");
+            if (pool != null)
+            {
+                pool.ClearAllEnemies();
+                hasEnemiesCleared = true;
+                Debug.Log("제발 사라져라");
+            }
         }
-
-        //gameTime += Time.deltaTime;
-
-        //if (gameTime > maxGameTime) {
-        //    gameTime = maxGameTime;
-        //}
-
-        //if ( gameTime >= enmiesClearTime && !hasEnemiesCleared)
-        //{
-        //    pool.ClearAllEnemies();
-        //    hasEnemiesCleared = true;
-        //}
     }
 
-    void Start()
+    // 🔹 씬 재시작/새 판 시작 시 상태 초기화용
+    public void ResetState()
     {
-        // ������ Player ������Ʈ�� ã�� Player ������Ʈ �Ҵ�
-        if (player == null)
-            player = GameObject.Find("Player").GetComponent<Player>();
+        gameTime = 0f;
+        hasEnemiesCleared = false;
+        isGameWon = false;
+        isGameOver = false;
     }
 
     public void GameClear()
@@ -77,7 +75,7 @@ public class GameManager : MonoBehaviour
         if (isGameWon || isGameOver) return;
         isGameWon = true;
         Debug.Log("게임 승리");
-        // 여기에 게임 승리 UI 띄우는 코드 넣으셈
+        // 게임 승리 UI 띄우기 등
     }
 
     public void GameOver()
@@ -85,6 +83,6 @@ public class GameManager : MonoBehaviour
         if (isGameWon || isGameOver) return;
         isGameOver = true;
         Debug.Log("게임 패배");
-        // 여기에 게임 오버 UI 띄우는 코드 넣으셈 ㅋ
+        // 실제 패널 활성화는 Player.Die()에서 처리 중
     }
 }
