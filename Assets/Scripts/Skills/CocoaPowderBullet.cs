@@ -14,7 +14,7 @@ public class CocoaPowderBullet : MonoBehaviour
     private Player player;
 
     // 갈색 계열 색상 (코코아 느낌)
-    //private readonly Color cocoaColor = new Color(0.55f, 0.3f, 0.1f);
+    private readonly Color cocoaColor = new Color(0.55f, 0.3f, 0.1f);
 
     void Awake()
     {
