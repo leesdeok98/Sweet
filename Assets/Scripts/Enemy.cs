@@ -26,8 +26,10 @@ public class Enemy : MonoBehaviour
     [HideInInspector] public bool isSlowed = false;
     private float originalSpeed;          // 기본 속도(슬로우/해제에 필요)
 
-    [Header("Knockback")]
+    [Header("넉백, 경직")]
     public float knockbackDuration = 0.1f;
+    public bool isKnockback = false;
+    public bool isStunned = false;
 
     private Coroutine removeSlowRoutine;
 
@@ -190,12 +192,39 @@ public class Enemy : MonoBehaviour
         removeSlowRoutine = null;
     }
 
-    /// <summary>
-    /// 넉백 적용 (간단한 임펄스)
-    /// </summary>
-    public void ApplyKnockback(Vector2 direction, float force)
+    public void ApplyKnockback(Vector2 direction, float force) // 넉백 효과
     {
         rb.AddForce(direction.normalized * force, ForceMode2D.Impulse);
-        // 필요하다면 knockbackDuration 동안 이동 로직 잠깐 끄는 처리도 가능
     }
+
+    public void ApplyStun(float duration)
+    {
+        if (!gameObject.activeInHierarchy) return;
+        StartCoroutine(WaitKnockbackThenStun(duration));
+    }
+
+    IEnumerator WaitKnockbackThenStun(float duration)
+    {
+        // 넉백 중이면 넉백 효과가 끝날 때까지 경직 효과 실행 X
+        while (isKnockback)
+            yield return null;
+
+        // 넉백이 끝난 후 이제 Stun 시작
+        StartCoroutine(StunRoutine(duration));
+    }
+
+    IEnumerator StunRoutine(float duration)
+    {
+        isStunned = true;
+
+        speed = 0f;
+        rb.velocity = Vector2.zero;
+
+        yield return new WaitForSeconds(duration);
+
+        speed = isSlowed ? originalSpeed * 0.5f : originalSpeed;
+
+        isStunned = false;
+    }
+
 }

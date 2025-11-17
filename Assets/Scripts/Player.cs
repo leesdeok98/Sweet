@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D rigid;
     private SpriteRenderer spr;
     [SerializeField] private GameObject diepanel;
+    public StrawberryPopCoreSkill popCoreSkill;
 
     [Header("HP")]
     public float maxHealth = 100f;
@@ -22,11 +23,15 @@ public class Player : MonoBehaviour
     public bool hasRollingChocolateBar = false;
     public bool hasPoppingCandy = false;
     public bool hasSyrupTornado = false;
+    public bool hasCocoaPowder = false;
+    public bool hasStrawberryPopCore = false;
 
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         spr = GetComponent<SpriteRenderer>();
+
+        popCoreSkill = GetComponent<StrawberryPopCoreSkill>();
 
         // 항상 풀피로 시작 + 생존 상태 보장
         health = maxHealth;

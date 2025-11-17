@@ -11,11 +11,10 @@ GameObject:
   - component: {fileID: 2677405389723617150}
   - component: {fileID: 6188430291500693671}
   - component: {fileID: 8925112846880800324}
-  - component: {fileID: 7239264720877347162}
-  - component: {fileID: 1271012493434481261}
+  - component: {fileID: 8220035701237801561}
   - component: {fileID: -1186312517586220965}
   m_Layer: 0
-  m_Name: Bullet
+  m_Name: Bullet 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -78,7 +77,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 11
   m_Sprite: {fileID: 1018700198, guid: 8df202ec8ea84f74889e9aac07215c27, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.6415094, g: 0.5088251, b: 0.13919543, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -115,7 +114,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &7239264720877347162
+--- !u!114 &8220035701237801561
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -124,29 +123,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4765972778447892138}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62e94680ae5f3304d84c57de4c0229d8, type: 3}
+  m_Script: {fileID: 11500000, guid: 4a021cf7e00d22642a3c2c1cf06d990a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   lifeTime: 3
-  baseDamage: 5
-  icedJellySpinePrefab: {fileID: 1444121518579667591, guid: 31c6a6892256833419bac4d0c47158ef, type: 3}
-  icedJellyChance: 1
---- !u!114 &1271012493434481261
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4765972778447892138}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8115acb7b8c772488cd82392ef7cbec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 4765972778447892138}
-  popChancePer: 0.3
-  extraBulletCount: 8
-  bulletSpeed: 5
+  damage: 5
+  knockbackPower: 5
+  stunDuration: 0.4
 --- !u!58 &-1186312517586220965
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -24803,6 +24803,7 @@ GameObject:
   - component: {fileID: 751445002}
   - component: {fileID: 751445003}
   - component: {fileID: 751445004}
+  - component: {fileID: 751445006}
   - component: {fileID: 751445005}
   m_Layer: 0
   m_Name: Player
@@ -24964,6 +24965,7 @@ MonoBehaviour:
   inputVec: {x: 0, y: 0}
   speed: 5
   diepanel: {fileID: 91834491}
+  popCoreSkill: {fileID: 0}
   maxHealth: 1
   health: 1
   hasIcedJellySkill: 0
@@ -24972,6 +24974,8 @@ MonoBehaviour:
   hasRollingChocolateBar: 0
   hasPoppingCandy: 0
   hasSyrupTornado: 0
+  hasCocoaPowder: 1
+  hasStrawberryPopCore: 0
 --- !u!114 &751445002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24985,6 +24989,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 4765972778447892138, guid: 84717f3c43c75ab40b0fcc16571fee1f, type: 3}
+  cocoaBulletPrefab: {fileID: 4765972778447892138, guid: d90b62812d1af5d46a74c4c6cbd82c3d, type: 3}
   firePoint: {fileID: 1923159566}
   bulletSpeed: 10
   fireRate: 1
@@ -25034,6 +25039,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 1
+--- !u!114 &751445006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 751444996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8115acb7b8c772488cd82392ef7cbec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 4765972778447892138, guid: 84717f3c43c75ab40b0fcc16571fee1f, type: 3}
+  popChancePer: 0.3
+  extraBulletCount: 8
+  bulletSpeed: 5
 --- !u!1 &782192856
 GameObject:
   m_ObjectHideFlags: 0

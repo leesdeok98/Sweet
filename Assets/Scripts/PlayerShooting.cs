@@ -3,11 +3,24 @@ using UnityEngine;
 public class PlayerShooting : MonoBehaviour
 {
     public GameObject bulletPrefab;
+    public GameObject cocoaBulletPrefab;
     public Transform firePoint;
     public float bulletSpeed = 4f;
     public float fireRate = 1f; // 초당 1발 (60발/분)
 
     private float nextFireTime = 0f;
+
+    private Player player;
+
+    private void Awake()
+    {
+        player = GetComponent<Player>();
+
+        if (player == null)
+        {
+            Debug.LogError("Player component not found on this GameObject!");
+        }
+    }
 
     void Update()
     {
@@ -27,8 +40,15 @@ public class PlayerShooting : MonoBehaviour
 
         Vector2 direction = ((Vector2)(mousePos - firePoint.position)).normalized;
 
+        // 어떤 탄을 쏠지 결정
+        GameObject prefabToUse = bulletPrefab;
+        if (player.hasCocoaPowder && cocoaBulletPrefab != null)
+        {
+            prefabToUse = cocoaBulletPrefab;
+        }
+
         // 총알 생성
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+        GameObject bullet = Instantiate(prefabToUse, firePoint.position, Quaternion.identity);
 
         // 회전 방향 설정
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -37,5 +57,11 @@ public class PlayerShooting : MonoBehaviour
         // 속도 부여 (항상 bulletSpeed 고정)
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
         rb.velocity = direction * bulletSpeed;
+
+        // 딸기팝코어 아이템 관련
+        if (player != null && player.hasStrawberryPopCore && player.popCoreSkill != null)
+        {
+            player.popCoreSkill.UseSkill();
+        }
     }
 }

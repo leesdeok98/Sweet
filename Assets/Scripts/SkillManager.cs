@@ -89,8 +89,17 @@ public class SkillManager : MonoBehaviour
             case ItemData.ItemType.DarkChip:
                 ApplyDarkChip(darkChipPercent);
                 break;
+
             case ItemData.ItemType.SyrupTornado:
                 ApplySyrupTornado();
+                break;
+
+            case ItemData.ItemType.CocoaPowder:
+                ApplyCocoaPowder();
+                break;
+
+            case ItemData.ItemType.StrawberryPopCore:
+                ApplyStrawberryPopCore();
                 break;
 
             default:
@@ -98,6 +107,20 @@ public class SkillManager : MonoBehaviour
                 break;
 
         }
+    }
+
+    void ApplyCocoaPowder()
+    {
+        if (player == null) { Debug.LogWarning("[SkillManager] Player 없음 (CocoaPowder)"); return; }
+        player.hasCocoaPowder = true;
+        Debug.Log("[SkillManager] 코코아 파우더 활성화");
+    }
+
+    void ApplyStrawberryPopCore()
+    {
+        if (player == null) { Debug.LogWarning("[SkillManager] Player 없음 (StrawberryPopCore)"); return; }
+        player.hasStrawberryPopCore = true;
+        Debug.Log("[SkillManager] 딸기 팝코어 활성화");
     }
 
     void ApplyIcedJelly(float value, float duration)
