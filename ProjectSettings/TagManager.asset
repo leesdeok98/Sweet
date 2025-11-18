@@ -45,9 +45,6 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: hpbar
-    uniqueID: 4277970259
-    locked: 0
   - name: setting
     uniqueID: 1764069631
     locked: 0
@@ -59,4 +56,7 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 558078665
+    locked: 0
+  - name: hpbar
+    uniqueID: 4277970259
     locked: 0

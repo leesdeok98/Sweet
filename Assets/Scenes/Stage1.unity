@@ -26264,8 +26264,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 558078665
+  m_SortingLayer: 4
   m_SortingOrder: 10
   m_Sprite: {fileID: 21300000, guid: bea56ec886dab72489421ac9d979da29, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -26380,16 +26380,17 @@ MonoBehaviour:
   speed: 5
   diepanel: {fileID: 91834491}
   popCoreSkill: {fileID: 0}
-  maxHealth: 1
-  health: 1
+  maxHealth: 100
+  health: 100
   hasIcedJellySkill: 0
   hasSugarShield: 0
   hasDarkChip: 0
   hasRollingChocolateBar: 0
   hasPoppingCandy: 0
   hasSyrupTornado: 0
-  hasCocoaPowder: 1
+  hasCocoaPowder: 0
   hasStrawberryPopCore: 0
+  hasHoneySpin: 0
 --- !u!114 &751445002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56726,6 +56727,13 @@ MonoBehaviour:
   darkChipAnimName: animation
   darkChipAnimLoop: 1
   darkChipLocalOffset: {x: 0, y: 0.6, z: 0}
+  honeySpinOrbPrefab: {fileID: 2653131319135065860, guid: 44072df9b91a4d542b9e606716369222, type: 3}
+  honeySpinRadius: 2.5
+  honeySpinRotateSpeed: 180
+  honeySpinDamage: 5
+  honeySpinSlowPercent: 0.3
+  honeySpinSlowDuration: 1
+  honeySpinOrbCount: 2
 --- !u!114 &1648878447
 MonoBehaviour:
   m_ObjectHideFlags: 0

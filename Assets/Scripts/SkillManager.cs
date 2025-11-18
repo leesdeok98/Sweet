@@ -1,5 +1,6 @@
-﻿// SkillManager.cs (CocoaPowder 및 StrawberryPopCore 기능 추가 완료)
+﻿// SkillManager.cs (CocoaPowder 및 StrawberryPopCore + HoneySpin 기능 포함)
 using System.Collections;
+using System.Collections.Generic;
 using Spine.Unity;
 using Spine;
 using UnityEngine;
@@ -13,7 +14,7 @@ public class SkillManager : MonoBehaviour
     public Player player;
 
     // ─────────────────────────────────────────────────────────────
-    // ▼▼▼ 1번(A)의 모든 스킬 '설정값'과 '변수'들 ▼▼▼
+    // ▼▼▼ 기존 스킬 설정값 ▼▼▼
     // ─────────────────────────────────────────────────────────────
 
     [Header("Syrup Tornado Settings")]
@@ -35,10 +36,34 @@ public class SkillManager : MonoBehaviour
     [SerializeField] private bool darkChipAnimLoop = false;
     [SerializeField] private Vector3 darkChipLocalOffset = Vector3.zero;
     private SkeletonAnimation darkChipSpineInstance;
-    private int darkChipLevel = 0; 
+    private int darkChipLevel = 0;
 
-    // ─────────────────────────────────────────────────────────────
-    // ▲▲▲ 1번(A)의 변수들 끝 ▲▲▲
+    // ★★★★★ 허니스핀 설정값 ★★★★★
+    [Header("Honey Spin Settings")]
+    [Tooltip("허니스핀 ‘구체(오브젝트)’ 프리팹 (SkeletonAnimation + HoneySpin.cs 포함)")]
+    public GameObject honeySpinOrbPrefab;
+
+    [Tooltip("플레이어를 기준으로 도는 반지름")]
+    public float honeySpinRadius = 1.5f;
+
+    [Tooltip("초당 회전 각도 (deg/sec)")]
+    public float honeySpinRotateSpeed = 180f;
+
+    [Tooltip("허니스핀 1회 충돌 시 데미지")]
+    public float honeySpinDamage = 5f;
+
+    [Range(0f, 1f), Tooltip("이동속도 감소 퍼센트 (0.3 = -30%)")]
+    public float honeySpinSlowPercent = 0.3f;
+
+    [Tooltip("디버프 지속 시간 (초)")]
+    public float honeySpinSlowDuration = 1f;
+
+    [Tooltip("허니스핀 구체 개수 (기본 2개)")]
+    public int honeySpinOrbCount = 2;
+
+    // 현재 씬에서 살아있는 허니스핀 오브젝트들
+    private List<HoneySpin> honeySpinInstances = new List<HoneySpin>();
+
     // ─────────────────────────────────────────────────────────────
 
     void Awake()
@@ -46,54 +71,74 @@ public class SkillManager : MonoBehaviour
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        if (player == null) player = FindObjectOfType<Player>();
+        if (player == null)
+            player = FindObjectOfType<Player>();
+    }
+
+    void Start()
+    {
+        if (player == null)
+            player = FindObjectOfType<Player>();
+
+        // ▶ 시작할 때 이미 hasHoneySpin이 true면 자동으로 적용
+        if (player != null && player.hasHoneySpin)
+        {
+            ApplyHoneySpin();
+        }
+    }
+
+    void Update()
+    {
+        // ▶ 혹시라도 런타임 중에 hasHoneySpin을 true로 바꾸면
+        //    (또는 인벤토리에서 스킬이 켜졌는데 아직 구체가 없다면) 자동 생성
+        if (player != null && player.hasHoneySpin)
+        {
+            if (honeySpinInstances == null || honeySpinInstances.Count == 0)
+            {
+                ApplyHoneySpin();
+            }
+        }
     }
 
     /// <summary>
-    /// ★ 2번(B)의 구조 ★
     /// 모든 스킬 플래그와 중첩 스택을 0으로 초기화합니다.
     /// </summary>
     public void ResetAllSkills()
     {
         if (player == null) return;
 
-        // 1번(A)의 모든 스킬 플래그를 false로 리셋
+        // 플래그 리셋
         player.hasIcedJellySkill = false;
         player.hasSugarShield = false;
         player.hasDarkChip = false;
         player.hasRollingChocolateBar = false;
         player.hasPoppingCandy = false;
         player.hasSyrupTornado = false;
-        
-        // ▼▼▼ [추가됨] 코코아/딸기 플래그 리셋 ▼▼▼
         player.hasCocoaPowder = false;
         player.hasStrawberryPopCore = false;
-        // ▲▲▲ 추가 완료 ▲▲▲
+        player.hasHoneySpin = false;
 
         // 스탯 및 중첩 횟수 초기화
         darkChipLevel = 0;
-        Bullet.damageMultiplier = 1f; // 총알 데미지 배율 원상복구
-        
-        // ▼▼▼ [버그 수정] 지속형 애니메이션/오브젝트 파괴 ▼▼▼
-        
-        // 1. 시럽 토네이도 인스턴스 파괴
+        Bullet.damageMultiplier = 1f;
+
+        // 지속형 오브젝트 파괴
         if (syrupTornadoInstance != null)
         {
             Destroy(syrupTornadoInstance.gameObject);
             syrupTornadoInstance = null;
         }
 
-        // 2. 다크 칩 스파인 인스턴스 파괴
         if (darkChipSpineInstance != null)
         {
             Destroy(darkChipSpineInstance.gameObject);
             darkChipSpineInstance = null;
         }
-        // ▲▲▲ [수정 완료] ▲▲▲
+
+        ClearHoneySpinInstances();
     }
 
     /// <summary>
-    /// ★ 2번(B)의 구조 ★
     /// 특정 스킬 '하나'를 활성화합니다. (InventoryManager가 호출)
     /// </summary>
     public void ActivateSkill(ItemData.ItemType type)
@@ -115,18 +160,19 @@ public class SkillManager : MonoBehaviour
             case ItemData.ItemType.PoppingCandy:
                 player.hasPoppingCandy = true;
                 break;
-                
-            // ▼▼▼ [추가됨] 코코아/딸기 활성화 로직 ▼▼▼
+
+            // --- 코코아/딸기/허니스핀 ---
             case ItemData.ItemType.CocoaPowder:
                 ApplyCocoaPowder();
                 break;
             case ItemData.ItemType.StrawberryPopCore:
                 ApplyStrawberryPopCore();
                 break;
-            // ▲▲▲ 추가 완료 ▲▲▲
+            case ItemData.ItemType.HoneySpin:
+                ApplyHoneySpin();
+                break;
 
-
-            // --- 1번(A)의 로직이 필요한 스킬들 ---
+            // --- 별도 로직이 있는 스킬들 ---
             case ItemData.ItemType.DarkChip:
                 ApplyDarkChip(darkChipPercent);
                 break;
@@ -136,21 +182,21 @@ public class SkillManager : MonoBehaviour
 
             case ItemData.ItemType.None:
             default:
-                 Debug.Log($"[SkillManager] '{type}' 처리 미구현 아이템입니다."); // None 케이스 처리
+                Debug.Log($"[SkillManager] '{type}' 처리 미구현 아이템입니다.");
                 break;
         }
     }
 
     // ─────────────────────────────────────────────────────────────
-    // ▼▼▼ [추가됨] 스킬 실행 함수들 ▼▼▼
+    // ▼▼▼ 개별 스킬 함수들 ▼▼▼
     // ─────────────────────────────────────────────────────────────
 
     private void ApplySyrupTornado()
     {
         if (player == null) return;
-        player.hasSyrupTornado = true; 
+        player.hasSyrupTornado = true;
 
-        if (syrupTornadoInstance == null) // 중복 생성 방지
+        if (syrupTornadoInstance == null)
         {
             if (syrupTornadoPrefab == null)
             {
@@ -166,17 +212,14 @@ public class SkillManager : MonoBehaviour
 
     void ApplyDarkChip(float percent)
     {
-        // 2번(B)의 중첩 로직 적용
-        darkChipLevel++; 
+        darkChipLevel++;
 
         if (player != null)
             player.hasDarkChip = true;
 
-        // 전역 데미지 배율 (중첩 적용)
         Bullet.damageMultiplier = 1f + (darkChipLevel * percent);
         Debug.Log($"다크칩 획득! (Lvl {darkChipLevel}) 총알 공격력 +{percent * 100f}%");
 
-        // Spine 프리팹 인스턴스 생성/재사용
         if (player == null) return;
         if (darkChipSpinePrefab == null)
         {
@@ -184,26 +227,23 @@ public class SkillManager : MonoBehaviour
             return;
         }
 
-        if (darkChipSpineInstance == null) // ★ 중복 생성 방지
+        if (darkChipSpineInstance == null)
         {
             var go = Instantiate(darkChipSpinePrefab, player.transform);
             go.transform.localPosition = darkChipLocalOffset;
             darkChipSpineInstance = go.GetComponent<SkeletonAnimation>();
         }
 
-        // 애니메이션 재생 (이미 켜져 있어도 새로 재생)
         var state = darkChipSpineInstance.AnimationState;
         TrackEntry entry = state.SetAnimation(0, darkChipAnimName, darkChipAnimLoop);
 
-        // 루프가 아니면 자연스럽게 제거
         if (!darkChipAnimLoop)
         {
             state.AddEmptyAnimation(0, 0.15f, 0f);
-            StartCoroutine(DestroyAfter(entry)); // 자동 파괴 코루틴
+            StartCoroutine(DestroyAfter(entry));
         }
     }
-    
-    // ▼▼▼ [추가됨] 코코아 파우더 구현 함수 ▼▼▼
+
     void ApplyCocoaPowder()
     {
         if (player == null) return;
@@ -211,15 +251,87 @@ public class SkillManager : MonoBehaviour
         Debug.Log("[SkillManager] 코코아 파우더 활성화");
     }
 
-    // ▼▼▼ [추가됨] 딸기 팝코어 구현 함수 ▼▼▼
     void ApplyStrawberryPopCore()
     {
         if (player == null) return;
         player.hasStrawberryPopCore = true;
         Debug.Log("[SkillManager] 딸기 팝코어 활성화");
     }
-    // ▲▲▲ 추가 완료 ▲▲▲
 
+    // ★★★ 허니스핀 구체 생성 함수 ★★★
+    void ApplyHoneySpin()
+    {
+        if (player == null)
+        {
+            Debug.LogError("[SkillManager] ApplyHoneySpin 호출 시 player가 null 입니다.");
+            return;
+        }
+
+        // 플레이어 플래그 ON
+        player.hasHoneySpin = true;
+
+        // 이미 구체가 떠 있으면 중복 생성 방지
+        if (honeySpinInstances != null && honeySpinInstances.Count > 0)
+        {
+            Debug.Log("[SkillManager] 허니스핀 이미 활성화됨");
+            return;
+        }
+
+        if (honeySpinOrbPrefab == null)
+        {
+            Debug.LogError("[SkillManager] honeySpinOrbPrefab 비어 있음 (프리팹 연결 필요)");
+            return;
+        }
+
+        if (honeySpinOrbCount <= 0) honeySpinOrbCount = 2;
+
+        float angleStep = 360f / honeySpinOrbCount;
+
+        honeySpinInstances = new List<HoneySpin>();
+
+        for (int i = 0; i < honeySpinOrbCount; i++)
+        {
+            GameObject orb = Instantiate(honeySpinOrbPrefab, player.transform);
+            orb.name = $"HoneySpinOrb_{i + 1}";
+
+            HoneySpin spin = orb.GetComponent<HoneySpin>();
+            if (spin == null)
+            {
+                spin = orb.AddComponent<HoneySpin>();
+            }
+
+            float startAngle = i * angleStep;
+
+            spin.Initialize(
+                player.transform,
+                honeySpinRadius,
+                honeySpinRotateSpeed,
+                startAngle,
+                honeySpinDamage,
+                honeySpinSlowPercent,
+                honeySpinSlowDuration
+            );
+
+            honeySpinInstances.Add(spin);
+        }
+
+        Debug.Log("[SkillManager] 허니스핀 활성화: 구체 " + honeySpinOrbCount + "개 생성");
+    }
+
+    // 허니스핀 오브젝트 전부 제거
+    void ClearHoneySpinInstances()
+    {
+        if (honeySpinInstances == null) return;
+
+        for (int i = 0; i < honeySpinInstances.Count; i++)
+        {
+            if (honeySpinInstances[i] != null)
+            {
+                Destroy(honeySpinInstances[i].gameObject);
+            }
+        }
+        honeySpinInstances.Clear();
+    }
 
     // Spine 트랙 종료 후 이펙트 제거
     IEnumerator DestroyAfter(TrackEntry entry)

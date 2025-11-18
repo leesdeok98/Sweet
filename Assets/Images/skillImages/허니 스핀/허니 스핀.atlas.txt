@@ -1,0 +1,20 @@
+허니 스핀.png
+size:481,411
+filter:Linear,Linear
+pma:true
+허니 스핀
+bounds:2,2,407,417
+offsets:36,210,444,629
+rotate:90
+허니1r
+bounds:421,251,41,158
+offsets:3,4,47,163
+허니2r
+bounds:421,159,58,90
+offsets:1,1,60,95
+허니3r
+bounds:421,20,43,61
+offsets:1,1,46,64
+허니4r
+bounds:421,83,36,74
+offsets:1,2,38,77
