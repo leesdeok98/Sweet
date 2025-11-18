@@ -3,26 +3,78 @@ using UnityEngine;
 [System.Serializable]
 public class ItemData
 {
-    public string itemName;       // ¾ÆÀÌÅÛ ÀÌ¸§
-    public string description;    // ¾ÆÀÌÅÛ ¼³¸í
-    public Sprite icon;           // ¾ÆÀÌÄÜ ÀÌ¹ÌÁö (Inspector¿¡¼­ Á÷Á¢ ³Ö±â)
-    public ItemType type;         // ¾ÆÀÌÅÛÀÇ Á¾·ù (¹öÇÁ / È¸º¹ / ÆøÅº µî)
-    public float value;           // ¼öÄ¡ (¿¹: È¸º¹·®, ¹èÀ², Áö¼Ó½Ã°£ µî)
+    // --- 1. ìœ ì €ë‹˜ì˜ 'ì›ë˜' ë³€ìˆ˜ë“¤ (100% 'ìœ ì§€') ---
+    public string itemName;
+    public string description;
+    public Sprite icon;
+    public ItemType type; 
+    public float value;
 
+    // --- 2. 'í…ŒíŠ¸ë¦¬ìŠ¤' (5x5) 'ì „ìš©' 'ì¶”ê°€' ë³€ìˆ˜ë“¤ ---
+    public int width;
+    public int height;
+    public bool[,] shape; 
+
+    // --- 3. â˜…â˜…â˜… "None" + "ìœ ì €ë‹˜ì˜ 12ê°œ ëª©ë¡"ì´ í•©ì³ì§„ 'ìµœì¢…' Enum â˜…â˜…â˜… ---
     public enum ItemType
     {
-        CaramelCube,        // Ä«¶ó¸á Å¥ºê (1)
-        SugarShield,        // ½´°¡ ½Çµå (2)
-        StrawberryPopCore,  // µş±â ÆËÄÚ¾î (3)
-        RollingChocolateBar, // ·Ñ¸µ ÃÊÄÚ¹Ù (4)
-        CocoaPowder,        // ÄÚÄÚ¾Æ ÆÄ¿ì´õ (5)
-        SnowflakeCandy,     // ´«²É »çÅÁ (6)
-        PoppingCandy,       // ÆËÇÎ Äµµğ (7)
-        DarkChip,           // ´ÙÅ© Ä¨ (8)
-        IcedJelly,          // ¾ÆÀÌ½º Á©¸® (9)
-        SyrupTornado,       // ½Ã·´ Åä³×ÀÌµµ (10)
-        HoneySpin,          // Çã´Ï ½ºÇÉ (11)
-        SugarPorridge       // ¼³ÅÁ ÆøÁ× (12)
+        None,               // â˜… (ì œê°€ ì¶”ê°€í–ˆë˜ 'ìŠ¤í‚¬ ì—†ìŒ' - í•„ìˆ˜)
+
+        // (â†“ ì‚¬ìš©ìë‹˜ì˜ 'ë§ˆìŠ¤í„° ëª©ë¡' 12ê°œ)
+        CaramelCube,        
+        SugarShield,        
+        StrawberryPopCore,  
+        RollingChocolateBar, 
+        CocoaPowder,        
+        SnowflakeCandy,     
+        PoppingCandy,       // (ì´ì „ ë²„ì „ì—ì„œ ëˆ„ë½ë¨)
+        DarkChip,           
+        IcedJelly,          
+        SyrupTornado,       // (ì´ì „ ë²„ì „ì—ì„œ ëˆ„ë½ë¨)
+        HoneySpin,          // (ì´ì „ ë²„ì „ì—ì„œ ëˆ„ë½ë¨)
+        SugarPorridge       // (ì´ì „ ë²„ì „ì—ì„œ ëˆ„ë½ë¨)
+    }
+    // ---
+
+    // (ìƒì„±ì - ìˆ˜ì • ì—†ìŒ)
+    public ItemData(ItemData original, int w, int h, bool[,] s)
+    {
+        this.itemName = original.itemName;
+        this.description = original.description;
+        this.icon = original.icon;
+        this.type = original.type;
+        this.value = original.value;
+        this.width = w;
+        this.height = h;
+        this.shape = s;
     }
 
+    // (ActivateAbility í•¨ìˆ˜ - ìˆ˜ì • ì—†ìŒ)
+    public void ActivateAbility()
+    {
+        Debug.Log(itemName + "ì˜ 'ëŠ¥ë ¥'ì´ 'ë°œë™'ë˜ì—ˆìŠµë‹ˆë‹¤!");
+        
+        switch (type)
+        {
+            case ItemType.CaramelCube:
+                // ...
+                break;
+            case ItemType.SugarShield:
+                // ...
+                break;
+        }
+    }
+
+    // (DeactivateAbility í•¨ìˆ˜ - ìˆ˜ì • ì—†ìŒ)
+    public void DeactivateAbility()
+    {
+        Debug.Log(itemName + "ì˜ 'ëŠ¥ë ¥'ì´ 'ë¹„í™œì„±'ë˜ì—ˆìŠµë‹ˆë‹¤.");
+        
+        switch (type)
+        {
+            case ItemType.CaramelCube:
+                // ...
+                break;
+        }
+    }
 }
