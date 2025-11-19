@@ -110,7 +110,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: SkillIcon_0
+      name: StrawberryPopCore
       rect:
         serializedVersion: 2
         x: 169
@@ -131,7 +131,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkillIcon_1
+      name: HoneySpin
       rect:
         serializedVersion: 2
         x: 1316
@@ -152,7 +152,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkillIcon_3
+      name: SyrupTornado
       rect:
         serializedVersion: 2
         x: 2960
@@ -173,7 +173,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkillIcon_4
+      name: SugarPorridge
       rect:
         serializedVersion: 2
         x: 186
@@ -194,7 +194,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkillIcon_9
+      name: CocoaPowde
       rect:
         serializedVersion: 2
         x: 3306
@@ -215,7 +215,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkillIcon_13
+      name: DarkChip
       rect:
         serializedVersion: 2
         x: 2436
@@ -236,7 +236,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkillIcon_14
+      name: PoppingCandy
       rect:
         serializedVersion: 2
         x: 1282
@@ -257,7 +257,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkillIcon_29
+      name: RollingChocolateBar
       rect:
         serializedVersion: 2
         x: 161
@@ -278,7 +278,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkillIcon_30
+      name: SugarShield
       rect:
         serializedVersion: 2
         x: 3353
@@ -299,11 +299,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkillIcon_32
+      name: IcedJelly
       rect:
         serializedVersion: 2
         x: 925
-        y: 745
+        y: 751
         width: 768
         height: 540
       alignment: 0
@@ -320,7 +320,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkillIcon_33
+      name: SnowflakeCandy
       rect:
         serializedVersion: 2
         x: 1912
@@ -341,7 +341,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SkillIcon_34
+      name: CaramelCube
       rect:
         serializedVersion: 2
         x: 2648
@@ -372,13 +372,16 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      SkillIcon_0: 1512046430
-      SkillIcon_1: -2008756850
+      CaramelCube: -1459328844
+      CocoaPowde: 770485438
+      DarkChip: 271767605
+      HoneySpin: -2008756850
+      IcedJelly: 150283594
+      PoppingCandy: -1805200940
+      RollingChocolateBar: -280658307
       SkillIcon_10: -1740852799
       SkillIcon_11: 1856448929
       SkillIcon_12: 1903782240
-      SkillIcon_13: 271767605
-      SkillIcon_14: -1805200940
       SkillIcon_15: -1435545889
       SkillIcon_16: 563831349
       SkillIcon_17: 1169829571
@@ -394,20 +397,17 @@ TextureImporter:
       SkillIcon_26: 2127311896
       SkillIcon_27: -1411670699
       SkillIcon_28: -543684099
-      SkillIcon_29: -280658307
-      SkillIcon_3: -51118576
-      SkillIcon_30: 634009859
       SkillIcon_31: 1054307554
-      SkillIcon_32: 150283594
-      SkillIcon_33: -1470531393
-      SkillIcon_34: -1459328844
       SkillIcon_35: 1479323086
-      SkillIcon_4: -106123003
       SkillIcon_5: -166362503
       SkillIcon_6: -2074465935
       SkillIcon_7: -439411087
       SkillIcon_8: 2130410025
-      SkillIcon_9: 770485438
+      SnowflakeCandy: -1470531393
+      StrawberryPopCore: 1512046430
+      SugarPorridge: -106123003
+      SugarShield: 634009859
+      SyrupTornado: -51118576
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
