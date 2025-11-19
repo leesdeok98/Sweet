@@ -25,7 +25,7 @@ public class Player : MonoBehaviour
     public bool hasSyrupTornado = false;
     public bool hasCocoaPowder = false;
     public bool hasStrawberryPopCore = false;
-    public bool hasHoneySpin = false;   // ✅ 허니스핀
+    public bool hasHoneySpin = false;   
 
     // ✅ 인스펙터에서 체크된 스킬들을 한 번만 적용하기 위한 플래그
     private bool startingSkillsApplied = false;

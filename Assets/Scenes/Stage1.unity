@@ -56587,14 +56587,14 @@ MonoBehaviour:
   - itemName: "\uB538\uAE30\uD31D\uCF54\uC5B4"
     description: 
     icon: {fileID: 1512046430, guid: 263937157f3c1c74d83cba1f2d755c01, type: 3}
-    type: 2
+    type: 3
     value: 0
     width: 0
     height: 0
   - itemName: "\uCE74\uB77C\uBA5C\uD050\uBE0C"
     description: 
     icon: {fileID: -1459328844, guid: 263937157f3c1c74d83cba1f2d755c01, type: 3}
-    type: 0
+    type: 1
     value: 0
     width: 0
     height: 0
