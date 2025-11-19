@@ -11,11 +11,11 @@ public class InventoryManager : MonoBehaviour
 
     [Header("Grid Settings")]
     [SerializeField] private int gridWidth = 5;
-    [SerializeField] private int gridHeight = 8; // ★ (수정됨) 8줄
+    [SerializeField] private int gridHeight = 8; // 8줄
 
     [Header("Ability Zone")]
     [SerializeField]
-    private int activeZoneStartY = 3; // ★ (수정됨) Y=3부터 활성
+    private int activeZoneStartY = 3; // Y=3부터 활성
 
     [Header("UI Settings")]
     [SerializeField]
@@ -24,7 +24,6 @@ public class InventoryManager : MonoBehaviour
     private InventoryItemData[,] tetrisGrid; 
     private HashSet<InventoryItemData> processedItems = new HashSet<InventoryItemData>();
 
-    // (Awake - 수정 없음)
     void Awake()
     {
         if (instance == null) instance = this;
@@ -34,7 +33,6 @@ public class InventoryManager : MonoBehaviour
 
     // --- '공용' (Public) '테트리스' '핵심' '인터페이스' 함수들 ---
 
-    // (PlaceItem - 수정 없음)
     public bool PlaceItem(InventoryItemData itemData, int gridX, int gridY, int rotatedWidth, int rotatedHeight, bool[] rotatedShape, int rotationAngle)
     {
         if (!CanPlaceItem(itemData, gridX, gridY, rotatedWidth, rotatedHeight, rotatedShape))
@@ -54,7 +52,8 @@ public class InventoryManager : MonoBehaviour
             }
         }
         
-        UpdateActiveSkills(); 
+        // (즉시 스킬 갱신 방지 - 확인 버튼 누를 때 갱신됨)
+        // UpdateActiveSkills(); 
 
         SpawnItemUI(itemData, gridX, gridY, 
                     rotatedWidth, rotatedHeight, 
@@ -63,7 +62,6 @@ public class InventoryManager : MonoBehaviour
         return true; 
     }
 
-    // (RemoveDataOnly - 수정 없음)
     public bool RemoveDataOnly(InventoryItemData itemData)
     {
         bool removed = false;
@@ -75,12 +73,12 @@ public class InventoryManager : MonoBehaviour
                 }
             }
         }
-        if (removed) { UpdateActiveSkills(); }
+        // (즉시 스킬 갱신 방지)
+        // if (removed) { UpdateActiveSkills(); }
+        
         return removed;
     }
 
-
-    // (CanPlaceItem - Y=2 버퍼 영역 체크)
     public bool CanPlaceItem(InventoryItemData itemData, int gridX, int gridY, int rotatedWidth, int rotatedHeight, bool[] rotatedShape)
     {
         for (int y = 0; y < rotatedHeight; y++) {
@@ -101,15 +99,13 @@ public class InventoryManager : MonoBehaviour
         return true;
     }
 
-
-    // (UpdateActiveSkills - Y=3~7 활성 영역 스캔)
     public void UpdateActiveSkills()
     {
         if (SkillManager.Instance == null) return;
         SkillManager.Instance.ResetAllSkills();
         processedItems.Clear();
 
-        for (int y = activeZoneStartY; y < gridHeight; y++) // (Y=3 부터 Y=7 까지)
+        for (int y = activeZoneStartY; y < gridHeight; y++) 
         {
             for (int x = 0; x < gridWidth; x++) {
                 InventoryItemData item = tetrisGrid[x, y];
@@ -121,40 +117,67 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
+    // (지연 실행 함수)
+    public void ApplySkillsWithDelay(float delay)
+    {
+        StartCoroutine(DelayedUpdateRoutine(delay));
+    }
 
-    // (AddItem - Y=0, 1 보관함에 배치)
+    private IEnumerator DelayedUpdateRoutine(float delay)
+    {
+        yield return new WaitForSeconds(delay); 
+        UpdateActiveSkills(); 
+        Debug.Log($"[InventoryManager] {delay}초 지연 후 스킬 갱신 완료");
+    }
+
+
+    // ─────────────────────────────────────────────────────────────
+    // ★★★ [수정된 함수] 보관함 -> 활성 영역 순서로 빈 공간 탐색 ★★★
+    // ─────────────────────────────────────────────────────────────
     public bool AddItem(InventoryItemData itemData)
     {
-        for (int y = 0; y < 2; y++) // (Y=0 부터 Y=1 까지)
+        // 1단계: '보관함(Storage)' (Y = 0 ~ 1) 우선 탐색
+        for (int y = 0; y < 2; y++) 
         {
-            for (int x = 0; x < gridWidth; x++) {
-                if (CanPlaceItem(itemData, x, y, itemData.width, itemData.height, itemData.shape)) {
-                    PlaceItem(itemData, x, y, 
-                              itemData.width, itemData.height, 
-                              itemData.shape, 0); 
-                    return true;
+            for (int x = 0; x < gridWidth; x++) 
+            {
+                if (CanPlaceItem(itemData, x, y, itemData.width, itemData.height, itemData.shape)) 
+                {
+                    PlaceItem(itemData, x, y, itemData.width, itemData.height, itemData.shape, 0); 
+                    return true; // 보관함에 배치 성공
                 }
             }
         }
-        Debug.LogWarning($"{itemData.itemName}을(를) 보관함에 배치할 공간이 없습니다!");
+
+        // 2단계: 보관함이 꽉 찼다면 '활성 영역(Active Zone)' (Y = 3 ~ 끝) 탐색
+        // (Y=2는 경계선이라 건너뜁니다)
+        for (int y = activeZoneStartY; y < gridHeight; y++) 
+        {
+            for (int x = 0; x < gridWidth; x++) 
+            {
+                if (CanPlaceItem(itemData, x, y, itemData.width, itemData.height, itemData.shape)) 
+                {
+                    PlaceItem(itemData, x, y, itemData.width, itemData.height, itemData.shape, 0); 
+                    return true; // 활성 영역 빈 곳에 배치 성공
+                }
+            }
+        }
+
+        // 3단계: 전체 맵 어디에도 자리가 없음 -> 생성 포기
+        Debug.LogWarning($"[InventoryManager] 공간 부족! {itemData.itemName} 생성 실패. (보관함 및 활성 영역 모두 꽉 참)");
         return false;
     }
 
-    // (IsWithinGrid - Y=0~7 허용)
     private bool IsWithinGrid(int x, int y)
     {
-        return x >= 0 && x < gridWidth && y >= 0 && y < gridHeight; // (y < 8)
+        return x >= 0 && x < gridWidth && y >= 0 && y < gridHeight; 
     }
 
-    // (GetItemLayerRect - 수정 없음)
     public RectTransform GetItemLayerRect()
     {
         return itemLayerRect;
     }
 
-    // ---------------------------------------------------------------------
-    // ★ [수정] '중심' 피벗 기준 '스폰' 함수
-    // ---------------------------------------------------------------------
     private void SpawnItemUI(InventoryItemData itemData, int gridX, int gridY, int w, int h, bool[] shape, int rot)
     {
         if (itemUIPrefab == null) {
@@ -162,7 +185,6 @@ public class InventoryManager : MonoBehaviour
             return;
         }
 
-        // (중복 UI 검사 - 수정 없음)
         ItemDragHandler existingHandler = null;
         if (itemLayerRect != null) {
             foreach (Transform child in itemLayerRect) {
@@ -181,7 +203,6 @@ public class InventoryManager : MonoBehaviour
             itemObj = existingHandler.gameObject;
             dragHandler = existingHandler;
         } else {
-            // 부모를 지정하며 생성
             itemObj = Instantiate(itemUIPrefab, itemLayerRect);
             dragHandler = itemObj.GetComponent<ItemDragHandler>();
         }
@@ -192,25 +213,16 @@ public class InventoryManager : MonoBehaviour
             return;
         }
 
-        // 1. (중요) DragHandler 초기화 (Initialize가 피벗을 0.5로 설정함)
         dragHandler.Initialize(itemData, gridX, gridY, w, h, shape, rot);
 
-        // 2. (UI) 그리드 '중심' 좌표에 맞게 RectTransform 위치 설정
         RectTransform rt = itemObj.GetComponent<RectTransform>();
         if (rt != null)
         {
-            // ★★★ [여기가 수정되었습니다] ★★★
-            // 생성 직후 스케일이 엉망이거나 Z축이 뒤로 밀려 안 보이는 문제를 방지합니다.
             rt.localScale = Vector3.one; 
             rt.localPosition = new Vector3(rt.localPosition.x, rt.localPosition.y, 0);
-
             const float SLOT_SIZE = 100f; 
-            
-            // ★ (수정) (0,1) 좌상단 앵커 사용 (계산 편의)
             rt.anchorMin = new Vector2(0, 1);
             rt.anchorMax = new Vector2(0, 1);
-            
-            // ★ (수정) 좌상단 앵커 기준 (0.5, 0.5) 피벗의 '중심' 위치 계산
             rt.anchoredPosition = new Vector2(
                 (gridX * SLOT_SIZE) + (w * SLOT_SIZE / 2f),
                 -(gridY * SLOT_SIZE) - (h * SLOT_SIZE / 2f)

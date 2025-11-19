@@ -1,6 +1,4 @@
-// Stage1Setting.cs (최종 완성본: '확인 버튼' 관리 로직 제거 - InventoryInput이 담당함)
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement; 
 using UnityEngine.UI;
@@ -11,27 +9,29 @@ public class Stage1Setting : MonoBehaviour
     [Header("Main Panel")]
     [SerializeField] private GameObject pausePanel; 
     
+    [Header("Game Over Panel")]
+    [SerializeField] private GameObject gameOverPanel; 
+    
     [Header("Tetris Inventory Link")]
     [SerializeField] private GameObject tetrisInventoryPanel; 
     [SerializeField] private ItemSelectionUI itemSelectionUI; 
 
-    // ★ '확인 버튼' 슬롯이 여기서 '삭제'되었습니다.
-
-    // ('130줄' 이동 기능)
-    [SerializeField] private Vector2 inventoryEscPosition = new Vector2(-500f, 0f);
+    // ESC 눌렀을 때 인벤토리를 왼쪽으로 이동시키는 좌표
+    [SerializeField] private Vector2 inventoryEscPosition = new Vector2(-300f, 0f);
     private RectTransform inventoryRect;
     private Vector2 inventoryOriginalPosition;
     
     private bool isPaused = false; 
-
-    // '내가' (Stage1Setting) '시간'을 '직접' 멈췄는지 '기록'
+    
+    // '내가' 시간을 멈췄는지 기록하는 변수
     private bool didIPauseTime = false; 
 
     void Start()
     {
-        pausePanel.SetActive(false); 
-        
-        // ('130줄' 이동 기능) 'UI 부품' (RectTransform)을 '찾아본다'
+        if (pausePanel != null) pausePanel.SetActive(false); 
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+
+        // 1. 인벤토리 UI 위치 및 초기 상태 설정
         if (tetrisInventoryPanel != null)
         {
             inventoryRect = tetrisInventoryPanel.GetComponent<RectTransform>(); 
@@ -39,18 +39,14 @@ public class Stage1Setting : MonoBehaviour
             {
                 inventoryOriginalPosition = inventoryRect.anchoredPosition; 
             }
+            
+            // 시작 시 아이템 선택 중이 아니라면 인벤토리 끄기
+            if (itemSelectionUI == null || !itemSelectionUI.IsWaitingForClose())
+            {
+                tetrisInventoryPanel.SetActive(false);
+            }
         }
         
-        // '인벤토리 끄기' (Start)
-        if (itemSelectionUI == null || !itemSelectionUI.IsWaitingForClose())
-        {
-             if (tetrisInventoryPanel != null) 
-             {
-                 tetrisInventoryPanel.SetActive(false);
-             }
-        }
-        
-        // (★ 1번(A) 기능 추가) 씬 시작 시 시간/오디오/입력 초기화
         Time.timeScale = 1f;
         AudioListener.pause = false;
         Input.ResetInputAxes();
@@ -66,169 +62,135 @@ public class Stage1Setting : MonoBehaviour
         }
     }
 
-    // ★ 2번(B)의 'P키 대기' 이동 버그 '수정된' 함수
     public void TogglePause()
     {
-        isPaused = !isPaused; // '설정창' 켜기/끄기
+        isPaused = !isPaused;
 
-        if (isPaused) // '일시정지' (ESC 누름)
+        // ItemSelectionUI에게 ESC 상태 알림 (확인 버튼 숨김용)
+        if (itemSelectionUI != null)
         {
-            // ★ 1. '시간'이 '이미' 멈춰있는지 (1f인지) 확인
+            itemSelectionUI.IsEscMenuOpen = isPaused;
+        }
+
+        if (isPaused) // [ESC 메뉴 열림]
+        {
+            // 1. 시간 정지 체크
+            // (이미 시간이 0이면 아이템 선택 중이라는 뜻 -> 내가 멈춘 게 아님)
             if (Time.timeScale == 1f)
             {
                 Time.timeScale = 0f;
-                didIPauseTime = true; // '내가' 멈췄다고 '기록'
+                didIPauseTime = true; // "내가 멈췄음"
             }
             else
             {
-                didIPauseTime = false; // '내가' 멈춘 게 '아님'
+                didIPauseTime = false;
             }
             
-            // ★ 2. '설정창' 켜기
-            pausePanel.SetActive(true);
+            // 2. 설정창 켜기
+            if (pausePanel != null) pausePanel.SetActive(true);
 
-            // ★ 3. '인벤토리 켜기' (P키 대기 중이 '아닐' 때만)
-            if (itemSelectionUI == null || !itemSelectionUI.IsWaitingForClose())
+            // 3. ★★★ [복구됨] 인벤토리 보여주기 ★★★
+            // "ESC 때는 보이는 게 당연해" -> 강제로 켭니다.
+            if (tetrisInventoryPanel != null) 
             {
-                 if (tetrisInventoryPanel != null) 
-                 {
-                     tetrisInventoryPanel.SetActive(true); // '평소' 상태일 때만 '켠다'
-                 }
+                tetrisInventoryPanel.SetActive(true);
+                
+                // (선택) 위치 이동
+                if (inventoryRect != null)
+                    inventoryRect.anchoredPosition = inventoryEscPosition;
             }
-
-            // ★ 4. '인벤토리 이동' ('P키 대기'/'평소' '모두' '왼쪽'으로)
-            if (tetrisInventoryPanel != null && inventoryRect != null) 
-            {
-                 inventoryRect.anchoredPosition = inventoryEscPosition; 
-            }
-            
-            // ★ 5. [삭제] '확인 버튼' 숨기기 (InventoryInput이 담당)
         }
-        else // '게임 재개' (ESC 다시 누름)
+        else // [ESC 메뉴 닫힘]
         {
-            // ★ 1. '설정창' 끄기
-            pausePanel.SetActive(false);
+            // 1. 설정창 끄기
+            if (pausePanel != null) pausePanel.SetActive(false);
 
-            // ★ 2. '시간' 및 '인벤토리 끄기' 복구 ('내가' 멈췄을 때만)
+            // 2. 시간 복구 및 인벤토리 닫기
+            // ★★★ [핵심 수정] "내가 멈췄던 거라면(=원래 게임 중이었다면)" 무조건 닫습니다. ★★★
             if (didIPauseTime) 
             {
-                Time.timeScale = 1f; // '게임 재개'
-                didIPauseTime = false; // '기록' 삭제
-                
-                if (itemSelectionUI == null || !itemSelectionUI.IsWaitingForClose())
+                Time.timeScale = 1f; 
+                didIPauseTime = false; 
+
+                // 원래 게임 중이었으니 인벤토리는 닫혀있는 게 맞음 -> 강제 종료
+                if (tetrisInventoryPanel != null)
                 {
-                    if (tetrisInventoryPanel != null)
-                    {
-                        tetrisInventoryPanel.SetActive(false); // '평소' ESC는 '끈다'
-                    }
+                    tetrisInventoryPanel.SetActive(false);
                 }
             }
+            
+            // (참고) 만약 didIPauseTime이 false라면? 
+            // -> 아이템 선택 중이었다는 뜻이므로, 인벤토리를 끄지 않고 그대로 둡니다.
 
-            // ★ 3. '인벤토리 위치' 복구 ('P키 대기'/'평소' '모두' '가운데'로)
+            // 3. 인벤토리 위치 원복
             if (tetrisInventoryPanel != null && inventoryRect != null)
             {
                 inventoryRect.anchoredPosition = inventoryOriginalPosition;
             }
-
-            // ★ 4. [삭제] '확인 버튼' 다시 켜기 (InventoryInput이 담당)
         }
     }
 
-    // ★ 2번(B)의 'Resume' 버튼
+    // 'Resume' 버튼용 함수
     public void ResumeGame()
     {
-        isPaused = false; // '설정창' 끄기
-        pausePanel.SetActive(false);
+        isPaused = false; 
+        
+        if (itemSelectionUI != null) itemSelectionUI.IsEscMenuOpen = false;
+        if (pausePanel != null) pausePanel.SetActive(false);
 
-        // ★ 2. '시간' 및 '인벤토리 끄기' 복구 ('내가' 멈췄을 때만)
+        // ★★★ [핵심 수정] 여기도 동일하게 적용 ★★★
         if (didIPauseTime) 
         {
-            Time.timeScale = 1f; // '게임 재개'
-            didIPauseTime = false; // '기록' 삭제
+            Time.timeScale = 1f; 
+            didIPauseTime = false; 
 
-            if (itemSelectionUI == null || !itemSelectionUI.IsWaitingForClose())
+            if (tetrisInventoryPanel != null)
             {
-                if (tetrisInventoryPanel != null)
-                {
-                    tetrisInventoryPanel.SetActive(false); // '평소' ESC는 '끈다'
-                }
+                tetrisInventoryPanel.SetActive(false);
             }
         }
 
-        // ★ 3. '인벤토리 위치' 복구 ('P키 대기'/'평소' '모두' '가운데'로)
         if (tetrisInventoryPanel != null && inventoryRect != null)
         {
             inventoryRect.anchoredPosition = inventoryOriginalPosition;
         }
-
-        // ★ 4. [삭제] '확인 버튼' 다시 켜기 (InventoryInput이 담당)
         
-        // (★ 1번(A) 기능 추가) 입력 축 초기화
         Input.ResetInputAxes();
         var es = EventSystem.current; 
         if (es) es.SetSelectedGameObject(null);
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // ▼▼▼ 1번(A)에서 가져온 '재시작', '메인으로' 기능 (수정 없음) ▼▼▼
-    // ─────────────────────────────────────────────────────────────
-
-    // ... (QuitToMain, GoMainRoutine, OnClickRetry, LoadRoutine 함수는 이전과 동일하게 유지) ...
-    
-    /// <summary>
-    /// [1번(A) 기능] '메인으로' 버튼 클릭 시 (안전하게 씬 이동)
-    /// </summary>
-    public void QuitToMain()
+    // --- 게임 오버 및 씬 이동 (기존 유지) ---
+    public void ShowGameOver()
     {
-        StartCoroutine(GoMainRoutine());
+        Debug.Log("Stage1Setting: 게임 오버 UI 활성화");
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+            gameOverPanel.transform.SetAsLastSibling(); 
+        }
+        Time.timeScale = 0f;
+        if (tetrisInventoryPanel != null) tetrisInventoryPanel.SetActive(false);
     }
 
-    /// <summary>
-    /// [1번(A) 기능] 메인 씬 로드 코루틴
-    /// </summary>
-    private System.Collections.IEnumerator GoMainRoutine()
-    {
-        Time.timeScale = 1f;
+    public void QuitToMain() { StartCoroutine(GoMainRoutine()); }
+    private IEnumerator GoMainRoutine() { 
+        Time.timeScale = 1f; 
         AudioListener.pause = false;
-
-        // 메인으로 가기 전에 모든 Player 인스턴스 파괴
         var players = FindObjectsOfType<Player>(true);
-        foreach (var p in players)
-            Destroy(p.gameObject);
-
-        yield return null; // 파괴가 반영되도록 한 프레임 대기
-
-        SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        foreach (var p in players) Destroy(p.gameObject);
+        yield return null; 
+        SceneManager.LoadScene("Main", LoadSceneMode.Single); 
     }
-
-    /// <summary>
-    /// [1번(A) 기능] '재시작' 버튼 클릭 시
-    /// </summary>
-    public void OnClickRetry()
-    {
-        // 현재 씬의 이름을 가져와서 다시 로드
-        StartCoroutine(LoadRoutine(SceneManager.GetActiveScene().name));
-    }
-
-    /// <summary>
-    /// [1번(A) 기능] 씬 재시작 코루틴 (★ '좀비 플레이어' 버그 수정됨 ★)
-    /// </summary>
-    private IEnumerator LoadRoutine(string sceneName)
-    {
-        // 정지 해제 / 사운드 / 입력 축 초기화
-        Time.timeScale = 1f;
+    public void OnClickRetry() { StartCoroutine(LoadRoutine(SceneManager.GetActiveScene().name)); }
+    private IEnumerator LoadRoutine(string sceneName) { 
+        Time.timeScale = 1f; 
         AudioListener.pause = false;
         Input.ResetInputAxes();
-        var es = EventSystem.current; 
-        if (es) es.SetSelectedGameObject(null);
-        
-        // [버그 수정] '죽은 Player'를 확실히 파괴하고 씬을 로드
+        var es = EventSystem.current; if (es) es.SetSelectedGameObject(null);
         var players = FindObjectsOfType<Player>(true);
-        foreach (var p in players)
-            Destroy(p.gameObject);
-
-        yield return null; // 파괴가 반영되도록 한 프레임 대기
-        
-        SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+        foreach (var p in players) Destroy(p.gameObject);
+        yield return null; 
+        SceneManager.LoadScene(sceneName, LoadSceneMode.Single); 
     }
 }

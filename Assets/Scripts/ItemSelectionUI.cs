@@ -25,14 +25,14 @@ public class ItemSelectionUI : MonoBehaviour
     public GameObject tetrisInventoryPanel; // 테트리스 인벤토리 패널
 
     [Header("Items")]
-    public List<ItemData> itemPool = new List<ItemData>(); // 전체 아이템 풀 (12개 등)
+    public List<ItemData> itemPool = new List<ItemData>(); // 전체 아이템 풀
     private List<ItemData> currentChoices = new List<ItemData>(); // 이번에 뽑힌 아이템들
     private HashSet<ItemData> acquiredItems = new HashSet<ItemData>(); // 이미 획득한 아이템
 
     private bool isOpen = false;
 
     [Header("State Control")]
-    [Tooltip("ESC 설정 창이 열려있는지 여부 (다른 스크립트에서 제어용)")]
+    [Tooltip("ESC 설정 창이 열려있는지 여부 (Stage1Setting.cs에서 제어용)")]
     public bool IsEscMenuOpen = false;
 
     [Header("Tetris Inventory Mapping")]
@@ -112,7 +112,7 @@ public class ItemSelectionUI : MonoBehaviour
     }
 
     /// <summary>
-    /// 각 버튼의 아이콘, 이름, 설명을 UI에 반영
+    /// 각 버튼의 아이콘, 이름, 설명을 UI에 반영 (TextMeshPro 스타일 적용)
     /// </summary>
     void UpdateUI()
     {
@@ -186,9 +186,6 @@ public class ItemSelectionUI : MonoBehaviour
             acquiredItems.Add(chosen);
         }
 
-        // ★ 여기서는 스킬을 바로 적용하지 않고,
-        //    InventoryManager 쪽 5x5 활성 영역 로직에 맡긴다.
-
         // 테트리스 인벤토리(대기 영역)에 추가
         InventoryItemData tetrisItemToAdd = null;
 
@@ -206,36 +203,48 @@ public class ItemSelectionUI : MonoBehaviour
             InventoryManager.instance.AddItem(tetrisItemToAdd);
         }
 
-        // 선택창만 끄고, 인벤토리는 계속 보여줌 (P키로 게임 재개)
+        // 선택창만 끄고, 인벤토리는 계속 보여줌 (확인 버튼 대기)
         if (panelRoot != null)
         {
             panelRoot.SetActive(false);
         }
 
-        Debug.Log("[ItemSelectionUI] 아이템 선택 완료. 'P' 키를 눌러 게임을 재개하세요.");
+        Debug.Log("[ItemSelectionUI] 아이템 선택 완료. 확인 버튼을 눌러 게임을 재개하세요.");
     }
 
-    /// <summary>
-    /// InventoryInput.cs에서 'P'키로 창 닫을 때 호출
-    /// </summary>
-    public void Close()
-    {
-        if (!isOpen) return;
-        isOpen = false;
+    // ─────────────────────────────────────────────────────────────────────
+    // ▼▼▼ [수정됨] InventoryInput.cs와의 연결을 위한 핵심 함수들 ▼▼▼
+    // ─────────────────────────────────────────────────────────────────────
 
-        if (panelRoot != null) panelRoot.SetActive(false);
+    /// <summary>
+    /// (InventoryInput.cs에서 버튼 클릭 시 호출)
+    /// 인벤토리를 닫고 게임을 재개합니다.
+    /// </summary>
+    public void ClosePanelAndResume()
+    {
+        // 1. 테트리스 인벤토리 닫기
         if (tetrisInventoryPanel != null) tetrisInventoryPanel.SetActive(false);
 
-        Time.timeScale = 1f; // 게임 시간 재개
+        // 2. 아이템 선택창 닫기
+        if (panelRoot != null) panelRoot.SetActive(false);
+
+        // 3. 플래그 초기화
+        isOpen = false;
+        IsEscMenuOpen = false;
+
+        // 4. 게임 시간 재개
+        Time.timeScale = 1f; 
+
+        Debug.Log("[ItemSelectionUI] Closed & Resumed.");
     }
 
     /// <summary>
-    /// 아이템은 골랐고, P키를 기다리는 상태인지 확인용
+    /// (InventoryInput.cs에서 호출) 
+    /// 확인 버튼을 보여줘야 하는 상태인지(인벤토리 정리 중인지) 체크합니다.
     /// </summary>
     public bool IsWaitingForClose()
     {
-        // isOpen == true 이고 panelRoot가 꺼져 있으면
-        // -> 아이템은 선택했고, 아직 게임은 멈춘 상태(P키 대기중)
-        return isOpen && (panelRoot != null && !panelRoot.activeSelf);
+        // 테트리스 패널이 켜져 있다면 -> 유저가 정리를 마치고 나가길 기다리는 중
+        return tetrisInventoryPanel != null && tetrisInventoryPanel.activeSelf;
     }
 }
