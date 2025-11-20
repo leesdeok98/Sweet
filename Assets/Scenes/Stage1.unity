@@ -20538,7 +20538,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   totalTime: 300
-  itemInterval: 1
+  itemInterval: 30
   itemSelectionUI: {fileID: 1648878445}
   timeText: {fileID: 805644418}
   timeSlider: {fileID: 565826259}
@@ -26527,6 +26527,7 @@ MonoBehaviour:
   hasCocoaPowder: 0
   hasStrawberryPopCore: 0
   hasHoneySpin: 0
+  hasSnowflakeCandy: 0
 --- !u!114 &751445002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57013,6 +57014,12 @@ MonoBehaviour:
   honeySpinSlowPercent: 0.3
   honeySpinSlowDuration: 1
   honeySpinOrbCount: 2
+  snowflakeFreezeChance: 0.15
+  snowflakeFreezeDuration: 1
+  snowflakeAuraSprite: {fileID: 21300000, guid: 41e59097cf0f05346ae632675d625f5c, type: 3}
+  snowflakeAuraScale: 1.2
+  snowflakeAuraAlpha: 0.7
+  snowflakeAuraSortingOrderOffset: -1
 --- !u!114 &1648878447
 MonoBehaviour:
   m_ObjectHideFlags: 0
