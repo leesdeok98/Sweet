@@ -25,7 +25,8 @@ public class Player : MonoBehaviour
     public bool hasSyrupTornado = false;
     public bool hasCocoaPowder = false;
     public bool hasStrawberryPopCore = false;
-    public bool hasHoneySpin = false;   
+    public bool hasHoneySpin = false;
+    public bool hasSnowflakeCandy = false;
 
     // ✅ 인스펙터에서 체크된 스킬들을 한 번만 적용하기 위한 플래그
     private bool startingSkillsApplied = false;
@@ -96,33 +97,20 @@ public class Player : MonoBehaviour
         var sm = SkillManager.Instance;
 
         // ───────── 인스펙터 bool → SkillManager.ActivateSkill 매핑 ─────────
-        if (hasIcedJellySkill)
-            sm.ActivateSkill(ItemData.ItemType.IcedJelly);
-
-        if (hasSugarShield)
-            sm.ActivateSkill(ItemData.ItemType.SugarShield);
-
-        if (hasRollingChocolateBar)
-            sm.ActivateSkill(ItemData.ItemType.RollingChocolateBar);
-
-        if (hasPoppingCandy)
-            sm.ActivateSkill(ItemData.ItemType.PoppingCandy);
-
-        if (hasCocoaPowder)
-            sm.ActivateSkill(ItemData.ItemType.CocoaPowder);
-
-        if (hasStrawberryPopCore)
-            sm.ActivateSkill(ItemData.ItemType.StrawberryPopCore);
+        if (hasIcedJellySkill) sm.ActivateSkill(ItemData.ItemType.IcedJelly);
+        if (hasSugarShield) sm.ActivateSkill(ItemData.ItemType.SugarShield);
+        if (hasRollingChocolateBar) sm.ActivateSkill(ItemData.ItemType.RollingChocolateBar);
+        if (hasPoppingCandy) sm.ActivateSkill(ItemData.ItemType.PoppingCandy);
+        if (hasCocoaPowder) sm.ActivateSkill(ItemData.ItemType.CocoaPowder);
+        if (hasStrawberryPopCore) sm.ActivateSkill(ItemData.ItemType.StrawberryPopCore);
 
         // 🔥 여기 세 개가 “안 되던 애들” → 이제 시작 시에도 강제로 실행
-        if (hasHoneySpin)
-            sm.ActivateSkill(ItemData.ItemType.HoneySpin);
+        if (hasHoneySpin) sm.ActivateSkill(ItemData.ItemType.HoneySpin);
+        if (hasSyrupTornado) sm.ActivateSkill(ItemData.ItemType.SyrupTornado);
+        if (hasDarkChip) sm.ActivateSkill(ItemData.ItemType.DarkChip);
 
-        if (hasSyrupTornado)
-            sm.ActivateSkill(ItemData.ItemType.SyrupTornado);
-
-        if (hasDarkChip)
-            sm.ActivateSkill(ItemData.ItemType.DarkChip);
+        // ★ 추가: 눈꽃사탕 자동 적용
+        if (hasSnowflakeCandy) sm.ActivateSkill(ItemData.ItemType.SnowflakeCandy);
 
         // 한 번 적용 완료
         startingSkillsApplied = true;

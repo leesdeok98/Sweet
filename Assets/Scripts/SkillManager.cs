@@ -1,5 +1,4 @@
-﻿// SkillManager.cs (CocoaPowder 및 StrawberryPopCore + HoneySpin 기능 포함)
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Spine.Unity;
 using Spine;
@@ -65,6 +64,19 @@ public class SkillManager : MonoBehaviour
     private List<HoneySpin> honeySpinInstances = new List<HoneySpin>();
 
     // ─────────────────────────────────────────────────────────────
+    // ★ 눈꽃사탕(SnowflakeCandy) 설정
+    [Header("Snowflake Candy Settings")]
+    [Range(0f, 1f)] public float snowflakeFreezeChance = 0.15f; // 15%
+    [Min(0f)] public float snowflakeFreezeDuration = 1f;         // 인스펙터에서 조절
+    [Tooltip("총알 아래쪽 레이어에 표시할 하늘색 오라 이미지 (PNG Sprite)")]
+    public Sprite snowflakeAuraSprite;
+    [Tooltip("오라 크기 배율")]
+    public float snowflakeAuraScale = 1.2f;
+    [Range(0f, 1f)] public float snowflakeAuraAlpha = 0.7f;
+    [Tooltip("오라 정렬순서: 총알보다 아래로 내려가게 음수 권장(-1)")]
+    public int snowflakeAuraSortingOrderOffset = -1;
+
+    // ─────────────────────────────────────────────────────────────
 
     void Awake()
     {
@@ -89,8 +101,7 @@ public class SkillManager : MonoBehaviour
 
     void Update()
     {
-        // ▶ 혹시라도 런타임 중에 hasHoneySpin을 true로 바꾸면
-        //    (또는 인벤토리에서 스킬이 켜졌는데 아직 구체가 없다면) 자동 생성
+        // ▶ 런타임 중에 hasHoneySpin true로 바뀐 경우 자동 생성
         if (player != null && player.hasHoneySpin)
         {
             if (honeySpinInstances == null || honeySpinInstances.Count == 0)
@@ -117,6 +128,7 @@ public class SkillManager : MonoBehaviour
         player.hasCocoaPowder = false;
         player.hasStrawberryPopCore = false;
         player.hasHoneySpin = false;
+        player.hasSnowflakeCandy = false;
 
         // 스탯 및 중첩 횟수 초기화
         darkChipLevel = 0;
@@ -178,6 +190,12 @@ public class SkillManager : MonoBehaviour
                 break;
             case ItemData.ItemType.SyrupTornado:
                 ApplySyrupTornado();
+                break;
+
+            // ★ 추가: 눈꽃사탕
+            case ItemData.ItemType.SnowflakeCandy:
+                player.hasSnowflakeCandy = true;
+                Debug.Log("[SkillManager] SnowflakeCandy 활성화");
                 break;
 
             case ItemData.ItemType.None:

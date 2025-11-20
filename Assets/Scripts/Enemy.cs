@@ -22,6 +22,11 @@ public class Enemy : MonoBehaviour
     protected Rigidbody2D rb;
     protected Animator anim;
     protected SpriteRenderer spriter;
+    //이성덕이 적음 
+    private float freezeRemain = 0f;
+    private float savedSpeed = 0f;
+    private Color originalColor = Color.white;
+    private float originalAnimSpeed = 1f;
 
     [HideInInspector] public bool isSlowed = false;
     private float originalSpeed;          // 기본 속도(슬로우/해제에 필요)
@@ -30,6 +35,7 @@ public class Enemy : MonoBehaviour
     public float knockbackDuration = 0.1f;
     public bool isKnockback = false;
     public bool isStunned = false;
+    private bool isFrozen = false;
 
     private Coroutine removeSlowRoutine;
 
@@ -41,7 +47,11 @@ public class Enemy : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriter = GetComponent<SpriteRenderer>();
-        originalSpeed = speed; // 인스펙터의 초기 speed 저장
+        originalSpeed = speed; // 인스펙터의 초기 speed 저장ㅌ
+        //이성덕이 추가했음 
+        anim = GetComponent<Animator>();
+        if (spriter != null) originalColor = spriter.color;
+        if (anim != null) originalAnimSpeed = anim.speed;
     }
 
     void Start()
@@ -58,8 +68,25 @@ public class Enemy : MonoBehaviour
         isSlowed = false;
     }
 
+    void Update()
+    {
+        // 빙결 지속시간 관리
+        //이성덕이 작성
+        if (isFrozen)
+        {
+            freezeRemain -= Time.deltaTime;
+            if (freezeRemain <= 0f)
+                Unfreeze();
+        }
+    }
+
     public virtual void FixedUpdate()
     {
+        if (isFrozen || isStunned || isKnockback)
+        {
+            if (rb != null) rb.velocity = Vector2.zero;
+            return;
+        }
         if (!isLive || target == null) return;
 
         // 플레이어를 향해 이동
@@ -73,6 +100,7 @@ public class Enemy : MonoBehaviour
 
     void LateUpdate()
     {
+        if (!isLive) return;
         if (!isLive || target == null) return;
 
         // 좌우 플립
@@ -99,6 +127,14 @@ public class Enemy : MonoBehaviour
 
         // 🔸 처치 집계 플래그 초기화 (오브젝트 풀 대비)
         hasCountedKill = false;
+
+        isFrozen = false;          // 빙결 상태 해제
+        freezeRemain = 0f;         // 남은 빙결 시간 초기화
+        isStunned = false;         // 스턴 상태 해제
+        isKnockback = false;       // 넉백 상태 해제
+
+        if (anim != null) anim.speed = originalAnimSpeed;   // 애니메이션 재생속도 원복
+        if (spriter != null) spriter.color = originalColor; // 파란 틴트 등 색상 원복
     }
 
     /// <summary>
@@ -121,6 +157,14 @@ public class Enemy : MonoBehaviour
         isSlowed = false;
         hasCountedKill = false;
         isLive = true;
+        isFrozen = false;          // 빙결 상태 해제
+        freezeRemain = 0f;         // 남은 빙결 시간 초기화
+        isStunned = false;         // 스턴 상태 해제
+        isKnockback = false;       // 넉백 상태 해제
+
+        if (anim != null) anim.speed = originalAnimSpeed;   // 애니메이션 재생속도 원복
+        if (spriter != null) spriter.color = originalColor; // 파란 틴트 등 색상 원복
+
     }
 
     // ★★ 중요: 플레이어에게 데미지는 Player.cs에서만 처리하도록 유지
@@ -226,5 +270,47 @@ public class Enemy : MonoBehaviour
 
         isStunned = false;
     }
+    public void ApplyFreeze(float duration) //아성덕이 작성
+    {
+        if (duration <= 0f) return;
 
+        if (!isFrozen)
+        {
+            isFrozen = true;
+            freezeRemain = duration;
+            savedSpeed = speed;        // 기존 이동속도 저장
+            speed = 0f;                // 속도 0으로
+
+            if (anim != null)
+            {
+                originalAnimSpeed = anim.speed;
+                anim.speed = 0f;       // 애니메이션도 정지
+            }
+
+            if (spriter != null)
+            {
+                // 살짝 푸른빛(원래 색에乘해 약간 파랗게). 필요하면 여기서 고정 색도 가능
+                spriter.color = originalColor * new Color(0.7f, 0.85f, 1.15f, 1f);
+            }
+            if (rb != null) rb.velocity = Vector2.zero;
+        }
+        else
+        {
+            // 중첩 시 남은 시간 연장(선호 로직에 맞게 변경 가능)
+            freezeRemain = Mathf.Max(freezeRemain, duration);
+        }
+    }
+    private void Unfreeze() // 이성덕이 작성
+    {
+        isFrozen = false;
+        speed = savedSpeed;
+
+        if (anim != null)
+            anim.speed = originalAnimSpeed;
+
+        if (spriter != null)
+            spriter.color = originalColor;
+    }
 }
+
+
