@@ -2,9 +2,16 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem.LowLevel;
+using Spine.Unity;
 
 public class Enemy : MonoBehaviour
 {
+    [Header("Spine Setting")]
+    public SkeletonAnimation skeletonAnimation;
+    [SpineAnimation] public string runAnimName = "Run";
+    [SpineAnimation] public string deadAnimName = "Die";
+
     // 🔸 전역 이벤트: 어떤 적이든 죽으면 한 번만 방송
     public static Action OnAnyEnemyDied;
 
@@ -14,22 +21,20 @@ public class Enemy : MonoBehaviour
     public float maxHealth;
     public float dps;             // 초당 피해량 (Player가 읽어 씀)
 
-    [Header("Animation / Target")]
-    public RuntimeAnimatorController[] animCon;
+    [Header("Target")]
     public Rigidbody2D target;    // 추적 대상 (Player)
 
     protected bool isLive;
     protected Rigidbody2D rb;
-    protected Animator anim;
-    protected SpriteRenderer spriter;
+
     //이성덕이 적음 
     private float freezeRemain = 0f;
     private float savedSpeed = 0f;
     private Color originalColor = Color.white;
-    private float originalAnimSpeed = 1f;
+    //private float originalAnimSpeed = 1f;
 
     [HideInInspector] public bool isSlowed = false;
-    private float originalSpeed;          // 기본 속도(슬로우/해제에 필요)
+    protected float originalSpeed;      // 기본 속도(슬로우/해제에 필요)
 
     [Header("넉백, 경직")]
     public float knockbackDuration = 0.1f;
@@ -45,13 +50,7 @@ public class Enemy : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>();
-        spriter = GetComponent<SpriteRenderer>();
-        originalSpeed = speed; // 인스펙터의 초기 speed 저장ㅌ
-        //이성덕이 추가했음 
-        anim = GetComponent<Animator>();
-        if (spriter != null) originalColor = spriter.color;
-        if (anim != null) originalAnimSpeed = anim.speed;
+        originalSpeed = speed; // 인스펙터의 초기 speed 저장 
     }
 
     void Start()
@@ -87,6 +86,7 @@ public class Enemy : MonoBehaviour
             if (rb != null) rb.velocity = Vector2.zero;
             return;
         }
+
         if (!isLive || target == null) return;
 
         // 플레이어를 향해 이동
@@ -104,7 +104,7 @@ public class Enemy : MonoBehaviour
         if (!isLive || target == null) return;
 
         // 좌우 플립
-        spriter.flipX = target.position.x < rb.position.x;
+        //spriter.flipX = target.position.x < rb.position.x;
     }
 
     void OnEnable()
@@ -133,8 +133,10 @@ public class Enemy : MonoBehaviour
         isStunned = false;         // 스턴 상태 해제
         isKnockback = false;       // 넉백 상태 해제
 
-        if (anim != null) anim.speed = originalAnimSpeed;   // 애니메이션 재생속도 원복
-        if (spriter != null) spriter.color = originalColor; // 파란 틴트 등 색상 원복
+        if (skeletonAnimation != null)
+            skeletonAnimation.timeScale = 1f;
+        //if (anim != null) anim.speed = originalAnimSpeed;   // 애니메이션 재생속도 원복
+        //if (spriter != null) spriter.color = originalColor; // 파란 틴트 등 색상 원복
     }
 
     /// <summary>
@@ -162,8 +164,14 @@ public class Enemy : MonoBehaviour
         isStunned = false;         // 스턴 상태 해제
         isKnockback = false;       // 넉백 상태 해제
 
-        if (anim != null) anim.speed = originalAnimSpeed;   // 애니메이션 재생속도 원복
-        if (spriter != null) spriter.color = originalColor; // 파란 틴트 등 색상 원복
+        if (skeletonAnimation != null)
+        {
+            skeletonAnimation.timeScale = 1f; // 속도 정상화
+            skeletonAnimation.AnimationState.SetAnimation(0, runAnimName, true);
+        }
+
+        //if (anim != null) anim.speed = originalAnimSpeed;   // 애니메이션 재생속도 원복
+        //if (spriter != null) spriter.color = originalColor; // 파란 틴트 등 색상 원복
 
     }
 
@@ -192,8 +200,11 @@ public class Enemy : MonoBehaviour
         isLive = false;
         rb.velocity = Vector2.zero;
 
-        if (anim != null)
-            anim.SetTrigger("Dead");
+        if (skeletonAnimation != null)
+            skeletonAnimation.AnimationState.SetAnimation(0, deadAnimName, false);
+
+        //if (anim != null)
+        //    anim.SetTrigger("Dead");
 
         // 🔸 처치수는 정확히 한 번만 증가
         if (!hasCountedKill)
@@ -210,6 +221,13 @@ public class Enemy : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         gameObject.SetActive(false);
+    }
+    public virtual void OnCollisionStay2D(Collision2D collision)
+    {
+        if (isLive && collision.gameObject.CompareTag("Player"))
+        {
+            collision.gameObject.GetComponent<Player>().TakeDamage(dps * Time.deltaTime);
+        }
     }
 
     /// <summary>
@@ -266,6 +284,8 @@ public class Enemy : MonoBehaviour
 
         yield return new WaitForSeconds(duration);
 
+        if (skeletonAnimation != null) skeletonAnimation.timeScale = 1f;
+
         speed = isSlowed ? originalSpeed * 0.5f : originalSpeed;
 
         isStunned = false;
@@ -281,17 +301,22 @@ public class Enemy : MonoBehaviour
             savedSpeed = speed;        // 기존 이동속도 저장
             speed = 0f;                // 속도 0으로
 
-            if (anim != null)
-            {
-                originalAnimSpeed = anim.speed;
-                anim.speed = 0f;       // 애니메이션도 정지
-            }
+            if (skeletonAnimation != null)
+                skeletonAnimation.timeScale = 0f; // 시간 0 = 멈춤
 
-            if (spriter != null)
-            {
-                // 살짝 푸른빛(원래 색에乘해 약간 파랗게). 필요하면 여기서 고정 색도 가능
-                spriter.color = originalColor * new Color(0.7f, 0.85f, 1.15f, 1f);
-            }
+            // (선택사항) 색상 변경 코드 필요 시: skeletonAnimation.skeleton.SetColor(...) 사용
+
+            //if (anim != null)
+            //{
+            //    originalAnimSpeed = anim.speed;
+            //    anim.speed = 0f;       // 애니메이션도 정지
+            //}
+
+            //if (spriter != null)
+            //{
+            //    // 살짝 푸른빛(원래 색에乘해 약간 파랗게). 필요하면 여기서 고정 색도 가능
+            //    spriter.color = originalColor * new Color(0.7f, 0.85f, 1.15f, 1f);
+            //}
             if (rb != null) rb.velocity = Vector2.zero;
         }
         else
@@ -305,11 +330,13 @@ public class Enemy : MonoBehaviour
         isFrozen = false;
         speed = savedSpeed;
 
-        if (anim != null)
-            anim.speed = originalAnimSpeed;
+        if (skeletonAnimation != null)
+            skeletonAnimation.timeScale = 1f;
+        //if (anim != null)
+        //    anim.speed = originalAnimSpeed;
 
-        if (spriter != null)
-            spriter.color = originalColor;
+        //if (spriter != null)
+        //    spriter.color = originalColor;
     }
 }
 

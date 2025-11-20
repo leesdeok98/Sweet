@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour
         // 게임 상태 초기화
         ResetState();
 
+        AudioManager.instance.PlayBgm(AudioManager.Bgm.Battle_BGM);
+
         // 플레이어 오브젝트 자동 할당 보강
         if (player == null)
         {

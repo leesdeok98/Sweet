@@ -167,7 +167,8 @@ public class Stage1Setting : MonoBehaviour
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
-            gameOverPanel.transform.SetAsLastSibling(); 
+            gameOverPanel.transform.SetAsLastSibling();
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.GameOver_SFX);
         }
         Time.timeScale = 0f;
         if (tetrisInventoryPanel != null) tetrisInventoryPanel.SetActive(false);

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 
-public class SoundUIManager : MonoBehaviour
+public class AudioUIManager : MonoBehaviour
 {
     [SerializeField] private AudioMixer audioMixer;
     [SerializeField] private Slider masterSlider;
@@ -32,21 +32,21 @@ public class SoundUIManager : MonoBehaviour
 
     public void SetMasterVolume(float value)
     {
-        audioMixer.SetFloat("Master", Mathf.Log10(value) * 20);
+        audioMixer.SetFloat("Master", Mathf.Log10(value) * 25);
         PlayerPrefs.SetFloat("Master", value);
         PlayerPrefs.Save();
     }
 
     public void SetBGMVolume(float value)
     {
-        audioMixer.SetFloat("BGM", Mathf.Log10(value) * 20);
+        audioMixer.SetFloat("BGM", Mathf.Log10(value) * 25);
         PlayerPrefs.SetFloat("BGM", value);
         PlayerPrefs.Save();
     }
 
     public void SetSFXVolume(float value)
     {
-        audioMixer.SetFloat("SFX", Mathf.Log10(value) * 20);
+        audioMixer.SetFloat("SFX", Mathf.Log10(value) * 25);
         PlayerPrefs.SetFloat("SFX", value);
         PlayerPrefs.Save();
     }

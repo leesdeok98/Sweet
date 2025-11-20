@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 3136202060126810688}
   - component: {fileID: 8124182143867584305}
   - component: {fileID: 3235996481968160904}
-  - component: {fileID: 8778036881871200699}
+  - component: {fileID: -3256111909800784907}
   m_Layer: 6
   m_Name: FudgyGolem
   m_TagString: Enemy
@@ -194,7 +194,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1847090783
-  m_SortingLayer: 4
+  m_SortingLayer: 3
   m_SortingOrder: 10
   m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   m_Color: {r: 0.3679245, g: 0.2605694, b: 0.23082057, a: 1}
@@ -234,7 +234,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &8778036881871200699
+--- !u!114 &-3256111909800784907
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -243,14 +243,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 6036541347627888680}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f78fec4eebf8a34c8820cb09ce6845a, type: 3}
+  m_Script: {fileID: 11500000, guid: 374b4b38a51fafc4abce0568bced40ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
-  health: 20
-  maxHealth: 20
+  skeletonAnimation: {fileID: 0}
+  runAnimName: Run
+  deadAnimName: Die
+  speed: 0
+  health: 0
+  maxHealth: 0
   dps: 0
-  animCon: []
   target: {fileID: 0}
   isSlowed: 0
   knockbackDuration: 0.1
+  isKnockback: 0
+  isStunned: 0
+  moveTime: 2
+  stopTime: 1
+  idleAnimName: Idle

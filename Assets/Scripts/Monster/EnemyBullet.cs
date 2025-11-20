@@ -4,31 +4,37 @@ using UnityEngine;
 
 public class EnemyBullet : MonoBehaviour
 {
-    private float speed;
-    private float duration;
     private float damage;
-    private Vector2 direction;
+    private Rigidbody2D rb; 
 
     public void Initialize(Vector2 direction, float damage, float speed, float duration)
     {
-        this.direction = direction.normalized;
         this.damage = damage;
-        this.speed = speed;
-        this.duration = duration;
 
-        Destroy(gameObject, this.duration);
+        rb = GetComponent<Rigidbody2D>();
+
+        if (rb != null)
+        {
+            rb.velocity = direction.normalized * speed;
+        }
+
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+
+        Destroy(gameObject, duration);
     }
 
-    private void Update()
-    {
-        transform.Translate(direction * this.speed * Time.deltaTime);
-    }
 
     void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
-            collision.GetComponent<Player>().TakeDamage(damage);
+            Player player = collision.GetComponent<Player>();
+
+            if (player != null)
+            {
+                player.TakeDamage(damage);
+            }
             Destroy(gameObject);
         }
     }
