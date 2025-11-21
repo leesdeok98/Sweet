@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Iced Jelly
   m_EditorClassIdentifier: 
   itemName: Iced Jelly
-  icon: {fileID: 150283594, guid: 263937157f3c1c74d83cba1f2d755c01, type: 3}
+  icon: {fileID: 21300000, guid: 40b8fe77669d73347a0ac10144591fdd, type: 3}
   skillType: 9
   width: 2
   height: 1

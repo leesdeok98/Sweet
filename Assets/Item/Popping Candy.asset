@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Popping Candy
   m_EditorClassIdentifier: 
   itemName: Popping Candy
-  icon: {fileID: -1805200940, guid: 263937157f3c1c74d83cba1f2d755c01, type: 3}
+  icon: {fileID: 21300000, guid: 00a772bc241472143bde2ef7f00fea8d, type: 3}
   skillType: 7
   width: 2
   height: 2

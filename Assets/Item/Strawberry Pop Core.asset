@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Strawberry Pop Core
   m_EditorClassIdentifier: 
   itemName: Strawberry Pop Core
-  icon: {fileID: 1512046430, guid: 263937157f3c1c74d83cba1f2d755c01, type: 3}
+  icon: {fileID: 21300000, guid: f802725ef80cb394f9da185bdb95f011, type: 3}
   skillType: 3
   width: 2
   height: 2

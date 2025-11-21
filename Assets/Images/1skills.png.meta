@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 263937157f3c1c74d83cba1f2d755c01
+guid: 298fea1a364dc014096a9f4df2bdab84
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -21,7 +21,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 1
+  isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -113,10 +113,10 @@ TextureImporter:
       name: StrawberryPopCore
       rect:
         serializedVersion: 2
-        x: 169
-        y: 2932
-        width: 1023
-        height: 961
+        x: 162
+        y: 2925
+        width: 1037
+        height: 975
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -124,8 +124,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 340857f89dd38b9449f0c3294521843a
-      internalID: 1512046430
+      spriteID: bf1b369b715f2b142b7919737de91897
+      internalID: -1508116315
       vertices: []
       indices: 
       edges: []
@@ -134,10 +134,10 @@ TextureImporter:
       name: HoneySpin
       rect:
         serializedVersion: 2
-        x: 1316
-        y: 2865
-        width: 1465
-        height: 1006
+        x: 1309
+        y: 2858
+        width: 1480
+        height: 1020
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -145,8 +145,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ae5fa5242c90c44489650c74652b6c1c
-      internalID: -2008756850
+      spriteID: f298b16148f1ff0479538e27b74da4d1
+      internalID: 40604743
       vertices: []
       indices: 
       edges: []
@@ -155,10 +155,10 @@ TextureImporter:
       name: SyrupTornado
       rect:
         serializedVersion: 2
-        x: 2960
-        y: 2902
+        x: 2967
+        y: 2895
         width: 937
-        height: 966
+        height: 980
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,8 +166,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b4561b6965b488d4aaffc4df33dda1e2
-      internalID: -51118576
+      spriteID: 0280c41d5e737d54286d20a1e5d0cf1a
+      internalID: 1001257849
       vertices: []
       indices: 
       edges: []
@@ -176,72 +176,9 @@ TextureImporter:
       name: SugarPorridge
       rect:
         serializedVersion: 2
-        x: 186
-        y: 1741
-        width: 976
-        height: 962
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: bbb9219e59dd10744b458d7dbd17ba0a
-      internalID: -106123003
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CocoaPowde
-      rect:
-        serializedVersion: 2
-        x: 3306
-        y: 1727
-        width: 541
-        height: 956
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 2d0438cbfd42fd24fa9f65708fb15d43
-      internalID: 770485438
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: DarkChip
-      rect:
-        serializedVersion: 2
-        x: 2436
-        y: 1678
-        width: 546
-        height: 806
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: eabafc079da67fc45b5cb104b45bc77b
-      internalID: 271767605
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: PoppingCandy
-      rect:
-        serializedVersion: 2
-        x: 1282
-        y: 1694
-        width: 935
+        x: 179
+        y: 1734
+        width: 990
         height: 976
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -250,8 +187,71 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 63650fb206f46544db7da433beb0407a
-      internalID: -1805200940
+      spriteID: c2040e567b9ce094da59c6affaf69b5f
+      internalID: 1405807125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CocoaPowder
+      rect:
+        serializedVersion: 2
+        x: 3299
+        y: 1721
+        width: 555
+        height: 969
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dcaf9dde14a723446b193b07d51e41b1
+      internalID: -947522181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkChip
+      rect:
+        serializedVersion: 2
+        x: 2429
+        y: 1671
+        width: 560
+        height: 820
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 58f45ddca686d44469b1f57ebf7855be
+      internalID: -1807719522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoppingCandy
+      rect:
+        serializedVersion: 2
+        x: 1281
+        y: 1687
+        width: 942
+        height: 1003
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0e48e372689fb6143ba3f81d19acd332
+      internalID: -160895384
       vertices: []
       indices: 
       edges: []
@@ -260,10 +260,10 @@ TextureImporter:
       name: RollingChocolateBar
       rect:
         serializedVersion: 2
-        x: 161
-        y: 125
-        width: 606
-        height: 1263
+        x: 154
+        y: 118
+        width: 620
+        height: 1277
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -271,29 +271,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9341571ec5b7142499f59e9e1bcdf859
-      internalID: -280658307
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SugarShield
-      rect:
-        serializedVersion: 2
-        x: 3353
-        y: 697
-        width: 401
-        height: 755
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 11d8afc90762c9e43a3c55a216cb4e42
-      internalID: 634009859
+      spriteID: cf2ae3a805b9b824ba80ec82134c4752
+      internalID: -1386585558
       vertices: []
       indices: 
       edges: []
@@ -302,10 +281,10 @@ TextureImporter:
       name: IcedJelly
       rect:
         serializedVersion: 2
-        x: 925
-        y: 751
-        width: 768
-        height: 540
+        x: 918
+        y: 738
+        width: 782
+        height: 554
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -313,8 +292,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1328a95c06d05ff4d9a2e2e6edb178bb
-      internalID: 150283594
+      spriteID: 6135c2e9da89cee48adf7f136c11c053
+      internalID: -473537163
       vertices: []
       indices: 
       edges: []
@@ -323,10 +302,10 @@ TextureImporter:
       name: SnowflakeCandy
       rect:
         serializedVersion: 2
-        x: 1912
-        y: 748
-        width: 501
-        height: 504
+        x: 1905
+        y: 741
+        width: 515
+        height: 518
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -334,8 +313,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4dbfc2dd3e6927946bc75bb16562ecc6
-      internalID: -1470531393
+      spriteID: abe7d9ed9bda91c49ade104de9f09a19
+      internalID: 227401136
       vertices: []
       indices: 
       edges: []
@@ -344,10 +323,10 @@ TextureImporter:
       name: CaramelCube
       rect:
         serializedVersion: 2
-        x: 2648
-        y: 806
-        width: 489
-        height: 429
+        x: 2641
+        y: 799
+        width: 503
+        height: 443
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -355,8 +334,29 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f920ac31e0959784f87495c6ac8cdf7f
-      internalID: -1459328844
+      spriteID: 2457ebbae3e5a9d45a9f99ea6d6f5fec
+      internalID: -895708757
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SugarShield
+      rect:
+        serializedVersion: 2
+        x: 3324
+        y: 690
+        width: 439
+        height: 769
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aeff2c402bba198419178b3759959416
+      internalID: 101355160
       vertices: []
       indices: 
       edges: []
@@ -372,42 +372,28 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      CaramelCube: -1459328844
-      CocoaPowde: 770485438
-      DarkChip: 271767605
-      HoneySpin: -2008756850
-      IcedJelly: 150283594
-      PoppingCandy: -1805200940
-      RollingChocolateBar: -280658307
-      SkillIcon_10: -1740852799
-      SkillIcon_11: 1856448929
-      SkillIcon_12: 1903782240
-      SkillIcon_15: -1435545889
-      SkillIcon_16: 563831349
-      SkillIcon_17: 1169829571
-      SkillIcon_18: 1311517923
-      SkillIcon_19: -159918123
-      SkillIcon_2: 142524319
-      SkillIcon_20: -1851869640
-      SkillIcon_21: 1891076358
-      SkillIcon_22: 441040173
-      SkillIcon_23: 323127558
-      SkillIcon_24: 584462375
-      SkillIcon_25: -973856709
-      SkillIcon_26: 2127311896
-      SkillIcon_27: -1411670699
-      SkillIcon_28: -543684099
-      SkillIcon_31: 1054307554
-      SkillIcon_35: 1479323086
-      SkillIcon_5: -166362503
-      SkillIcon_6: -2074465935
-      SkillIcon_7: -439411087
-      SkillIcon_8: 2130410025
-      SnowflakeCandy: -1470531393
-      StrawberryPopCore: 1512046430
-      SugarPorridge: -106123003
-      SugarShield: 634009859
-      SyrupTornado: -51118576
+      CaramelCube: -895708757
+      CocoaPowder: -947522181
+      DarkChip: -1807719522
+      HoneySpin: 40604743
+      IcedJelly: -473537163
+      PoppingCandy: -160895384
+      RollingChocolateBar: -1386585558
+      SnowflakeCandy: 227401136
+      StrawberryPopCore: -1508116315
+      SugarPorridge: 1405807125
+      SugarShield: 101355160
+      SyrupTornado: 1001257849
+      skills_10: -1716489664
+      skills_11: -1847469894
+      skills_14: 6071969
+      skills_15: -809254281
+      skills_16: 194776613
+      skills_4: 1259703844
+      skills_5: -613177317
+      skills_6: 970589907
+      skills_7: -1800259011
+      skills_9: 967315085
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

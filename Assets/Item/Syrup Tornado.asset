@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Syrup Tornado
   m_EditorClassIdentifier: 
   itemName: Syrup Tornado
-  icon: {fileID: -51118576, guid: 263937157f3c1c74d83cba1f2d755c01, type: 3}
+  icon: {fileID: 21300000, guid: 5841091402cce5e459015528557a7b26, type: 3}
   skillType: 10
   width: 2
   height: 2
