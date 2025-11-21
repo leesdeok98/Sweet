@@ -52,7 +52,11 @@ public class ItemSelectionUI : MonoBehaviour
     [Tooltip("아이템 이름의 크기 배율 (기본 크기 대비 배수, 1.3 = 130%)")]
     [Range(0.5f, 2f)]
     public float nameSizeMultiplier = 1.3f;
-    // =======================================================
+
+    [Tooltip("아이템 이름과 설명 사이에 넣을 빈 줄 수")]
+    [Range(0, 10)]
+    public float nameDescEmptyLines = 0;
+    
 
     void Start()
     {
@@ -145,22 +149,22 @@ public class ItemSelectionUI : MonoBehaviour
                         {
                             label.fontSize = labelFontSize; // 설명 기본 크기
                         }
+
                     }
 
                     string nameText = currentChoices[i].itemName;
                     string descText = currentChoices[i].description;
-
-                    // 3-2. 이름: 가운데 정렬 + 크게 + 굵게
                     string formattedName =
                         $"<align=\"center\"><size={nameSizeMultiplier * 100f}%><b>{nameText}</size></align>";
-
-                    // 3-3. 설명: 왼쪽 정렬 + 기본 크기
                     string formattedDesc =
                         $"<align=\"left\">{descText}</align>";
+                    string gap = "\n"; 
+                    for (int n = 0; n < nameDescEmptyLines; n++)
+                    {
+                        gap += "\n";
+                    }  
+                    label.text = $"{formattedName}{gap}{formattedDesc}";
 
-                    // 3-4. 최종 텍스트 (위: 이름 / 아래: 설명)
-                    label.text = $"{formattedName}\n{formattedDesc}";
-                    // ※ TextMeshPro 컴포넌트에서 Rich Text 옵션이 켜져 있어야 합니다.
                 }
             }
             else
@@ -171,9 +175,6 @@ public class ItemSelectionUI : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 버튼 클릭 시 호출 (index는 0~2)
-    /// </summary>
     public void OnItemSelected(int index)
     {
         if (index < 0 || index >= currentChoices.Count) return;

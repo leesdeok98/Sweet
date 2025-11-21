@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8778499442915713533}
   - component: {fileID: 7415009911057949614}
   - component: {fileID: 2907261441043926367}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: "\uBE44\uD130\uBA5C\uD2B8 \uCE74\uC624\uC2A4"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -80,8 +80,8 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1562435213
+  m_SortingLayer: 6
   m_SortingOrder: 30
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &2907261441043926367

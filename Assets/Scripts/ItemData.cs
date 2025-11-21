@@ -8,7 +8,7 @@ public class ItemData
     public string description;
     public Sprite icon;
     public ItemType type; 
-    public float value;
+    //public float value;
 
     // --- 2. '테트리스' (5x5) '전용' '추가' 변수들 ---
     public int width;
@@ -43,7 +43,7 @@ public class ItemData
         this.description = original.description;
         this.icon = original.icon;
         this.type = original.type;
-        this.value = original.value;
+        //this.value = original.value;
         this.width = w;
         this.height = h;
         this.shape = s;
