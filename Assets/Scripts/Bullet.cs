@@ -15,6 +15,17 @@ public class Bullet : MonoBehaviour
     // ★ 눈꽃사탕 오라 내부용 참조
     private SpriteRenderer auraSR;
 
+    // ─────────────────────────────────────────────────────────────
+    // ★ 비터멜트 카오스 세트 효과용 설정값 (인스펙터에서 조절) ★
+    [Header("Bittermelt Chaos Set Settings")]
+    [Tooltip("세트 효과 지속 피해 (초당)")]
+    public float bittermeltChaosDps = 2f;           // 5초간 초당 2의 지속 피해
+    [Tooltip("세트 효과 지속 시간 (초)")]
+    public float bittermeltChaosDuration = 5f;      // 기본 5초
+    [Tooltip("플레이어 HP가 50% 이상일 때 적용될 공격력 배율 (1.3 = +30%)")]
+    public float bittermeltChaosHpBuffMultiplier = 1.3f;
+    // ─────────────────────────────────────────────────────────────
+
     void Start()
     {
         Destroy(gameObject, lifeTime);
@@ -56,7 +67,47 @@ public class Bullet : MonoBehaviour
         if (hitEnemy != null)
         {
             // 1) 기본 데미지
-            int finalDamage = Mathf.RoundToInt(baseDamage * damageMultiplier);
+            float finalDamageFloat = baseDamage * damageMultiplier; // ★ 내부 계산은 float으로
+
+            // ─────────────────────────────────────────────────────
+            // ★ 비터멜트 카오스 세트 효과: HP 50% 이상이면 공격력 +30%
+            //    (DarkChip + CocoaPowder + RollingChocolateBar 세트가 활성화된 상태에서만 동작)
+            // ─────────────────────────────────────────────────────
+            var smSet = SkillManager.Instance;
+            if (smSet != null && smSet.IsBittermeltChaosActive)
+            {
+                var player = smSet.player;
+                if (player != null && player.maxHealth > 0f)
+                {
+                    float hpRatio = player.health / player.maxHealth;
+                    if (hpRatio >= 0.5f)
+                    {
+                        // HP가 50% 이상일 때만 추가 배율 적용
+                        finalDamageFloat *= bittermeltChaosHpBuffMultiplier;
+                    }
+                }
+
+                // ─────────────────────────────────────────────
+                // ★ 비터멜트 카오스 세트 효과: 5초간 초당 2의 지속 피해
+                //    - Enemy 오브젝트에 BittermeltChaosDot 컴포넌트를 붙여서 Tick
+                //    - 이미 걸려있으면 남은 시간을 5초로 갱신
+                // ─────────────────────────────────────────────
+                if (bittermeltChaosDps > 0f && bittermeltChaosDuration > 0f)
+                {
+                    var dot = hitEnemy.GetComponent<BittermeltChaosDot>();
+                    if (dot == null)
+                    {
+                        dot = hitEnemy.gameObject.AddComponent<BittermeltChaosDot>();
+                        dot.Initialize(hitEnemy, bittermeltChaosDuration, bittermeltChaosDps);
+                    }
+                    else
+                    {
+                        dot.Refresh(bittermeltChaosDuration, bittermeltChaosDps);
+                    }
+                }
+            }
+
+            int finalDamage = Mathf.RoundToInt(finalDamageFloat);
             hitEnemy.TakeDamage(finalDamage);
 
             // (옵션) 2) 아이스젤리 스파인 확률 발동

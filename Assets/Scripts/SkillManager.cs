@@ -76,7 +76,22 @@ public class SkillManager : MonoBehaviour
     [Tooltip("오라 정렬순서: 총알보다 아래로 내려가게 음수 권장(-1)")]
     public int snowflakeAuraSortingOrderOffset = -1;
 
-    // ─────────────────────────────────────────────────────────────
+    // ★ 비터멜트 카오스 세트 효과 설정 (DarkChip + CocoaPowder + RollingChocolateBar)
+    [Header("Bittermelt Chaos Set Settings")]
+    [Tooltip("세트 효과 발동 시 재생할 Spine 프리팹 (1회 재생 후 파괴)")]
+    [SerializeField] private GameObject bittermeltChaosSpinePrefab;
+    [Tooltip("Spine 애니메이션 이름")]
+    [SerializeField] private string bittermeltChaosAnimName = "activate";
+    [Tooltip("세트 FX는 1번만 재생하고 끝나야 하므로 기본값은 false 입니다.")]
+    [SerializeField] private bool bittermeltChaosAnimLoop = false; // ★ 요구사항: loop = false
+    [Tooltip("플레이어 기준 위치 오프셋")]
+    [SerializeField]
+    private Vector3 bittermeltChaosLocalOffset = Vector3.zero;
+
+    //세트효과 발동 여부
+    private bool bittermeltChaosActive = false;
+
+    public bool IsBittermeltChaosActive => bittermeltChaosActive;
 
     void Awake()
     {
@@ -133,6 +148,9 @@ public class SkillManager : MonoBehaviour
         // 스탯 및 중첩 횟수 초기화
         darkChipLevel = 0;
         Bullet.damageMultiplier = 1f;
+
+        // 세트 효과 리셋
+        bittermeltChaosActive = false;
 
         // 지속형 오브젝트 파괴
         if (syrupTornadoInstance != null)
@@ -203,6 +221,9 @@ public class SkillManager : MonoBehaviour
                 Debug.Log($"[SkillManager] '{type}' 처리 미구현 아이템입니다.");
                 break;
         }
+        //세트 효과 체크
+        //DarkChip + CocoaPowder + RollingChocolateBar
+        CheckBittermeltChaosSet();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -350,6 +371,56 @@ public class SkillManager : MonoBehaviour
         }
         honeySpinInstances.Clear();
     }
+    // ─────────────────────────────────────────────────────────────
+    // ★ 비터멜트 카오스 세트 효과 체크 & 적용 로직 ★
+    // ─────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// DarkChip + CocoaPowder + RollingChocolateBar 를 모두 보유했는지 검사하고,
+    /// 처음으로 조건을 만족했을 때 비터멜트 카오스 세트 효과를 발동합니다.
+    /// </summary>
+    void CheckBittermeltChaosSet()
+    {
+        if (bittermeltChaosActive) return; // 이미 발동된 상태면 무시
+        if (player == null) return;
+
+        if (player.hasDarkChip && player.hasCocoaPowder && player.hasRollingChocolateBar)
+        {
+            ApplyBittermeltChaosSet();
+        }
+    }
+
+    
+    void ApplyBittermeltChaosSet() //비터멜트 세트효과 로직
+    {
+        bittermeltChaosActive = true;
+        Debug.Log("[SkillManager] 비터멜트 카오스 세트 효과 발동!");
+
+        if (player == null) return;
+        if (bittermeltChaosSpinePrefab == null)
+        {
+            // Spine FX를 아직 안 넣었어도 게임 진행에는 지장 없도록 로그만 남김
+            Debug.LogWarning("[SkillManager] bittermeltChaosSpinePrefab 비어 있음 (세트 FX는 나중에 연결 가능)");
+            return;
+        }
+
+        GameObject fx = Instantiate(bittermeltChaosSpinePrefab, player.transform);
+        fx.name = "BittermeltChaos_SetFX";
+        fx.transform.localPosition = bittermeltChaosLocalOffset;
+
+        SkeletonAnimation sa = fx.GetComponent<SkeletonAnimation>();
+        if (sa != null)
+        {
+            var state = sa.AnimationState;
+            TrackEntry entry = state.SetAnimation(0, bittermeltChaosAnimName, bittermeltChaosAnimLoop);
+
+            // 세트 FX는 1번만 재생하고 끝나야 하므로 loop = false 기준
+            if (!bittermeltChaosAnimLoop)
+            {
+                StartCoroutine(DestroySpineEffectAfter(sa, entry));
+            }
+        }
+    }
 
     // Spine 트랙 종료 후 이펙트 제거
     IEnumerator DestroyAfter(TrackEntry entry)
@@ -369,6 +440,26 @@ public class SkillManager : MonoBehaviour
         {
             Destroy(darkChipSpineInstance.gameObject);
             darkChipSpineInstance = null;
+        }
+    }
+
+    /// 비터멜트 카오스 전용 Spine FX 제거용 코루틴
+    IEnumerator DestroySpineEffectAfter(SkeletonAnimation sa, TrackEntry entry)
+    {
+        float duration = (entry != null && entry.Animation != null)
+            ? entry.Animation.Duration
+            : 0.5f;
+
+        float t = 0f;
+        while (t < duration + 0.2f)
+        {
+            t += Time.unscaledDeltaTime; // 일시정지 중에도 진행
+            yield return null;
+        }
+
+        if (sa != null)
+        {
+            Destroy(sa.gameObject);
         }
     }
 

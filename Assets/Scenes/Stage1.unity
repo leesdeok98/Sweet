@@ -57234,6 +57234,10 @@ MonoBehaviour:
   snowflakeAuraScale: 1.2
   snowflakeAuraAlpha: 0.7
   snowflakeAuraSortingOrderOffset: -1
+  bittermeltChaosSpinePrefab: {fileID: 7406085794817793385, guid: 697e694d32864ec4f98c6d9bfca88b5f, type: 3}
+  bittermeltChaosAnimName: animation
+  bittermeltChaosAnimLoop: 0
+  bittermeltChaosLocalOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &1648878447
 MonoBehaviour:
   m_ObjectHideFlags: 0
