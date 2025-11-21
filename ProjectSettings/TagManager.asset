@@ -18,7 +18,7 @@ TagManager:
   - Enemy
   - Player
   - Effect
-  - 
+  - Object
   - 
   - 
   - 
@@ -59,4 +59,7 @@ TagManager:
     locked: 0
   - name: hpbar
     uniqueID: 4277970259
+    locked: 0
+  - name: Object
+    uniqueID: 1569767775
     locked: 0
