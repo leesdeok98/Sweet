@@ -22,7 +22,13 @@ public class InventoryManager : MonoBehaviour
     private RectTransform itemLayerRect; 
 
     private InventoryItemData[,] tetrisGrid; 
-    private HashSet<InventoryItemData> processedItems = new HashSet<InventoryItemData>();
+    
+    // ★★★ [최적화] 현재 활성화된 스킬 목록 기억용 ★★★
+    // (이 목록과 비교해서 변화가 없으면 리셋을 안 함 -> 깜빡임 방지)
+    private HashSet<ItemData.ItemType> currentActiveSkills = new HashSet<ItemData.ItemType>();
+
+    // 변경 사항 감지 플래그
+    public bool isDirty = false; 
 
     void Awake()
     {
@@ -52,8 +58,7 @@ public class InventoryManager : MonoBehaviour
             }
         }
         
-        // (즉시 스킬 갱신 방지 - 확인 버튼 누를 때 갱신됨)
-        // UpdateActiveSkills(); 
+        isDirty = true; // 변경됨
 
         SpawnItemUI(itemData, gridX, gridY, 
                     rotatedWidth, rotatedHeight, 
@@ -73,8 +78,8 @@ public class InventoryManager : MonoBehaviour
                 }
             }
         }
-        // (즉시 스킬 갱신 방지)
-        // if (removed) { UpdateActiveSkills(); }
+        
+        if (removed) isDirty = true; // 변경됨
         
         return removed;
     }
@@ -88,7 +93,7 @@ public class InventoryManager : MonoBehaviour
                     int currentY = gridY + y;
 
                     if (!IsWithinGrid(currentX, currentY)) return false; 
-                    if (currentY == 2) return false; // (Y=2 배치 불가)
+                    if (currentY == 2) return false; 
                     if (tetrisGrid[currentX, currentY] != null && tetrisGrid[currentX, currentY] != itemData)
                     {
                         return false;
@@ -99,25 +104,55 @@ public class InventoryManager : MonoBehaviour
         return true;
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // ★★★ [핵심 수정] 스마트 스킬 갱신 (깜빡임 방지) ★★★
+    // ─────────────────────────────────────────────────────────────
     public void UpdateActiveSkills()
     {
         if (SkillManager.Instance == null) return;
-        SkillManager.Instance.ResetAllSkills();
-        processedItems.Clear();
+        
+        // 1. 이번 턴에 활성화되어야 할 스킬 목록을 새로 조사합니다.
+        // (중복 제거를 위해 HashSet 사용)
+        HashSet<ItemData.ItemType> newActiveSkills = new HashSet<ItemData.ItemType>();
 
+        // 활성 구역 스캔
         for (int y = activeZoneStartY; y < gridHeight; y++) 
         {
             for (int x = 0; x < gridWidth; x++) {
                 InventoryItemData item = tetrisGrid[x, y];
-                if (item != null && item.skillType != ItemData.ItemType.None && !processedItems.Contains(item)) {
-                    processedItems.Add(item);
-                    SkillManager.Instance.ActivateSkill(item.skillType);
+                
+                // 아이템이 있고, 스킬 타입이 None이 아니면 목록에 추가
+                if (item != null && item.skillType != ItemData.ItemType.None) {
+                    newActiveSkills.Add(item.skillType);
                 }
             }
         }
+
+        // 2. [비교] 기존 목록(currentActiveSkills)과 새 목록(newActiveSkills)이 완전히 똑같은지 확인합니다.
+        // (아이템 위치만 바뀌고 스킬 종류 구성은 그대로라면 굳이 초기화할 필요 없음!)
+        if (newActiveSkills.SetEquals(currentActiveSkills))
+        {
+            // 변화 없음 -> 갱신 건너뜀 (애니메이션 유지됨)
+            isDirty = false;
+            // Debug.Log("[InventoryManager] 스킬 구성 변동 없음. 갱신 생략.");
+            return;
+        }
+
+        // 3. [갱신] 구성이 달라졌을 때만 리셋하고 다시 켭니다.
+        SkillManager.Instance.ResetAllSkills();
+        
+        foreach (var skillType in newActiveSkills)
+        {
+            SkillManager.Instance.ActivateSkill(skillType);
+        }
+
+        // 4. 현재 상태 저장 및 플래그 해제
+        currentActiveSkills = newActiveSkills;
+        isDirty = false;
+        
+        Debug.Log("[InventoryManager] 스킬 구성 변경됨 -> 재활성화 완료");
     }
 
-    // (지연 실행 함수)
     public void ApplySkillsWithDelay(float delay)
     {
         StartCoroutine(DelayedUpdateRoutine(delay));
@@ -127,16 +162,13 @@ public class InventoryManager : MonoBehaviour
     {
         yield return new WaitForSeconds(delay); 
         UpdateActiveSkills(); 
-        Debug.Log($"[InventoryManager] {delay}초 지연 후 스킬 갱신 완료");
+        Debug.Log($"[InventoryManager] {delay}초 지연 후 스킬 갱신 체크 완료");
     }
 
-
-    // ─────────────────────────────────────────────────────────────
-    // ★★★ [수정된 함수] 보관함 -> 활성 영역 순서로 빈 공간 탐색 ★★★
-    // ─────────────────────────────────────────────────────────────
+    // (AddItem - 보관함 -> 활성 영역)
     public bool AddItem(InventoryItemData itemData)
     {
-        // 1단계: '보관함(Storage)' (Y = 0 ~ 1) 우선 탐색
+        // 1. 보관함
         for (int y = 0; y < 2; y++) 
         {
             for (int x = 0; x < gridWidth; x++) 
@@ -144,13 +176,12 @@ public class InventoryManager : MonoBehaviour
                 if (CanPlaceItem(itemData, x, y, itemData.width, itemData.height, itemData.shape)) 
                 {
                     PlaceItem(itemData, x, y, itemData.width, itemData.height, itemData.shape, 0); 
-                    return true; // 보관함에 배치 성공
+                    return true; 
                 }
             }
         }
 
-        // 2단계: 보관함이 꽉 찼다면 '활성 영역(Active Zone)' (Y = 3 ~ 끝) 탐색
-        // (Y=2는 경계선이라 건너뜁니다)
+        // 2. 활성 영역
         for (int y = activeZoneStartY; y < gridHeight; y++) 
         {
             for (int x = 0; x < gridWidth; x++) 
@@ -158,13 +189,12 @@ public class InventoryManager : MonoBehaviour
                 if (CanPlaceItem(itemData, x, y, itemData.width, itemData.height, itemData.shape)) 
                 {
                     PlaceItem(itemData, x, y, itemData.width, itemData.height, itemData.shape, 0); 
-                    return true; // 활성 영역 빈 곳에 배치 성공
+                    return true; 
                 }
             }
         }
 
-        // 3단계: 전체 맵 어디에도 자리가 없음 -> 생성 포기
-        Debug.LogWarning($"[InventoryManager] 공간 부족! {itemData.itemName} 생성 실패. (보관함 및 활성 영역 모두 꽉 참)");
+        Debug.LogWarning($"[InventoryManager] 공간 부족! {itemData.itemName} 생성 실패.");
         return false;
     }
 
