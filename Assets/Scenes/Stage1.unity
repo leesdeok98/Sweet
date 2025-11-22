@@ -12465,9 +12465,10 @@ GameObject:
   - component: {fileID: 1429503044}
   - component: {fileID: 1429503043}
   - component: {fileID: 1429503042}
-  - component: {fileID: 1429503041}
   - component: {fileID: 1429503040}
+  - component: {fileID: 1429503041}
   - component: {fileID: 1429503039}
+  - component: {fileID: 1429503046}
   - component: {fileID: 1429503038}
   - component: {fileID: 1429503045}
   m_Layer: 0
@@ -12683,6 +12684,7 @@ MonoBehaviour:
   hasStrawberryPopCore: 0
   hasHoneySpin: 0
   hasSnowflakeCandy: 0
+  hasCaramelCube: 1
 --- !u!70 &1429503045
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -12718,6 +12720,21 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: -0.10910167}
   m_Size: {x: 0.5, y: 1.2182033}
   m_Direction: 0
+--- !u!114 &1429503046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429503034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee534aa0108fa040ac0e4432fea5fec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  duration: 5
+  cooldown: 20
+  speedMultiplier: 2
 --- !u!1 &1432312277
 GameObject:
   m_ObjectHideFlags: 0
@@ -16400,6 +16417,7 @@ MonoBehaviour:
   gridHeight: 8
   activeZoneStartY: 3
   itemLayerRect: {fileID: 341056784}
+  isDirty: 0
 --- !u!114 &1905553305
 MonoBehaviour:
   m_ObjectHideFlags: 0

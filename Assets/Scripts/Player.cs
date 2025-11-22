@@ -38,6 +38,7 @@ public class Player : MonoBehaviour
     public bool hasStrawberryPopCore = false;
     public bool hasHoneySpin = false;
     public bool hasSnowflakeCandy = false;
+    public bool hasCaramelCube = false;
 
     //인스펙터에서 체크된 스킬들을 한 번만 적용하기 위한 플래그
     private bool startingSkillsApplied = false;
@@ -143,6 +144,7 @@ public class Player : MonoBehaviour
         if (hasPoppingCandy) sm.ActivateSkill(ItemData.ItemType.PoppingCandy);
         if (hasCocoaPowder) sm.ActivateSkill(ItemData.ItemType.CocoaPowder);
         if (hasStrawberryPopCore) sm.ActivateSkill(ItemData.ItemType.StrawberryPopCore);
+        if (hasCaramelCube) sm.ActivateSkill(ItemData.ItemType.CaramelCube);
 
         // 🔥 여기 세 개가 “안 되던 애들” → 이제 시작 시에도 강제로 실행
         if (hasHoneySpin) sm.ActivateSkill(ItemData.ItemType.HoneySpin);

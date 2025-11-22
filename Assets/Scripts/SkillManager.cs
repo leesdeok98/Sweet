@@ -144,6 +144,7 @@ public class SkillManager : MonoBehaviour
         player.hasStrawberryPopCore = false;
         player.hasHoneySpin = false;
         player.hasSnowflakeCandy = false;
+        player.hasCaramelCube = false;
 
         // 스탯 및 중첩 횟수 초기화
         darkChipLevel = 0;
@@ -189,6 +190,9 @@ public class SkillManager : MonoBehaviour
                 break;
             case ItemData.ItemType.PoppingCandy:
                 player.hasPoppingCandy = true;
+                break;
+            case ItemData.ItemType.CaramelCube: 
+                player.hasCaramelCube = true;
                 break;
 
             // --- 코코아/딸기/허니스핀 ---

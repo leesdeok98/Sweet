@@ -13,8 +13,6 @@ public class CocoaPowderBullet : MonoBehaviour
     private SpriteRenderer sr;
     private Player player;
 
-//남은영 실수함
-    // ���� �迭 ���� (���ھ� ����)
     private readonly Color cocoaColor = new Color(0.55f, 0.3f, 0.1f);
 
     void Awake()
