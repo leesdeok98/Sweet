@@ -13,16 +13,17 @@ public class CocoaPowderBullet : MonoBehaviour
     private SpriteRenderer sr;
     private Player player;
 
-    // °¥»ö °è¿­ »ö»ó (ÄÚÄÚ¾Æ ´À³¦)
+//ë‚¨ì€ì˜ ì‹¤ìˆ˜í•¨
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½è¿­ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½Ú¾ï¿½ ï¿½ï¿½ï¿½ï¿½)
     private readonly Color cocoaColor = new Color(0.55f, 0.3f, 0.1f);
 
     void Awake()
     {
-        // º»Ã¼¿¡ SpriteRenderer ÀÖÀ¸¹Ç·Î ÀÌ°É·Î ÃæºĞ
+        // ï¿½ï¿½Ã¼ï¿½ï¿½ SpriteRenderer ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½Ì°É·ï¿½ ï¿½ï¿½ï¿½
         sr = GetComponent<SpriteRenderer>();
         player = GameObject.FindWithTag("Player")?.GetComponent<Player>();
 
-        // ÇÁ¸®ÆÕ »ö»ó º¸Àå
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (sr != null)
             sr.color = cocoaColor;
     }
@@ -51,12 +52,12 @@ public class CocoaPowderBullet : MonoBehaviour
 
         hitEnemy.TakeDamage(damage);
 
-        // ³Ë¹é, °æÁ÷ Àû¿ë
+        // ï¿½Ë¹ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         Vector2 knockDir = (hitEnemy.transform.position - transform.position).normalized;
         hitEnemy.ApplyKnockback(knockDir, knockbackPower);
         hitEnemy.ApplyStun(stunDuration);
 
-        // ºñÈ°¼ºÈ­·Î
+        // ï¿½ï¿½È°ï¿½ï¿½È­ï¿½ï¿½
         Deactivate();
     }
 }
