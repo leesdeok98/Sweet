@@ -12678,13 +12678,13 @@ MonoBehaviour:
   hasSugarShield: 0
   hasDarkChip: 0
   hasRollingChocolateBar: 0
-  hasPoppingCandy: 0
+  hasPoppingCandy: 1
   hasSyrupTornado: 0
   hasCocoaPowder: 0
   hasStrawberryPopCore: 0
   hasHoneySpin: 0
   hasSnowflakeCandy: 0
-  hasCaramelCube: 1
+  hasCaramelCube: 0
 --- !u!70 &1429503045
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -14510,7 +14510,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c33f87fcbc9bbdc4da099706f300ba64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
+  player: {fileID: 1429503044}
   syrupTornadoPrefab: {fileID: 2310070060321691167, guid: a82ec8fadc6d17947bd2ede781fe6b10, type: 3}
   poppingColliderRadius: 0.3
   poppingRange: 5
@@ -14526,6 +14526,7 @@ MonoBehaviour:
   - {fileID: 602878481925108109, guid: 1198467f65cf3704c8a9daf0b4e78122, type: 3}
   - {fileID: 8337420281652448825, guid: 430edfe8e42fa114dbe322adb7506925, type: 3}
   - {fileID: 2573533215926175062, guid: 51da079ab9b4a214aaf8fd33d696401b, type: 3}
+  poppingChance: 1
   darkChipPercent: 0.3
   darkChipSpinePrefab: {fileID: 8358102944823119088, guid: 3bce94651fab6a442b4539f11bd7c52e, type: 3}
   darkChipAnimName: animation

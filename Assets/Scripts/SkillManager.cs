@@ -27,6 +27,7 @@ public class SkillManager : MonoBehaviour
     [Range(0f, 3f)] public float poppingDamageFactor = 0.8f;
     public GameObject poppingDefaultShardPrefab;
     public GameObject[] poppingShardPrefabs = new GameObject[8];
+    [Range(0f, 1f)] public float poppingChance = 1f;   // 1 = 100% 발동
 
     [Header("Dark Chip Settings")]
     [Range(0f, 1f)] public float darkChipPercent = 0.3f; // +30%
@@ -375,14 +376,11 @@ public class SkillManager : MonoBehaviour
         }
         honeySpinInstances.Clear();
     }
-    // ─────────────────────────────────────────────────────────────
-    // ★ 비터멜트 카오스 세트 효과 체크 & 적용 로직 ★
-    // ─────────────────────────────────────────────────────────────
+    
 
-    /// <summary>
+   
     /// DarkChip + CocoaPowder + RollingChocolateBar 를 모두 보유했는지 검사하고,
-    /// 처음으로 조건을 만족했을 때 비터멜트 카오스 세트 효과를 발동합니다.
-    /// </summary>
+
     void CheckBittermeltChaosSet()
     {
         if (bittermeltChaosActive) return; // 이미 발동된 상태면 무시

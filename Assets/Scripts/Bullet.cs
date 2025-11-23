@@ -15,6 +15,7 @@ public class Bullet : MonoBehaviour
     // ★ 눈꽃사탕 오라 내부용 참조
     private SpriteRenderer auraSR;
 
+
     // ─────────────────────────────────────────────────────────────
     // ★ 비터멜트 카오스 세트 효과용 설정값 (인스펙터에서 조절) ★
     [Header("Bittermelt Chaos Set Settings")]
@@ -132,8 +133,33 @@ public class Bullet : MonoBehaviour
                 }
             }
 
-            // (기존) 팝핑캔디 등 다른 처리들 있으면 아래에 그대로…
-            // 충돌지점 근사 등 기존 코드 유지
+            // ★ 4) 팝핑캔디: 적 맞은 지점에서 8방향 버스트
+            if (sm != null && sm.player != null && sm.player.hasPoppingCandy)
+            {
+                // 발동 확률 체크 (확률 쓰기 싫으면 이 if는 지워도 됨)
+                if (Random.value <= (sm.poppingChance <= 0f ? 1f : sm.poppingChance))
+                {
+                    // 충돌 지점 (already have collision)
+                    Vector2 hitPoint = collision.ClosestPoint(transform.position);
+
+                    // 샤드 데미지 = 최종 데미지 * 배율
+                    int burstDamage = Mathf.RoundToInt(finalDamageFloat * sm.poppingDamageFactor);
+
+                    // 버스트 컨테이너 생성
+                    GameObject burst = new GameObject("PoppingCandyBurst");
+                    burst.transform.position = hitPoint;
+
+                    var comp = burst.AddComponent<PoppingCandyBurst>();
+                    comp.Initialize(
+                        colliderRadius: sm.poppingColliderRadius,
+                        range: sm.poppingRange,
+                        speed: sm.poppingShardSpeed,
+                        damage: burstDamage,
+                        defaultShardPrefab: sm.poppingDefaultShardPrefab,
+                        shardPrefabs: sm.poppingShardPrefabs
+                    );
+                }
+            }
         }
 
         // 총알 소멸
