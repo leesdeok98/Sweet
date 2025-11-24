@@ -68,11 +68,11 @@ public class Bullet : MonoBehaviour
         if (hitEnemy != null)
         {
             // 1) 기본 데미지
-            float finalDamageFloat = baseDamage * damageMultiplier; // ★ 내부 계산은 float으로
+            float finalDamageFloat = baseDamage * damageMultiplier;
 
             // ─────────────────────────────────────────────────────
-            // ★ 비터멜트 카오스 세트 효과: HP 50% 이상이면 공격력 +30%
-            //    (DarkChip + CocoaPowder + RollingChocolateBar 세트가 활성화된 상태에서만 동작)
+            // 비터멜트 카오스 세트 효과: HP 50% 이상이면 공격력 +30%
+            //  (DarkChip + CocoaPowder + RollingChocolateBar 세트가 활성화된 상태에서만 동작)
             // ─────────────────────────────────────────────────────
             var smSet = SkillManager.Instance;
             if (smSet != null && smSet.IsBittermeltChaosActive)
@@ -89,9 +89,9 @@ public class Bullet : MonoBehaviour
                 }
 
                 // ─────────────────────────────────────────────
-                // ★ 비터멜트 카오스 세트 효과: 5초간 초당 2의 지속 피해
-                //    - Enemy 오브젝트에 BittermeltChaosDot 컴포넌트를 붙여서 Tick
-                //    - 이미 걸려있으면 남은 시간을 5초로 갱신
+                // 비터멜트 카오스 세트 효과: 5초간 초당 2의 지속 피해
+                //  Enemy 오브젝트에 BittermeltChaosDot 컴포넌트를 붙여서 Tick
+                //  이미 걸려있으면 남은 시간을 5초로 갱신
                 // ─────────────────────────────────────────────
                 if (bittermeltChaosDps > 0f && bittermeltChaosDuration > 0f)
                 {
@@ -106,6 +106,17 @@ public class Bullet : MonoBehaviour
                         dot.Refresh(bittermeltChaosDuration, bittermeltChaosDps);
                     }
                 }
+            }
+
+            // ─────────────────────────────────────────────
+            // ★ 아이스브레이커 세트 효과:
+            //   SnowflakeCandy + IcedJelly + PoppingCandy 세트가 활성 상태라면
+            //   얼음 계열 공격에 고정 데미지 +5 추가 (finalDamageFloat에 더함)
+            // ─────────────────────────────────────────────
+            var smIce = SkillManager.Instance;
+            if (smIce != null && smIce.IsIcebreakerActive)
+            {
+                finalDamageFloat += smIce.IcebreakerBonusDamage;
             }
 
             int finalDamage = Mathf.RoundToInt(finalDamageFloat);

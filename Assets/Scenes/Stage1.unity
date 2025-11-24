@@ -12678,7 +12678,7 @@ MonoBehaviour:
   hasSugarShield: 0
   hasDarkChip: 0
   hasRollingChocolateBar: 0
-  hasPoppingCandy: 1
+  hasPoppingCandy: 0
   hasSyrupTornado: 0
   hasCocoaPowder: 0
   hasStrawberryPopCore: 0
@@ -14549,6 +14549,12 @@ MonoBehaviour:
   bittermeltChaosAnimName: animation
   bittermeltChaosAnimLoop: 0
   bittermeltChaosLocalOffset: {x: 0, y: 0, z: 0}
+  icebreakerSpinePrefab: {fileID: 8255982626959705862, guid: 30ec96ca79db5e74fa4fbfef690da2e7, type: 3}
+  icebreakerAnimName: animation
+  icebreakerAnimLoop: 0
+  icebreakerLocalOffset: {x: 0, y: 0, z: 0}
+  icebreakerSlowPercent: 0.1
+  icebreakerBonusDamage: 5
 --- !u!114 &1648878447
 MonoBehaviour:
   m_ObjectHideFlags: 0

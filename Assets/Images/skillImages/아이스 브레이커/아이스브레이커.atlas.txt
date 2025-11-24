@@ -1,0 +1,15 @@
+아이스브레이커.png
+size:1923,1084
+filter:Linear,Linear
+pma:true
+그레이디언트 칠 2
+bounds:2,2,1919,1080
+offsets:1,1,1921,1082
+
+아이스브레이커_2.png
+size:1924,1084
+filter:Linear,Linear
+pma:true
+레이어 10 복사
+bounds:2,2,1920,1080
+offsets:1,1,1922,1082

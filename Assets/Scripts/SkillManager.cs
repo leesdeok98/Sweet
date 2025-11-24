@@ -38,7 +38,7 @@ public class SkillManager : MonoBehaviour
     private SkeletonAnimation darkChipSpineInstance;
     private int darkChipLevel = 0;
 
-    // ★★★★★ 허니스핀 설정값 ★★★★★
+    // 허니스핀 설정값 
     [Header("Honey Spin Settings")]
     [Tooltip("허니스핀 ‘구체(오브젝트)’ 프리팹 (SkeletonAnimation + HoneySpin.cs 포함)")]
     public GameObject honeySpinOrbPrefab;
@@ -64,7 +64,7 @@ public class SkillManager : MonoBehaviour
     // 현재 씬에서 살아있는 허니스핀 오브젝트들
     private List<HoneySpin> honeySpinInstances = new List<HoneySpin>();
 
-    // ─────────────────────────────────────────────────────────────
+
     // ★ 눈꽃사탕(SnowflakeCandy) 설정
     [Header("Snowflake Candy Settings")]
     [Range(0f, 1f)] public float snowflakeFreezeChance = 0.15f; // 15%
@@ -89,11 +89,44 @@ public class SkillManager : MonoBehaviour
     [SerializeField]
     private Vector3 bittermeltChaosLocalOffset = Vector3.zero;
 
+    // Icebreaker 세트 발동 시 보여줄 Spine FX 설정
+    [Header("Icebreaker Set FX (Spine)")]
+    [Tooltip("아이스브레이커 세트 발동 시 1회 재생할 Spine 프리팹")]
+    [SerializeField] private GameObject icebreakerSpinePrefab;
+    [Tooltip("Spine 애니메이션 이름")]
+    [SerializeField] private string icebreakerAnimName = "activate";
+    [Tooltip("세트 FX는 1번만 재생하고 끝나야 하므로 기본값은 false 입니다.")]
+    [SerializeField] private bool icebreakerAnimLoop = false;   // 요구사항: loop = false
+    [Tooltip("플레이어 기준 위치 오프셋")]
+    [SerializeField] private Vector3 icebreakerLocalOffset = Vector3.zero;
+
+
+    //아이스 브레이커 세트 효과
+    //눈꽃사탕+아이스 젤리+팝핑 캔디
+    //모든 적 이동속도 10%감소, 눈꽃사탕,아이스 젤리 데미지 5 증가
+    [Header("Icebreaker Set Settings")]
+    [Tooltip("세트 효과 발동 시, 모든 적 이동속도 감소 비율 (0.1 = 10% 느려짐)")]
+    [Range(0f, 1f)]
+    public float icebreakerSlowPercent = 0.1f;
+
+    [Tooltip("세트 효과 발동 시, 눈꽃사탕/아이스젤리 관련 공격에 추가되는 고정 데미지")]
+    public float icebreakerBonusDamage = 5f;
+
     //세트효과 발동 여부
-    private bool bittermeltChaosActive = false;
+    private bool bittermeltChaosActive = false; //비터멜트 카오스
+    private bool icebreakerActive = false;     //아이스 브레이커
+
+
 
     public bool IsBittermeltChaosActive => bittermeltChaosActive;
+    public bool IsIcebreakerActive => icebreakerActive;
 
+    public float IcebreakerBonusDamage => icebreakerBonusDamage;
+
+    //아이스브레이커로 느려지기 전 에너미 속도 저장
+    private readonly Dictionary<Enemy, float> icebreakerOriginalSpeed = new Dictionary<Enemy, float>();
+
+    private Coroutine icebreakerSlowRoutine; //아이스 브레이커 지속 슬로우 적용 코루틴 핸들
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -153,6 +186,7 @@ public class SkillManager : MonoBehaviour
 
         // 세트 효과 리셋
         bittermeltChaosActive = false;
+        DeactivateIcebreakerSet(); // 아이스브레이커 세트 효과도 해제
 
         // 지속형 오브젝트 파괴
         if (syrupTornadoInstance != null)
@@ -192,7 +226,7 @@ public class SkillManager : MonoBehaviour
             case ItemData.ItemType.PoppingCandy:
                 player.hasPoppingCandy = true;
                 break;
-            case ItemData.ItemType.CaramelCube: 
+            case ItemData.ItemType.CaramelCube:
                 player.hasCaramelCube = true;
                 break;
 
@@ -229,6 +263,7 @@ public class SkillManager : MonoBehaviour
         //세트 효과 체크
         //DarkChip + CocoaPowder + RollingChocolateBar
         CheckBittermeltChaosSet();
+        CheckIcebreakerSet(); // SnowflakeCandy + IcedJelly + PoppingCandy 세트 체크
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -376,9 +411,9 @@ public class SkillManager : MonoBehaviour
         }
         honeySpinInstances.Clear();
     }
-    
 
-   
+
+
     /// DarkChip + CocoaPowder + RollingChocolateBar 를 모두 보유했는지 검사하고,
 
     void CheckBittermeltChaosSet()
@@ -392,7 +427,7 @@ public class SkillManager : MonoBehaviour
         }
     }
 
-    
+
     void ApplyBittermeltChaosSet() //비터멜트 세트효과 로직
     {
         bittermeltChaosActive = true;
@@ -421,6 +456,110 @@ public class SkillManager : MonoBehaviour
             {
                 StartCoroutine(DestroySpineEffectAfter(sa, entry));
             }
+        }
+    }
+
+    // 아이스브레이커 세트 효과 체크 (SnowflakeCandy + IcedJelly + PoppingCandy)
+    void CheckIcebreakerSet()
+    {
+        if (icebreakerActive) return;
+        if (player == null) return;
+
+        if (player.hasSnowflakeCandy && player.hasIcedJellySkill && player.hasPoppingCandy)
+        {
+            ApplyIcebreakerSet();
+        }
+    }
+
+    // 아이스브레이커 세트 효과 실제 적용: 플래그 on + 슬로우 코루틴 시작
+    void ApplyIcebreakerSet()
+    {
+        icebreakerActive = true;
+        Debug.Log("[SkillManager] 아이스브레이커 세트 효과 발동!");
+
+        if (icebreakerSlowRoutine != null)
+        {
+            StopCoroutine(icebreakerSlowRoutine);
+        }
+        icebreakerSlowRoutine = StartCoroutine(ApplyIcebreakerSlowLoop());
+
+        // ─────────────────────────────────────────────
+        // 아이스브레이커 세트 발동 시 Spine FX 1회 재생
+        // ─────────────────────────────────────────────
+        if (player == null) return;
+        if (icebreakerSpinePrefab == null)
+        {
+            Debug.LogWarning("[SkillManager] icebreakerSpinePrefab 비어 있음 (세트 FX는 나중에 연결 가능)");
+            return;
+        }
+
+        GameObject fx = Instantiate(icebreakerSpinePrefab, player.transform);
+        fx.name = "Icebreaker_SetFX";
+        fx.transform.localPosition = icebreakerLocalOffset;
+
+        SkeletonAnimation sa = fx.GetComponent<SkeletonAnimation>();
+        if (sa != null)
+        {
+            var state = sa.AnimationState;
+            TrackEntry entry = state.SetAnimation(0, icebreakerAnimName, icebreakerAnimLoop);
+
+            // 세트 FX는 1번만 재생하고 끝나야 하므로 loop = false 기준
+            if (!icebreakerAnimLoop)
+            {
+                StartCoroutine(DestroySpineEffectAfter(sa, entry));
+            }
+        }
+    }
+
+
+    // 아이스브레이커 세트 효과 해제: 적 속도 원복 + 코루틴 정리
+    void DeactivateIcebreakerSet()
+    {
+        icebreakerActive = false;
+
+        if (icebreakerSlowRoutine != null)
+        {
+            StopCoroutine(icebreakerSlowRoutine);
+            icebreakerSlowRoutine = null;
+        }
+
+        if (icebreakerOriginalSpeed.Count > 0)
+        {
+            foreach (var pair in icebreakerOriginalSpeed)
+            {
+                if (pair.Key != null)
+                {
+                    pair.Key.speed = pair.Value;
+                }
+            }
+            icebreakerOriginalSpeed.Clear();
+        }
+    }
+
+    // 세트가 유지되는 동안 주기적으로 모든 Enemy 이동속도 10% 감소 적용
+    IEnumerator ApplyIcebreakerSlowLoop()
+    {
+        var wait = new WaitForSeconds(0.5f);
+
+        while (icebreakerActive)
+        {
+            Enemy[] enemies = FindObjectsOfType<Enemy>();
+            float multiplier = 1f - Mathf.Clamp01(icebreakerSlowPercent);
+
+            foreach (var e in enemies)
+            {
+                if (e == null) continue;
+
+                if (!icebreakerOriginalSpeed.ContainsKey(e))
+                {
+                    icebreakerOriginalSpeed[e] = e.speed;
+                }
+
+                float baseSpeed = icebreakerOriginalSpeed[e];
+                e.speed = baseSpeed * multiplier;
+            }
+
+            yield return wait;
         }
     }
 
