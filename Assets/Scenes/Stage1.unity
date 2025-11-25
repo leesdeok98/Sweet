@@ -12519,6 +12519,7 @@ GameObject:
   - component: {fileID: 1429503041}
   - component: {fileID: 1429503039}
   - component: {fileID: 1429503046}
+  - component: {fileID: 1429503047}
   - component: {fileID: 1429503038}
   - component: {fileID: 1429503045}
   m_Layer: 0
@@ -12719,6 +12720,7 @@ MonoBehaviour:
   diepanel: {fileID: 91834491}
   deathScreenCapture: {fileID: 575644667}
   popCoreSkill: {fileID: 0}
+  sugarShieldSkill: {fileID: 0}
   skeletonAnim: {fileID: 1152682876}
   idleAnimationName: idle
   walkAnimationName: walk
@@ -12726,7 +12728,6 @@ MonoBehaviour:
   maxHealth: 1
   health: 1
   hasIcedJellySkill: 0
-  hasSugarShield: 0
   hasDarkChip: 0
   hasRollingChocolateBar: 0
   hasPoppingCandy: 0
@@ -12736,6 +12737,7 @@ MonoBehaviour:
   hasHoneySpin: 0
   hasSnowflakeCandy: 0
   hasCaramelCube: 0
+  hasSugarShield: 1
 --- !u!70 &1429503045
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -12786,6 +12788,23 @@ MonoBehaviour:
   duration: 5
   cooldown: 20
   speedMultiplier: 2
+--- !u!114 &1429503047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429503034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f6354ccfe16b35478cc7ee87247888f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shieldPrefab1: {fileID: 2814831720856251709, guid: f226a597fe773db4c98c2dbd69e048ed, type: 3}
+  shieldPrefab2: {fileID: 4812786653249516637, guid: 2fd89679ab0ca1745b8be46e5d35df1a, type: 3}
+  generationInterval: 20
+  activeShield1: {fileID: 0}
+  activeShield2: {fileID: 0}
 --- !u!1 &1432312277
 GameObject:
   m_ObjectHideFlags: 0

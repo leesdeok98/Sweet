@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject diepanel;
     [SerializeField] private DeathScreenCapture deathScreenCapture; 
     public StrawberryPopCoreSkill popCoreSkill;
+    public SugarShieldSkill sugarShieldSkill;
 
     //  Spine 관련 필드
     [Header("Spine")]
@@ -31,7 +32,6 @@ public class Player : MonoBehaviour
     // 스킬 보유 상태 (인스펙터에서 체크)
     [Header("has skill")]
     public bool hasIcedJellySkill = false;
-    public bool hasSugarShield = false;
     public bool hasDarkChip = false;
     public bool hasRollingChocolateBar = false;
     public bool hasPoppingCandy = false;
@@ -41,6 +41,7 @@ public class Player : MonoBehaviour
     public bool hasHoneySpin = false;
     public bool hasSnowflakeCandy = false;
     public bool hasCaramelCube = false;
+    public bool hasSugarShield = false;
 
     //인스펙터에서 체크된 스킬들을 한 번만 적용하기 위한 플래그
     private bool startingSkillsApplied = false;
@@ -164,12 +165,38 @@ public class Player : MonoBehaviour
     {
         if (!isLive) return;
 
+        // 슈가 실드 체크 및 데미지 흡수 (본체 충돌)
+        if (hasSugarShield && sugarShieldSkill != null && sugarShieldSkill.CurrentShieldCount > 0)   // 몬스터나 총알이 플레이어 본체에 직접 닿았을 때
+        {
+            // 실드가 있으면 실드 1개 소모 (ConsumeShieldByVisual이 아닌 ConsumeShield 호출)
+            bool shieldConsumed = sugarShieldSkill.ConsumeShield();
+
+            if (shieldConsumed)
+            {
+                Debug.Log($"슈가 실드가 데미지({damage:0.##})를 막았습니다. (본체 충돌)");
+
+                // Health UI 강제 업데이트
+                Health healthComponent = GetComponentInChildren<Health>();
+                if (healthComponent != null) healthComponent.ForceRefresh();
+
+                return; 
+            }
+        }
+
+        // 실드가 없거나 흡수에 실패했을 때만 플레이어 HP 감소 (기존에 잇던 코드)
+
         health -= damage;
+
+        // Health UI 업데이트 
+        Health healthComp = GetComponentInChildren<Health>();
+        if (healthComp != null) healthComp.ForceRefresh();
+
         Debug.Log($"[Player] 피해: {damage:0.##}, HP: {Mathf.Max(health, 0):0.##}/{maxHealth}");
 
         if (health <= 0f)
             Die();
     }
+
 
     public void Heal(float amount)
     {

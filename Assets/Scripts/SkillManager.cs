@@ -101,6 +101,11 @@ public class SkillManager : MonoBehaviour
     [SerializeField] private Vector3 icebreakerLocalOffset = Vector3.zero;
 
 
+    // 슈가실드
+    private SugarShieldSkill sugarShieldSkill;
+
+
+
     //아이스 브레이커 세트 효과
     //눈꽃사탕+아이스 젤리+팝핑 캔디
     //모든 적 이동속도 10%감소, 눈꽃사탕,아이스 젤리 데미지 5 증가
@@ -134,6 +139,10 @@ public class SkillManager : MonoBehaviour
 
         if (player == null)
             player = FindObjectOfType<Player>();
+
+        // 슈가 실드
+        sugarShieldSkill = GetComponent<SugarShieldSkill>(); // 변경된 타입으로 컴포넌트 가져오기
+        //if (sugarShieldSkill == null) Debug.LogError("SugarShieldSkill is missing on Player!");
     }
 
     void Start()
@@ -217,9 +226,6 @@ public class SkillManager : MonoBehaviour
             case ItemData.ItemType.IcedJelly:
                 player.hasIcedJellySkill = true;
                 break;
-            case ItemData.ItemType.SugarShield:
-                player.hasSugarShield = true;
-                break;
             case ItemData.ItemType.RollingChocolateBar:
                 player.hasRollingChocolateBar = true;
                 break;
@@ -230,7 +236,7 @@ public class SkillManager : MonoBehaviour
                 player.hasCaramelCube = true;
                 break;
 
-            // --- 코코아/딸기/허니스핀 ---
+            // --- 코코아/딸기/허니스핀/슈가실드 ---
             case ItemData.ItemType.CocoaPowder:
                 ApplyCocoaPowder();
                 break;
@@ -239,6 +245,9 @@ public class SkillManager : MonoBehaviour
                 break;
             case ItemData.ItemType.HoneySpin:
                 ApplyHoneySpin();
+                break;
+            case ItemData.ItemType.SugarShield:
+                ApplySugarShield();
                 break;
 
             // --- 별도 로직이 있는 스킬들 ---
@@ -269,6 +278,25 @@ public class SkillManager : MonoBehaviour
     // ─────────────────────────────────────────────────────────────
     // ▼▼▼ 개별 스킬 함수들 ▼▼▼
     // ─────────────────────────────────────────────────────────────
+
+    void ApplySugarShield()
+    {
+        Debug.Log("슈가쉴드 획득!");
+        if (player != null)
+        {
+            player.hasSugarShield = true;
+
+            SugarShieldSkill shieldManager = player.GetComponent<SugarShieldSkill>();
+
+            if (shieldManager == null)
+            {
+                shieldManager = player.gameObject.AddComponent<SugarShieldSkill>();
+            }
+
+            // 실드 생성 + 주기 관리 시작
+            shieldManager.StartSugarShieldGeneration();
+        }
+    }
 
     private void ApplySyrupTornado()
     {
