@@ -1,5 +1,6 @@
 using UnityEngine;
 using Spine.Unity;  // 🔹 Spine 사용
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D rigid;
    
     [SerializeField] private GameObject diepanel;
+    [SerializeField] private DeathScreenCapture deathScreenCapture; 
     public StrawberryPopCoreSkill popCoreSkill;
 
     //  Spine 관련 필드
@@ -177,25 +179,37 @@ public class Player : MonoBehaviour
     }
 
     void Die()
+{
+    if (!isLive) return;
+
+    isLive = false;
+    if (rigid != null) rigid.velocity = Vector2.zero;
+
+    // 🔹 사망 애니메이션 재생
+    PlaySpineAnimation(deadAnimationName, false);
+
+    // 🔹 화면 캡쳐 + die panel 위에 띄우기
+    if (deathScreenCapture != null)
     {
-        if (!isLive) return;
-
-        isLive = false;
-        if (rigid != null) rigid.velocity = Vector2.zero;
-
-        // 🔹 사망 애니메이션 재생
-        PlaySpineAnimation(deadAnimationName, false);
-
-        if (GameManager.instance != null)
-            GameManager.instance.GameOver();
-        else
-            Debug.LogError("[Player] GameManager.instance가 null입니다.");
-
-        if (diepanel)
-            diepanel.SetActive(true);   //  여기서 버튼 포함한 사망 패널 활성화
-
-        Time.timeScale = 0f;            // 게임 일시정지
+        deathScreenCapture.ShowDeathScreen();
     }
+    else
+    {
+        Debug.LogWarning("[Player] DeathScreenCapture 참조가 비었습니다.");
+        // 만약 캡쳐 스크립트 연결 안 돼 있으면 최소한 기존처럼 패널만 켜기
+        if (diepanel)
+            diepanel.SetActive(true);
+    }
+
+    // 🔹 기존 GameOver 로직 & 정지
+    if (GameManager.instance != null)
+        GameManager.instance.GameOver();
+    else
+        Debug.LogError("[Player] GameManager.instance가 null입니다.");
+
+    Time.timeScale = 0f;            // 게임 일시정지
+}
+
 
     // 물리 충돌로 지속 피해를 받는 경우(Non-Trigger)
     void OnCollisionStay2D(Collision2D collision)
