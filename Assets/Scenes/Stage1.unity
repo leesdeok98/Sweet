@@ -12737,7 +12737,7 @@ MonoBehaviour:
   hasHoneySpin: 0
   hasSnowflakeCandy: 0
   hasCaramelCube: 0
-  hasSugarShield: 1
+  hasSugarShield: 0
 --- !u!70 &1429503045
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
