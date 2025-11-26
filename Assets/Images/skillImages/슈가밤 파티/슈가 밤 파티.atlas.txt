@@ -1,0 +1,128 @@
+슈가 밤 파티.png
+size:2012,1186
+filter:Linear,Linear
+pma:true
+레이어 1
+bounds:2,478,1920,706
+offsets:1,1,1922,748
+폭죽1 노
+bounds:1924,1100,84,86
+offsets:3,3,91,95
+rotate:90
+폭죽1
+bounds:1924,1100,84,86
+offsets:3,3,91,95
+rotate:90
+폭죽1 보
+bounds:1924,1014,84,86
+offsets:3,3,91,95
+rotate:90
+폭죽1 보2
+bounds:1924,1014,84,86
+offsets:3,3,91,95
+rotate:90
+폭죽1 빨
+bounds:1924,928,84,86
+offsets:3,4,91,95
+rotate:90
+폭죽1 빨2
+bounds:1924,842,84,86
+offsets:3,5,91,95
+rotate:90
+폭죽1 파
+bounds:1924,756,84,86
+offsets:3,3,91,95
+rotate:90
+폭죽2 노
+bounds:832,25,125,141
+offsets:3,2,132,146
+폭죽2
+bounds:832,25,125,141
+offsets:3,2,132,146
+폭죽2 보
+bounds:959,25,125,141
+offsets:3,2,132,146
+폭죽2 보2
+bounds:959,25,125,141
+offsets:3,2,132,146
+폭죽2 빨
+bounds:1086,25,125,141
+offsets:3,3,132,146
+폭죽2 빨2
+bounds:1213,25,125,141
+offsets:3,4,132,146
+폭죽2 파
+bounds:1340,25,125,141
+offsets:3,2,132,146
+폭죽3 노
+bounds:2,2,164,164
+offsets:4,3,171,170
+폭죽3
+bounds:2,2,164,164
+offsets:4,3,171,170
+폭죽3 보
+bounds:168,2,164,164
+offsets:4,3,171,170
+폭죽3 보2
+bounds:168,2,164,164
+offsets:4,3,171,170
+폭죽3 빨
+bounds:334,2,164,164
+offsets:4,4,171,170
+폭죽3 빨2
+bounds:500,2,164,164
+offsets:4,5,171,170
+폭죽3 파
+bounds:666,2,164,164
+offsets:4,3,171,170
+폭죽4 노
+bounds:1449,291,184,185
+offsets:1,1,186,187
+폭죽4
+bounds:1449,291,184,185
+offsets:1,1,186,187
+폭죽4 보
+bounds:1467,104,184,185
+offsets:1,1,186,187
+폭죽4 보2
+bounds:1467,104,184,185
+offsets:1,1,186,187
+폭죽4 빨
+bounds:1635,291,184,185
+offsets:1,1,186,187
+폭죽4 빨2
+bounds:1821,292,184,185
+offsets:1,1,186,187
+rotate:90
+폭죽4 파
+bounds:1821,106,184,185
+offsets:1,1,186,187
+rotate:90
+폭죽6 노
+bounds:2,168,308,288
+offsets:1,8,310,297
+rotate:90
+폭죽6
+bounds:2,168,308,288
+offsets:1,8,310,297
+rotate:90
+폭죽6 보
+bounds:292,168,308,288
+offsets:1,8,310,297
+rotate:90
+폭죽6 보2
+bounds:292,168,308,288
+offsets:1,8,310,297
+rotate:90
+폭죽6 빨
+bounds:872,168,308,287
+offsets:1,9,310,297
+rotate:90
+폭죽6 빨2
+bounds:1161,168,308,286
+offsets:1,10,310,297
+rotate:90
+폭죽6 파
+bounds:582,168,308,288
+offsets:1,8,310,297
+rotate:90

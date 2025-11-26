@@ -1,0 +1,7 @@
+스위트 아머 콤보.png
+size:1924,1084
+filter:Linear,Linear
+pma:true
+쉴드
+bounds:2,2,1920,1080
+offsets:1,1,1922,1082
