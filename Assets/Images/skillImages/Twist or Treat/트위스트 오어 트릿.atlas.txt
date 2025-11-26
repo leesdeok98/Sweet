@@ -1,0 +1,15 @@
+트위스트 오어 트릿.png
+size:1926,1227
+filter:Linear,Linear
+pma:true
+레이어 1
+bounds:2,2,1922,1223
+offsets:1,1,1924,1225
+
+트위스트 오어 트릿_2.png
+size:2004,2004
+filter:Linear,Linear
+pma:true
+삼각형 1 복사 2
+bounds:2,2,2000,2000
+offsets:1,1,2002,2002

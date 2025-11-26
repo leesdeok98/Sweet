@@ -35,6 +35,8 @@ public class SyrupTornadoSkill : MonoBehaviour
 
     float tickTimer;
 
+    private bool twistBuffApplied = false; // 트오트 세트효과 적용 확인
+
     void Awake()
     {
         circle = GetComponent<CircleCollider2D>();
@@ -98,6 +100,36 @@ public class SyrupTornadoSkill : MonoBehaviour
                 enemy.TakeDamage(damage);
             }
         }
+    }
+
+    /// <summary>
+    /// SkillManager에서 '트위스트 오어 트릿' 세트 효과가 발동될 때
+    /// 한 번만 호출해 주면 되는 버프 함수입니다.
+    /// rangeMultiplier : 범위 배율 (예: 1.25f = 25% 증가)
+    /// damageMultiplier: 데미지 배율 (예: 2f    = 2배 데미지)
+    /// </summary>
+    public void ApplyTwistOrTreatBuff(float rangeMultiplier, float damageMultiplier)
+    {
+        // 이미 버프가 적용되었다면 다시 적용하지 않음
+        if (twistBuffApplied) return;
+        twistBuffApplied = true;
+
+        // 1) 데미지 배율 적용 (시럽 토네이도 DPS 2배 등)
+        damagePerSecond *= damageMultiplier;
+
+        // 2) 범위 배율 적용 (논리값 + 실제 콜라이더 둘 다)
+        radius *= rangeMultiplier;
+
+        if (circle == null)
+            circle = GetComponent<CircleCollider2D>();
+
+        if (circle != null)
+        {
+            // 실제 충돌 범위도 함께 키워줌
+            circle.radius = radius;
+        }
+
+        Debug.Log("[SyrupTornadoSkill] Twist or Treat 버프 적용 완료");
     }
 
 #if UNITY_EDITOR

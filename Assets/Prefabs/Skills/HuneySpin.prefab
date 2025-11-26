@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3649476870670359532}
   - component: {fileID: 4463749919070986209}
   - component: {fileID: 6909657059349119598}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: HuneySpin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -82,8 +82,8 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1342202699
-  m_SortingLayer: 2
+  m_SortingLayerID: -1233970845
+  m_SortingLayer: 7
   m_SortingOrder: 10
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &3649476870670359532

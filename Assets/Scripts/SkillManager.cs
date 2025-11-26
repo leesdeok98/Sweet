@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Spine.Unity;
 using Spine;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class SkillManager : MonoBehaviour
 {
@@ -77,6 +78,8 @@ public class SkillManager : MonoBehaviour
     [Tooltip("오라 정렬순서: 총알보다 아래로 내려가게 음수 권장(-1)")]
     public int snowflakeAuraSortingOrderOffset = -1;
 
+
+
     // ★ 비터멜트 카오스 세트 효과 설정 (DarkChip + CocoaPowder + RollingChocolateBar)
     [Header("Bittermelt Chaos Set Settings")]
     [Tooltip("세트 효과 발동 시 재생할 Spine 프리팹 (1회 재생 후 파괴)")]
@@ -99,6 +102,42 @@ public class SkillManager : MonoBehaviour
     [SerializeField] private bool icebreakerAnimLoop = false;   // 요구사항: loop = false
     [Tooltip("플레이어 기준 위치 오프셋")]
     [SerializeField] private Vector3 icebreakerLocalOffset = Vector3.zero;
+
+    //  트위스트 오어 트릿 세트 효과 설정 (SyrupTornado + HoneySpin + RollingChocolateBar)
+    [Header("Twist Or Treat Set Settings")]
+    [Tooltip("세트 발동 시 3개 스킬 범위 배율 (1.25 = 25% 증가)")]
+    [Range(1f, 3f)]
+    public float twistRangeMultiplier = 1.25f;
+
+    [Tooltip("세트 발동 시 시럽 토네이도 데미지 배율 (2 = 2배)")]
+    public float twistSyrupDamageMultiplier = 2f;
+
+    [Tooltip("세트 발동 시 허니스핀/롤링초코바 생성 개수 배율 (2 = 2배)")]
+    public int twistCountMultiplier = 2;
+
+    // ★ 트위스트 오어 트릿 세트 발동 여부
+    private bool twistOrTreatActive = false;
+    //트오트 설정
+    [Header("Twist Or Treat Set FX")]
+    [Tooltip("트위스트 오어 트릿 발동 시 재생할 Spine 프리팹")]
+    [SerializeField] private GameObject twistOrTreatSpinePrefab;
+
+    [Tooltip("Spine 애니메이션 이름 (예: activate)")]
+    [SerializeField] private string twistOrTreatAnimName = "animation";
+
+    [Tooltip("세트 FX는 1번만 재생하고 끝나야 하므로 false로 두는걸 권장")]
+    [SerializeField] private bool twistOrTreatAnimLoop = false; // ★ 루프 X
+
+    [Tooltip("플레이어 기준 위치 오프셋")]
+    [SerializeField] private Vector3 twistOrTreatLocalOffset = Vector3.zero;
+
+
+    // 다른 스크립트에서 세트 발동 여부 확인용 (읽기 전용)
+    public bool IsTwistOrTreatActive => twistOrTreatActive;
+
+
+
+
 
 
     // 슈가실드
@@ -196,6 +235,7 @@ public class SkillManager : MonoBehaviour
         // 세트 효과 리셋
         bittermeltChaosActive = false;
         DeactivateIcebreakerSet(); // 아이스브레이커 세트 효과도 해제
+        twistOrTreatActive = false; // 트오트 세트 해제
 
         // 지속형 오브젝트 파괴
         if (syrupTornadoInstance != null)
@@ -270,9 +310,10 @@ public class SkillManager : MonoBehaviour
                 break;
         }
         //세트 효과 체크
-        //DarkChip + CocoaPowder + RollingChocolateBar
-        CheckBittermeltChaosSet();
+
+        CheckBittermeltChaosSet(); //DarkChip + CocoaPowder + RollingChocolateBar
         CheckIcebreakerSet(); // SnowflakeCandy + IcedJelly + PoppingCandy 세트 체크
+        CheckTwistOrTreatSet(); //SyrupTornado + HoneySpin + RollingChocolateBar 세트 체크
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -563,6 +604,149 @@ public class SkillManager : MonoBehaviour
             icebreakerOriginalSpeed.Clear();
         }
     }
+
+    void CheckTwistOrTreatSet()
+    {
+        if (twistOrTreatActive) return; // 만약 발동된 상태라면 리턴
+        if (player == null) return; // 플레이어가 null이면 리턴
+
+        //만약 플레이어 스크립트 시럽토네이도,허니스핀,롤링초코바가를 가지고 있다면
+        if (player.hasSyrupTornado && player.hasHoneySpin && player.hasRollingChocolateBar)
+        {
+            ApplyTwistOrTreatSet(); //세트효과 매서드 실행
+        }
+    }
+
+    //트위스트 오어 트릿 세트 효과 적용
+    //세트 플래그를 키면 각 3개의 스킬 효과 버프 적용
+    void ApplyTwistOrTreatSet() // 트위스트 오어 트릿 세트 효과 로직
+    {
+        // 세트 발동 플래그 ON
+        twistOrTreatActive = true;
+        Debug.Log("[SkillManager] 트위스트 오어 트릿 세트 효과 발동!");
+
+        
+        //   (시럽토네이도 / 허니스핀 / 롤링초코바 강화 함수 호출 등)
+        UpgradeHoneySpinForTwistOrTreat();
+        UpgradeSyrupTornadoForTwistOrTreat();
+        UpgradeRollingChocolateBarForTwistOrTreat();
+
+        
+        //  Spine 세트 이펙트 한 번만 재생 후 Destroy
+        if (player == null) return;
+
+        if (twistOrTreatSpinePrefab == null)
+        {
+            // FX 프리팹이 비어 있어도 게임이 터지진 않게 경고만 출력
+            Debug.LogWarning("[SkillManager] twistOrTreatSpinePrefab 비어 있음 (세트 FX는 나중에 연결 가능)");
+            return;
+        }
+
+        // 플레이어를 부모로 해서 FX 생성 (플레이어를 따라다니게)
+        GameObject fx = Instantiate(twistOrTreatSpinePrefab, player.transform);
+        fx.name = "TwistOrTreat_SetFX";
+        fx.transform.localPosition = twistOrTreatLocalOffset; // 인스펙터에서 준 오프셋만큼 위치 조정
+
+        // SkeletonAnimation 가져와서 애니메이션 1회 재생
+        SkeletonAnimation sa = fx.GetComponent<SkeletonAnimation>();
+        if (sa != null)
+        {
+            var state = sa.AnimationState;
+
+            //  애니 이름과 루프 여부는 코드 안에서 고정
+            const string animName = "animation"; // Spine 안에 있는 애니메이션 이름
+            const bool loop = false;             // 세트 FX는 항상 한 번만 재생
+
+            TrackEntry entry = state.SetAnimation(0, animName, loop);
+
+            // loop = false 이기 때문에, 끝나면 FX 오브젝트 제거
+            if (!loop)
+            {
+                StartCoroutine(DestroySpineEffectAfter(sa, entry));
+            }
+        }
+    }
+
+    void UpgradeHoneySpinForTwistOrTreat()
+    {
+        if (player == null) return;
+        if (!player.hasHoneySpin) return;
+        if (honeySpinOrbPrefab == null) return;
+
+        //기존 스킬 제거
+        ClearHoneySpinInstances();
+
+        int targetCount = Mathf.Max(1, honeySpinOrbCount * twistCountMultiplier);
+        float radius = honeySpinRadius * twistRangeMultiplier;
+
+        honeySpinInstances = new List<HoneySpin>();
+
+        for (int i = 0; i < targetCount; i++)
+        {
+            GameObject orb = Instantiate(honeySpinOrbPrefab, player.transform);
+            orb.name = $"HoneySpinOrb_Twist_{i + 1}";
+
+            HoneySpin spin = orb.GetComponent<HoneySpin>();
+            if (spin == null)
+                spin = orb.AddComponent<HoneySpin>();
+
+            float startAngle;
+
+            //   동(0) / 북(90) / 서(180) / 남(270)
+            if (targetCount == 4)
+            {
+                startAngle = i * 90f;
+            }
+            else
+            {
+                float angleStep = 360f / targetCount;
+                startAngle = i * angleStep;
+            }
+
+            spin.Initialize(
+                player.transform,
+                radius,
+                honeySpinRotateSpeed,
+                startAngle,
+                honeySpinDamage,
+                honeySpinSlowPercent,
+                honeySpinSlowDuration
+            );
+
+            honeySpinInstances.Add(spin);
+        }
+
+        Debug.Log("[SkillManager] 트위스트 오어 트릿: 허니스핀 오브젝트 재구성 완료");
+    }
+
+    //롤링 초코바 강화
+    //플래그만 키고 롤링초코바 스크립트에서 실행
+    void UpgradeRollingChocolateBarForTwistOrTreat()
+    {
+        if (player == null) return;
+        if (!player.hasRollingChocolateBar) return;
+
+        Debug.Log("[SkillManager] 트위스트 오어 트릿: 롤링초코바 세트 버프 활성화 (발사 로직은 RollingChocolateBar 스크립트에서 처리)");
+    }
+
+    void UpgradeSyrupTornadoForTwistOrTreat()
+    {
+        if (syrupTornadoInstance == null) return;
+
+        // SyrupTornadoSkill 스크립트에 이 메서드를 추가해서 사용합니다.
+        syrupTornadoInstance.ApplyTwistOrTreatBuff(
+            twistRangeMultiplier,
+            twistSyrupDamageMultiplier
+        );
+
+        Debug.Log("[SkillManager] 트위스트 오어 트릿: 시럽 토네이도 강화 적용");
+    }
+
+
+
+
+
+
 
     // 세트가 유지되는 동안 주기적으로 모든 Enemy 이동속도 10% 감소 적용
     IEnumerator ApplyIcebreakerSlowLoop()

@@ -15,24 +15,24 @@ public class ItemData
     public int height;
     public bool[,] shape; 
 
-    // --- 3. ★★★ "None" + "유저님의 12개 목록"이 합쳐진 '최종' Enum ★★★ ---
+    // 아이템 목록
     public enum ItemType
     {
-        None,               // ★ (제가 추가했던 '스킬 없음' - 필수)
+        None,               // 스킬 없음(지우면안됨)
 
         // (↓ 사용자님의 '마스터 목록' 12개)
-        CaramelCube,        
-        SugarShield,        
-        StrawberryPopCore,  
-        RollingChocolateBar, 
-        CocoaPowder,        
-        SnowflakeCandy,     
-        PoppingCandy,       // (이전 버전에서 누락됨)
-        DarkChip,           
-        IcedJelly,          
-        SyrupTornado,       // (이전 버전에서 누락됨)
-        HoneySpin,          // (이전 버전에서 누락됨)
-        SugarPorridge       // (이전 버전에서 누락됨)
+        CaramelCube,        //카라멜 큐브
+        SugarShield,        // 슈가 실드
+        StrawberryPopCore,  //딸기 팝 코어
+        RollingChocolateBar, // 롤링 초코 바
+        CocoaPowder,        // 코코아 파우더
+        SnowflakeCandy,     // 눈꽃 사탕
+        PoppingCandy,       // 팝핑 캔디
+        DarkChip,           // 다크 칩
+        IcedJelly,          // 아이스 젤리
+        SyrupTornado,       // 시럽 토네이도
+        HoneySpin,          // 허니 스핀
+        SugarPorridge       // 설탕 폭죽
     }
     // ---
 

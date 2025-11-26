@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5545054905125518742}
   - component: {fileID: 6367251982292088660}
   - component: {fileID: 304960723139496629}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SyrupTornado
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -83,9 +83,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 9
+  m_SortingLayerID: -1342202699
+  m_SortingLayer: 2
+  m_SortingOrder: 3
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &1962834333986857086
 MonoBehaviour:

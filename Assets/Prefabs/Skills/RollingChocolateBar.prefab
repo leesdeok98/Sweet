@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1470360526075504526}
   - component: {fileID: 3566009839906018380}
   - component: {fileID: 7906360334642039422}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: RollingChocolateBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,8 +73,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1342202699
+  m_SortingLayer: 2
   m_SortingOrder: 8
   m_Sprite: {fileID: 1937825658, guid: 2fe04c7174212804380cc31c28ff596f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

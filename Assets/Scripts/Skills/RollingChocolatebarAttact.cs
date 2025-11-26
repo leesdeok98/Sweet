@@ -11,6 +11,9 @@ public class RollingChocolateBarAttack : MonoBehaviour
     float startAngle;   // 시작 각도(옵션)
     int laps;           // 몇 바퀴 도는지(기본 1)
 
+    // ★ 트위스트 오어 트릿 세트에서 한 번만 길이 증가를 적용했는지 확인용
+    private bool twistRangeApplied = false;
+
     public void InitializeAttack(int dmg, float kbForce)
     {
         damage = dmg;
@@ -29,6 +32,25 @@ public class RollingChocolateBarAttack : MonoBehaviour
         transform.SetParent(center);
         transform.localPosition = Vector3.zero;               // 피벗(막대 한쪽 끝)이 플레이어 위치
         transform.localRotation = Quaternion.Euler(0, 0, startAngle);
+
+        // ★ 트위스트 오어 트릿 세트 효과가 발동 중이면, 막대 길이를 범위 배율만큼 키움
+        //   - SkillManager.IsTwistOrTreatActive : 세트 발동 여부
+        //   - SkillManager.twistRangeMultiplier : 예) 1.25f = 25% 증가
+        var sm = SkillManager.Instance;
+        if (sm != null && sm.IsTwistOrTreatActive && !twistRangeApplied)
+        {
+            twistRangeApplied = true;
+
+            float mul = sm.twistRangeMultiplier;
+
+            // ★ 트위스트 오어 트릿 세트일 때 전체 크기를 배율만큼 키움 (X/Y/Z 모두)
+            transform.localScale = new Vector3(
+                transform.localScale.x * mul,
+                transform.localScale.y * mul,
+                transform.localScale.z * mul
+            );
+        }
+
 
         StartCoroutine(ClockHandRoutine());
     }
