@@ -1,0 +1,15 @@
+반죽슬라임.png
+size:1611,747
+filter:Linear,Linear
+pma:true
+그림자
+bounds:1452,113,632,157
+offsets:353,903,1400,2000
+rotate:90
+머리
+bounds:1078,57,688,372
+offsets:689,941,1974,1548
+rotate:90
+몸체
+bounds:2,2,1074,743
+offsets:440,412,1974,1548

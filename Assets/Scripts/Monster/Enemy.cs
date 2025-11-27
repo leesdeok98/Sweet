@@ -4,9 +4,11 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
 using Spine.Unity;
+using UnityEditor.U2D.Sprites;
 
 public class Enemy : MonoBehaviour
 {
+
     [Header("Spine Setting")]
     public SkeletonAnimation skeletonAnimation;
     [SpineAnimation] public string runAnimName = "Run";
@@ -47,10 +49,20 @@ public class Enemy : MonoBehaviour
     // 🔸 처치수 중복 집계 방지용
     private bool hasCountedKill = false;
 
+    public Vector2 vec2;
+    private float spineInitialScaleX = 1f;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         originalSpeed = speed; // 인스펙터의 초기 speed 저장 
+
+        //스파인 초기 스케일 저장(좌우 반전용)
+        if(skeletonAnimation != null) 
+            spineInitialScaleX = skeletonAnimation.transform.localScale.x;
+        else
+            spineInitialScaleX = transform.localScale.x;
+          
     }
 
     void Start()
@@ -65,6 +77,10 @@ public class Enemy : MonoBehaviour
         health = maxHealth;
         speed = originalSpeed;
         isSlowed = false;
+
+        //이성덕 작성 애니메이션이 없으면 애니메이션 실행시키는 코드
+        if (skeletonAnimation != null)
+            skeletonAnimation.AnimationState.SetAnimation(0, runAnimName, true);
     }
 
     void Update()
@@ -92,7 +108,11 @@ public class Enemy : MonoBehaviour
         // 플레이어를 향해 이동
         Vector2 dir = target.position - rb.position;
         Vector2 nextVec = dir.normalized * speed * Time.fixedDeltaTime;
+        
+        vec2 = dir.normalized; //이동 방향 기록 x 값으로 좌우 판별
         rb.MovePosition(rb.position + nextVec);
+
+
 
         // 물리 잔여속도 제거
         rb.velocity = Vector2.zero;
@@ -102,6 +122,22 @@ public class Enemy : MonoBehaviour
     {
         if (!isLive) return;
         if (!isLive || target == null) return;
+
+
+        //이성덕 작성 : 이동 방향(vec2.x)에 따라 Spine 좌우 반전
+        if (skeletonAnimation != null && Mathf.Abs(vec2.x) > 0.001f)
+        {
+            Transform t = skeletonAnimation.transform;
+
+            float sign = (vec2.x < 0) ? 1f : -1f;   // 왼쪽이면 -1, 오른쪽이면 1
+            float baseScaleX = (spineInitialScaleX != 0f) ? spineInitialScaleX : t.localScale.x;
+
+            t.localScale = new Vector3(
+                Mathf.Abs(baseScaleX) * sign,
+                t.localScale.y,
+                t.localScale.z
+            );
+        }
 
         // 좌우 플립
         //spriter.flipX = target.position.x < rb.position.x;

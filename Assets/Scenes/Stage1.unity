@@ -12827,17 +12827,17 @@ MonoBehaviour:
   deadAnimationName: dead
   maxHealth: 100
   health: 100
-  hasIcedJellySkill: 1
-  hasDarkChip: 1
-  hasRollingChocolateBar: 1
-  hasPoppingCandy: 1
-  hasSyrupTornado: 1
-  hasCocoaPowder: 1
-  hasStrawberryPopCore: 1
-  hasHoneySpin: 1
-  hasSnowflakeCandy: 1
-  hasCaramelCube: 1
-  hasSugarShield: 1
+  hasIcedJellySkill: 0
+  hasDarkChip: 0
+  hasRollingChocolateBar: 0
+  hasPoppingCandy: 0
+  hasSyrupTornado: 0
+  hasCocoaPowder: 0
+  hasStrawberryPopCore: 0
+  hasHoneySpin: 0
+  hasSnowflakeCandy: 0
+  hasCaramelCube: 0
+  hasSugarShield: 0
 --- !u!70 &1429503045
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -14366,7 +14366,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -2.7199707, y: -0.10998535}
+  m_AnchoredPosition: {x: -2.6530151, y: 0.35101318}
   m_SizeDelta: {x: 0, y: 59.5795}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1604726594
@@ -17464,12 +17464,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabs:
-  - {fileID: 6036541347627888680, guid: d85528ad43b631148aa3f60144807a67, type: 3}
-  - {fileID: 6036541347627888680, guid: 1a562690e6c822e4ab9ee17c8775b05b, type: 3}
+  - {fileID: 926699699989198930, guid: d85528ad43b631148aa3f60144807a67, type: 3}
+  - {fileID: 3454054837596656730, guid: a300b805520e3bf43ae637cd295a7f5d, type: 3}
   - {fileID: 6036541347627888680, guid: 89512658eea45f240bfd322fea3581b5, type: 3}
-  - {fileID: 6036541347627888680, guid: 3dc3c3645aea9964ba088e2bdd0548f1, type: 3}
-  - {fileID: 6036541347627888680, guid: 2a9f58e18cb31c04aa5932bcae4c0dc0, type: 3}
-  - {fileID: 6036541347627888680, guid: 3dc3c3645aea9964ba088e2bdd0548f1, type: 3}
+  - {fileID: 3169144480671225973, guid: 3dc3c3645aea9964ba088e2bdd0548f1, type: 3}
+  - {fileID: 2663996054591021724, guid: eee7fa7d697720c42846bcaaf70928ac, type: 3}
+  - {fileID: 3169144480671225973, guid: 3dc3c3645aea9964ba088e2bdd0548f1, type: 3}
   - {fileID: 6036541347627888680, guid: 7c35835c551464a4f9a1a627d20ced55, type: 3}
 --- !u!4 &1988048209
 Transform:
