@@ -26,6 +26,7 @@ public class IcedJellySkillSpine : MonoBehaviour
         skeleton.Initialize(true);
         skeleton.timeScale = timeScale;
         skeleton.AnimationState.SetAnimation(0, loopAnimation, true);
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.IceJelly_SFX);
     }
 
     void OnEnable()

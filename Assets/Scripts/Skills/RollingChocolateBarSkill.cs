@@ -27,6 +27,7 @@ public class RollingChocolateBarSkill : MonoBehaviour
             {
                 ActivateSkill();
                 timer = 0f;
+                AudioManager.instance.PlaySfx(AudioManager.Sfx.RollingChocoBar_SFX);
             }
         }
     }

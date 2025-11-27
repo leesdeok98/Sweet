@@ -25,6 +25,12 @@ public class EnemyBoss : Enemy
 
     void Start()
     {
+
+        if (AudioManager.instance != null)
+        {
+            AudioManager.instance.PlayBgm(AudioManager.Bgm.Boss_BGM);
+        }
+
         if (GameManager.instance != null && GameManager.instance.player != null)
             target = GameManager.instance.player.GetComponent<Rigidbody2D>();
 

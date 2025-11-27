@@ -148,6 +148,7 @@ public class HoneySpin : MonoBehaviour
 
         // 1) 데미지
         enemy.TakeDamage(damage);
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.HoneySpin_SFX);
 
         // 2) 이동속도 감소 디버프
         try

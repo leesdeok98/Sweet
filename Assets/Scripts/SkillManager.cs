@@ -385,6 +385,8 @@ public class SkillManager : MonoBehaviour
         var state = darkChipSpineInstance.AnimationState;
         TrackEntry entry = state.SetAnimation(0, darkChipAnimName, darkChipAnimLoop);
 
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.DarkChip_SFX);
+
         if (!darkChipAnimLoop)
         {
             state.AddEmptyAnimation(0, 0.15f, 0f);
@@ -519,6 +521,7 @@ public class SkillManager : MonoBehaviour
         {
             var state = sa.AnimationState;
             TrackEntry entry = state.SetAnimation(0, bittermeltChaosAnimName, bittermeltChaosAnimLoop);
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.BitterMeltChaos_SFX);
 
             // 세트 FX는 1번만 재생하고 끝나야 하므로 loop = false 기준
             if (!bittermeltChaosAnimLoop)
@@ -571,6 +574,7 @@ public class SkillManager : MonoBehaviour
         {
             var state = sa.AnimationState;
             TrackEntry entry = state.SetAnimation(0, icebreakerAnimName, icebreakerAnimLoop);
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.IceBreaker_SFX);
 
             // 세트 FX는 1번만 재생하고 끝나야 하므로 loop = false 기준
             if (!icebreakerAnimLoop)
@@ -658,6 +662,9 @@ public class SkillManager : MonoBehaviour
             const bool loop = false;             // 세트 FX는 항상 한 번만 재생
 
             TrackEntry entry = state.SetAnimation(0, animName, loop);
+            Invoke("TwistorTreatSound", 1f);
+            // 인보크 = 매서드 지연 시키는 함수 (매서드이름,지연시킬시간) 
+
 
             // loop = false 이기 때문에, 끝나면 FX 오브젝트 제거
             if (!loop)
@@ -814,6 +821,11 @@ public class SkillManager : MonoBehaviour
         {
             Destroy(sa.gameObject);
         }
+    }
+
+    void TwistorTreatSound()
+    {
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.TwistOatNut_SFX);
     }
 
 #if UNITY_EDITOR

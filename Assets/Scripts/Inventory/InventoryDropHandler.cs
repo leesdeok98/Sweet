@@ -48,6 +48,7 @@ public class InventoryDropHandler : MonoBehaviour, IDropHandler
         {
             // ★★★ [수정] 배치 성공 시 플래그만 설정합니다. ★★★
             dragHandler.SetDropSuccess(true);
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.ItemDrop_SFX);
             // Destroy(draggedObject); // <--- 이 줄을 제거해야 합니다.
         }
     }

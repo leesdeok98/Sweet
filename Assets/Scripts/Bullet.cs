@@ -36,6 +36,7 @@ public class Bullet : MonoBehaviour
         if (sm != null && sm.player != null && sm.player.hasSnowflakeCandy && sm.snowflakeAuraSprite != null)
         {
             AttachSnowflakeAura(sm);
+            //AudioManager.instance.PlaySfx(AudioManager.Sfx.눈꽃 사탕 사운드);
         }
     }
 

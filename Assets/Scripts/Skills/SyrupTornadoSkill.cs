@@ -1,6 +1,7 @@
 // SyrupTornadoSkill.cs
 using UnityEngine;
 using Spine.Unity;
+using System.Xml.Serialization;
 
 [RequireComponent(typeof(CircleCollider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
@@ -36,6 +37,9 @@ public class SyrupTornadoSkill : MonoBehaviour
     float tickTimer;
 
     private bool twistBuffApplied = false; // 트오트 세트효과 적용 확인
+
+    private float lastSoundTime;
+    private float SoundCooldown = 0.1f;
 
     void Awake()
     {
@@ -130,6 +134,22 @@ public class SyrupTornadoSkill : MonoBehaviour
         }
 
         Debug.Log("[SyrupTornadoSkill] Twist or Treat 버프 적용 완료");
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)  // 범위 안에 들어오면 사운드 나게 하는 코드(연화)
+    {
+        if (((1 << collision.gameObject.layer) & enemyMask) != 0) // LayerMask 
+        {
+            if (Time.time >= lastSoundTime + SoundCooldown)
+            {
+                if (AudioManager.instance != null)
+                {
+                    AudioManager.instance.PlaySfx(AudioManager.Sfx.SyrupTornado_SFX);
+                }
+
+                lastSoundTime = Time.time;
+            }
+        }
     }
 
 #if UNITY_EDITOR
