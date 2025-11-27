@@ -130,7 +130,10 @@ MonoBehaviour:
   lifeTime: 3
   baseDamage: 5
   icedJellySpinePrefab: {fileID: 1444121518579667591, guid: 31c6a6892256833419bac4d0c47158ef, type: 3}
-  icedJellyChance: 1
+  icedJellyChance: 0.3
+  bittermeltChaosDps: 2
+  bittermeltChaosDuration: 5
+  bittermeltChaosHpBuffMultiplier: 1.3
 --- !u!114 &1271012493434481261
 MonoBehaviour:
   m_ObjectHideFlags: 0

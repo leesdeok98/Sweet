@@ -13,14 +13,13 @@ public class SkillManager : MonoBehaviour
     [Tooltip("플레이어 참조 (비워두면 런타임 자동 탐색)")]
     public Player player;
 
-    // ─────────────────────────────────────────────────────────────
-    // ▼▼▼ 기존 스킬 설정값 ▼▼▼
-    // ─────────────────────────────────────────────────────────────
-
+    
+    //시럽 토네이도 설정
     [Header("Syrup Tornado Settings")]
     [SerializeField] private GameObject syrupTornadoPrefab;
     private SyrupTornadoSkill syrupTornadoInstance;
 
+    //팝핑 캔디 설정
     [Header("Popping Candy Settings")]
     public float poppingColliderRadius = 0.6f;
     public float poppingRange = 6f;
@@ -30,6 +29,7 @@ public class SkillManager : MonoBehaviour
     public GameObject[] poppingShardPrefabs = new GameObject[8];
     [Range(0f, 1f)] public float poppingChance = 1f;   // 1 = 100% 발동
 
+    //다크칩 설정
     [Header("Dark Chip Settings")]
     [Range(0f, 1f)] public float darkChipPercent = 0.3f; // +30%
     [SerializeField] private GameObject darkChipSpinePrefab;
@@ -39,7 +39,7 @@ public class SkillManager : MonoBehaviour
     private SkeletonAnimation darkChipSpineInstance;
     private int darkChipLevel = 0;
 
-    // 허니스핀 설정값 
+    // 허니스핀 설정
     [Header("Honey Spin Settings")]
     [Tooltip("허니스핀 ‘구체(오브젝트)’ 프리팹 (SkeletonAnimation + HoneySpin.cs 포함)")]
     public GameObject honeySpinOrbPrefab;
@@ -66,7 +66,7 @@ public class SkillManager : MonoBehaviour
     private List<HoneySpin> honeySpinInstances = new List<HoneySpin>();
 
 
-    // ★ 눈꽃사탕(SnowflakeCandy) 설정
+    // 눈꽃사탕 설정
     [Header("Snowflake Candy Settings")]
     [Range(0f, 1f)] public float snowflakeFreezeChance = 0.15f; // 15%
     [Min(0f)] public float snowflakeFreezeDuration = 1f;         // 인스펙터에서 조절
@@ -80,14 +80,14 @@ public class SkillManager : MonoBehaviour
 
 
 
-    // ★ 비터멜트 카오스 세트 효과 설정 (DarkChip + CocoaPowder + RollingChocolateBar)
+    //  비터멜트 카오스 세트 효과 설정 (DarkChip + CocoaPowder + RollingChocolateBar)
     [Header("Bittermelt Chaos Set Settings")]
     [Tooltip("세트 효과 발동 시 재생할 Spine 프리팹 (1회 재생 후 파괴)")]
     [SerializeField] private GameObject bittermeltChaosSpinePrefab;
     [Tooltip("Spine 애니메이션 이름")]
     [SerializeField] private string bittermeltChaosAnimName = "activate";
     [Tooltip("세트 FX는 1번만 재생하고 끝나야 하므로 기본값은 false 입니다.")]
-    [SerializeField] private bool bittermeltChaosAnimLoop = false; // ★ 요구사항: loop = false
+    [SerializeField] private bool bittermeltChaosAnimLoop = false; // 요구사항: loop = false
     [Tooltip("플레이어 기준 위치 오프셋")]
     [SerializeField]
     private Vector3 bittermeltChaosLocalOffset = Vector3.zero;
@@ -99,7 +99,7 @@ public class SkillManager : MonoBehaviour
     [Tooltip("Spine 애니메이션 이름")]
     [SerializeField] private string icebreakerAnimName = "activate";
     [Tooltip("세트 FX는 1번만 재생하고 끝나야 하므로 기본값은 false 입니다.")]
-    [SerializeField] private bool icebreakerAnimLoop = false;   // 요구사항: loop = false
+    [SerializeField] private bool icebreakerAnimLoop = false;  
     [Tooltip("플레이어 기준 위치 오프셋")]
     [SerializeField] private Vector3 icebreakerLocalOffset = Vector3.zero;
 
@@ -115,7 +115,7 @@ public class SkillManager : MonoBehaviour
     [Tooltip("세트 발동 시 허니스핀/롤링초코바 생성 개수 배율 (2 = 2배)")]
     public int twistCountMultiplier = 2;
 
-    // ★ 트위스트 오어 트릿 세트 발동 여부
+    //  트위스트 오어 트릿 세트 발동 여부
     private bool twistOrTreatActive = false;
     //트오트 설정
     [Header("Twist Or Treat Set FX")]
@@ -126,7 +126,7 @@ public class SkillManager : MonoBehaviour
     [SerializeField] private string twistOrTreatAnimName = "animation";
 
     [Tooltip("세트 FX는 1번만 재생하고 끝나야 하므로 false로 두는걸 권장")]
-    [SerializeField] private bool twistOrTreatAnimLoop = false; // ★ 루프 X
+    [SerializeField] private bool twistOrTreatAnimLoop = true; 
 
     [Tooltip("플레이어 기준 위치 오프셋")]
     [SerializeField] private Vector3 twistOrTreatLocalOffset = Vector3.zero;
@@ -564,6 +564,7 @@ public class SkillManager : MonoBehaviour
             Debug.LogWarning("[SkillManager] icebreakerSpinePrefab 비어 있음 (세트 FX는 나중에 연결 가능)");
             return;
         }
+        //테스트
 
         GameObject fx = Instantiate(icebreakerSpinePrefab, player.transform);
         fx.name = "Icebreaker_SetFX";
@@ -573,15 +574,16 @@ public class SkillManager : MonoBehaviour
         if (sa != null)
         {
             var state = sa.AnimationState;
-            TrackEntry entry = state.SetAnimation(0, icebreakerAnimName, icebreakerAnimLoop);
-            AudioManager.instance.PlaySfx(AudioManager.Sfx.IceBreaker_SFX);
+            TrackEntry entry = state.SetAnimation(0, twistOrTreatAnimName, twistOrTreatAnimLoop);
 
-            // 세트 FX는 1번만 재생하고 끝나야 하므로 loop = false 기준
-            if (!icebreakerAnimLoop)
+            Invoke(nameof(TwistorTreatSound), 1f);
+
+            if (!twistOrTreatAnimLoop)
             {
                 StartCoroutine(DestroySpineEffectAfter(sa, entry));
             }
         }
+    
     }
 
 
