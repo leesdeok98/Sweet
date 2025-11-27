@@ -40,7 +40,7 @@ public class Enemy : MonoBehaviour
     public float knockbackDuration = 0.1f;
     public bool isKnockback = false;
     public bool isStunned = false;
-    private bool isFrozen = false;
+    public bool isFrozen = false;
 
     private Coroutine removeSlowRoutine;
 
@@ -107,7 +107,7 @@ public class Enemy : MonoBehaviour
         //spriter.flipX = target.position.x < rb.position.x;
     }
 
-    void OnEnable()
+    protected virtual void OnEnable()
     {
         // 씬/풀 재활성화 시 기본 상태로 초기화
         if (GameManager.instance != null && GameManager.instance.player != null)

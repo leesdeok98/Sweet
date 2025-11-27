@@ -6,18 +6,33 @@ using Spine.Unity;
 public class StopAndGoEnemy : Enemy
 {
     [Header("Movement Pattern")]
-    public float moveTime = 2.0f;
-    public float stopTime = 1.0f;
-
-    [SpineAnimation] public string idleAnimName = "Idle";
+    public float moveTime = 0.833f;
+    public float stopTime = 0.5f;
 
     private float timer;
     private bool isMoving = true;
 
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+
+        if (skeletonAnimation != null)
+        {
+            skeletonAnimation.timeScale = 1f;
+            skeletonAnimation.AnimationState.SetAnimation(0, runAnimName, true);
+        }
+
+        timer = 0f;
+        isMoving = true;
+    }
+
     public override void FixedUpdate()
     {
-        Debug.Log("몬스터 움직이는 중...");
-        if (!isLive || target == null || isStunned) return;
+        if (!isLive || target == null || isStunned || isFrozen)
+        {
+            if (rb != null) rb.velocity = Vector2.zero;
+            return;
+        }
 
         timer += Time.fixedDeltaTime;
 
@@ -27,11 +42,10 @@ public class StopAndGoEnemy : Enemy
 
             if (timer >= moveTime)
             {
-                timer = 0;
+                timer = 0f;
                 isMoving = false;
-                rb.velocity = Vector2.zero;
 
-                skeletonAnimation.AnimationState.SetAnimation(0, idleAnimName, true);
+                rb.velocity = Vector2.zero;
             }
         }
         else
@@ -40,10 +54,8 @@ public class StopAndGoEnemy : Enemy
 
             if (timer >= stopTime)
             {
-                timer = 0;
+                timer = 0f;
                 isMoving = true;
-
-                skeletonAnimation.AnimationState.SetAnimation(0, runAnimName, true);
             }
         }
     }
