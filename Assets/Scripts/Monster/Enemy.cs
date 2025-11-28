@@ -1,20 +1,29 @@
-// Enemy.cs
 using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
 using Spine.Unity;
-using UnityEditor.U2D.Sprites;
 
 public class Enemy : MonoBehaviour
 {
-
     [Header("Spine Setting")]
-    public SkeletonAnimation skeletonAnimation;
-    [SpineAnimation] public string runAnimName = "Run";
-    [SpineAnimation] public string deadAnimName = "Die";
+    [Tooltip("true면 이동 Spine / 사망 Spine을 따로 사용합니다.")]
+    public bool useSeparateSpine = false;
 
-    // 🔸 전역 이벤트: 어떤 적이든 죽으면 한 번만 방송
+    [Tooltip("단일 Spine 또는 이동용 Spine")]
+    public SkeletonAnimation skeletonAnimation;
+
+    [Tooltip("이동용 Spine (useSeparateSpine이 true일 때 사용, 비우면 위 SkeletonAnimation 사용)")]
+    public SkeletonAnimation runSkeleton;
+
+    [Tooltip("사망용 Spine (useSeparateSpine이 true일 때 사용)")]
+    public SkeletonAnimation deathSkeleton;
+
+   [SpineAnimation] public string runAnimName = "move";  // 이동만 SpineAnimation 유지
+    public string deadAnimName = "dead";
+
+
+    //  전역 이벤트: 어떤 적이든 죽으면 한 번만 방송
     public static Action OnAnyEnemyDied;
 
     [Header("Stats")]
@@ -46,24 +55,59 @@ public class Enemy : MonoBehaviour
 
     private Coroutine removeSlowRoutine;
 
-    // 🔸 처치수 중복 집계 방지용
+    //  처치수 중복 집계 방지용
     private bool hasCountedKill = false;
 
     public Vector2 vec2;
     private float spineInitialScaleX = 1f;
 
-    void Awake()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        originalSpeed = speed; // 인스펙터의 초기 speed 저장 
+    private float runInitialScaleX = 1f;
+    private float deathInitialScaleX = 1f;
 
-        //스파인 초기 스케일 저장(좌우 반전용)
-        if(skeletonAnimation != null) 
-            spineInitialScaleX = skeletonAnimation.transform.localScale.x;
-        else
-            spineInitialScaleX = transform.localScale.x;
-          
+    private Collider2D[] colliders;
+
+    //  공통 이동 스파인 반환용
+    private SkeletonAnimation RunSpine
+    {
+        get
+        {
+            if (useSeparateSpine)
+            {
+                // 별도 설정이 없으면 기존 skeletonAnimation을 이동 Spine으로 사용
+                return runSkeleton != null ? runSkeleton : skeletonAnimation;
+            }
+            else
+            {
+                return skeletonAnimation;
+            }
+        }
     }
+
+    void Awake()
+{
+    rb = GetComponent<Rigidbody2D>();
+    originalSpeed = speed; // 인스펙터의 초기 speed 저장 
+
+    colliders = GetComponentsInChildren<Collider2D>();
+
+    // 이동 스파인 기본 스케일 저장
+    SkeletonAnimation runSa = RunSpine;
+    if (runSa != null)
+    {
+        runInitialScaleX = runSa.transform.localScale.x;
+    }
+    else
+    {
+        runInitialScaleX = transform.localScale.x;
+    }
+
+    // 사망 스파인 기본 스케일 저장
+    if (deathSkeleton != null)
+    {
+        deathInitialScaleX = deathSkeleton.transform.localScale.x;
+    }
+}
+
 
     void Start()
     {
@@ -78,9 +122,9 @@ public class Enemy : MonoBehaviour
         speed = originalSpeed;
         isSlowed = false;
 
-        //이성덕 작성 애니메이션이 없으면 애니메이션 실행시키는 코드
-        if (skeletonAnimation != null)
-            skeletonAnimation.AnimationState.SetAnimation(0, runAnimName, true);
+        // 스파인 초기 상태 + 이동 애니 실행
+        ResetSpineState();     // 
+        PlayRunAnimation();    // 
     }
 
     void Update()
@@ -108,40 +152,40 @@ public class Enemy : MonoBehaviour
         // 플레이어를 향해 이동
         Vector2 dir = target.position - rb.position;
         Vector2 nextVec = dir.normalized * speed * Time.fixedDeltaTime;
-        
+
         vec2 = dir.normalized; //이동 방향 기록 x 값으로 좌우 판별
         rb.MovePosition(rb.position + nextVec);
-
-
 
         // 물리 잔여속도 제거
         rb.velocity = Vector2.zero;
     }
 
     void LateUpdate()
+{
+    if (!isLive) return;
+    if (target == null) return;
+
+    // 이동 방향(vec2.x)에 따라 "이동 스파인"만 좌우 반전
+    SkeletonAnimation runSa = RunSpine;
+    if (runSa != null && Mathf.Abs(vec2.x) > 0.001f)
     {
-        if (!isLive) return;
-        if (!isLive || target == null) return;
+        float sign = (vec2.x < 0) ? -1f : 1f;
 
+        Transform t = runSa.transform;
+        float baseRunScaleX = (runInitialScaleX != 0f) ? runInitialScaleX : t.localScale.x;
 
-        //이성덕 작성 : 이동 방향(vec2.x)에 따라 Spine 좌우 반전
-        if (skeletonAnimation != null && Mathf.Abs(vec2.x) > 0.001f)
-        {
-            Transform t = skeletonAnimation.transform;
-
-            float sign = (vec2.x < 0) ? 1f : -1f;   // 왼쪽이면 -1, 오른쪽이면 1
-            float baseScaleX = (spineInitialScaleX != 0f) ? spineInitialScaleX : t.localScale.x;
-
-            t.localScale = new Vector3(
-                Mathf.Abs(baseScaleX) * sign,
-                t.localScale.y,
-                t.localScale.z
-            );
-        }
-
-        // 좌우 플립
-        //spriter.flipX = target.position.x < rb.position.x;
+        t.localScale = new Vector3(
+            Mathf.Abs(baseRunScaleX) * sign,
+            t.localScale.y,
+            t.localScale.z
+        );
     }
+
+    // 🔹 deathSkeleton 쪽은 여기서 건드리지 않는다
+    //    → 프리팹에 세팅해둔 스케일/방향 그대로 사망 애니 재생
+}
+
+
 
     protected virtual void OnEnable()
     {
@@ -161,7 +205,7 @@ public class Enemy : MonoBehaviour
         speed = originalSpeed;
         isSlowed = false;
 
-        // 🔸 처치 집계 플래그 초기화 (오브젝트 풀 대비)
+        //  처치 집계 플래그 초기화 (오브젝트 풀 대비)
         hasCountedKill = false;
 
         isFrozen = false;          // 빙결 상태 해제
@@ -169,11 +213,146 @@ public class Enemy : MonoBehaviour
         isStunned = false;         // 스턴 상태 해제
         isKnockback = false;       // 넉백 상태 해제
 
-        if (skeletonAnimation != null)
-            skeletonAnimation.timeScale = 1f;
-        //if (anim != null) anim.speed = originalAnimSpeed;   // 애니메이션 재생속도 원복
-        //if (spriter != null) spriter.color = originalColor; // 파란 틴트 등 색상 원복
+        //  다시 살아날 때 물리 복구
+    if (rb != null)
+    {
+        rb.simulated = true;
+        rb.velocity = Vector2.zero;
     }
+
+    if (colliders != null)
+    {
+        foreach (var col in colliders)
+            col.enabled = true;
+    }
+
+        // 스파인 상태 초기화 + 이동 애니 재생
+        ResetSpineState();     // 
+        PlayRunAnimation();    // 
+    }
+
+    // 스파인 상태 초기화
+    // 스파인 상태 초기화
+private void ResetSpineState()
+{
+    if (useSeparateSpine)
+    {
+        if (RunSpine != null)
+        {
+            // ★ 컴포넌트/렌더러 다시 켜기
+            RunSpine.enabled = true;
+            var mr = RunSpine.GetComponent<MeshRenderer>();
+            if (mr != null) mr.enabled = true;
+
+            RunSpine.gameObject.SetActive(true);
+            RunSpine.timeScale = 1f;
+        }
+        if (deathSkeleton != null)
+        {
+            deathSkeleton.enabled = true;
+            var mr2 = deathSkeleton.GetComponent<MeshRenderer>();
+            if (mr2 != null) mr2.enabled = true;
+
+            deathSkeleton.gameObject.SetActive(false);
+            deathSkeleton.timeScale = 1f;
+        }
+    }
+    else
+    {
+        if (skeletonAnimation != null)
+        {
+            skeletonAnimation.enabled = true;
+            var mr = skeletonAnimation.GetComponent<MeshRenderer>();
+            if (mr != null) mr.enabled = true;
+
+            skeletonAnimation.gameObject.SetActive(true);
+            skeletonAnimation.timeScale = 1f;
+        }
+    }
+}
+
+    // 이동 애니메이션 실행
+    private void PlayRunAnimation()
+    {
+        SkeletonAnimation runSa = RunSpine;
+        if (runSa != null)
+        {
+            runSa.gameObject.SetActive(true);
+            runSa.timeScale = 1f;
+            runSa.AnimationState.SetAnimation(0, runAnimName, true);
+        }
+
+        if (useSeparateSpine && deathSkeleton != null)
+        {
+            deathSkeleton.gameObject.SetActive(false);
+        }
+    }
+
+    // 사망 애니메이션 실행
+    // 사망 애니메이션 실행
+// 사망 애니메이션 실행
+private void PlayDieAnimation()
+{
+    const float extraTime = 0.05f;  // 여유로 0.05초 정도 더 보기
+
+    if (useSeparateSpine)
+    {
+        // 이동 Spine 숨기기
+        SkeletonAnimation runSa = RunSpine;
+        if (runSa != null)
+        {
+            // Enemy 루트를 끄지 않고, 이동 스파인만 안 보이게
+            if (runSa.gameObject == gameObject)
+            {
+                runSa.enabled = false;
+                var mr = runSa.GetComponent<MeshRenderer>();
+                if (mr != null) mr.enabled = false;
+            }
+            else
+            {
+                runSa.gameObject.SetActive(false);
+            }
+        }
+
+        // 사망 Spine 켜고 dead 재생
+        if (deathSkeleton != null)
+        {
+            deathSkeleton.gameObject.SetActive(true);
+            deathSkeleton.enabled = true;
+
+            var mr2 = deathSkeleton.GetComponent<MeshRenderer>();
+            if (mr2 != null) mr2.enabled = true;
+
+            deathSkeleton.timeScale = 1f;
+
+            // ★ dead 애니 한 번 재생
+            var entry = deathSkeleton.AnimationState.SetAnimation(0, deadAnimName, false);
+
+            // ★ 애니 길이(Duration) 가져오기
+            float duration = 2.0f;
+            if (entry != null && entry.Animation != null)
+                duration = entry.Animation.Duration;
+
+            // ★ dead 애니 끝날 때쯤 Enemy 비활성화
+            StartCoroutine(DeactivateAfterDelay(duration + extraTime));
+        }
+    }
+    else
+    {
+        // 단일 Spine 사용하는 몬스터 (몬스터1 같은 애들)
+        if (skeletonAnimation != null)
+        {
+            var entry = skeletonAnimation.AnimationState.SetAnimation(0, deadAnimName, false);
+
+            float duration = 0.5f;
+            if (entry != null && entry.Animation != null)
+                duration = entry.Animation.Duration;
+
+            StartCoroutine(DeactivateAfterDelay(duration + extraTime));
+        }
+    }
+}
+
 
     /// <summary>
     /// 스폰 시 외부에서 스탯 일괄 설정 (스폰러가 호출)
@@ -200,18 +379,24 @@ public class Enemy : MonoBehaviour
         isStunned = false;         // 스턴 상태 해제
         isKnockback = false;       // 넉백 상태 해제
 
-        if (skeletonAnimation != null)
-        {
-            skeletonAnimation.timeScale = 1f; // 속도 정상화
-            skeletonAnimation.AnimationState.SetAnimation(0, runAnimName, true);
-        }
-
-        //if (anim != null) anim.speed = originalAnimSpeed;   // 애니메이션 재생속도 원복
-        //if (spriter != null) spriter.color = originalColor; // 파란 틴트 등 색상 원복
-
+        if (rb != null)
+    {
+        rb.simulated = true;
+        rb.velocity = Vector2.zero;
     }
 
-    // ★★ 중요: 플레이어에게 데미지는 Player.cs에서만 처리하도록 유지
+    if (colliders != null)
+    {
+        foreach (var col in colliders)
+            col.enabled = true;
+    }
+
+        // Spine 초기화 + 이동 애니메이션 실행 (단일 / 분리 공통 처리)
+        ResetSpineState();     // ★
+        PlayRunAnimation();    // ★
+    }
+
+    //  중요: 플레이어에게 데미지는 Player.cs에서만 처리하도록 유지
     // (OnCollisionStay2D/OnTriggerStay2D는 Player.cs에서 처리 중복 방지)
 
     /// <summary>
@@ -230,34 +415,43 @@ public class Enemy : MonoBehaviour
     /// 사망 처리 (애니메이션 트리거 + 처치 이벤트 + 비활성)
     /// </summary>
     void Die()
+{
+    if (!isLive) return;
+
+    isLive = false;
+
+    // ★ 물리 완전 차단
+    if (rb != null)
     {
-        if (!isLive) return;
-
-        isLive = false;
         rb.velocity = Vector2.zero;
-
-        if (skeletonAnimation != null)
-            skeletonAnimation.AnimationState.SetAnimation(0, deadAnimName, false);
-
-        //if (anim != null)
-        //    anim.SetTrigger("Dead");
-
-        // 🔸 처치수는 정확히 한 번만 증가
-        if (!hasCountedKill)
-        {
-            hasCountedKill = true;
-            OnAnyEnemyDied?.Invoke();
-        }
-
-        // 비주얼 연출 후 비활성화 (오브젝트 풀 전제)
-        StartCoroutine(DeactivateAfterDelay(1f));
+        rb.simulated = false;   // 더 이상 물리 계산 X
     }
+
+    if (colliders != null)
+    {
+        foreach (var col in colliders)
+            col.enabled = false; // 플레이어/총알과 충돌 X
+    }
+
+    // ★ 사망 애니 재생 (이동 스파인 숨기고, 죽는 스파인 켜기)
+    PlayDieAnimation();
+
+    // 처치 이벤트, 코루틴 그대로 유지
+    if (!hasCountedKill)
+    {
+        hasCountedKill = true;
+        OnAnyEnemyDied?.Invoke();
+    }
+
+    StartCoroutine(DeactivateAfterDelay(2.0f)); // 사망 애니 길이에 맞게 조절
+}
 
     IEnumerator DeactivateAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
         gameObject.SetActive(false);
     }
+
     public virtual void OnCollisionStay2D(Collision2D collision)
     {
         if (isLive && collision.gameObject.CompareTag("Player"))
@@ -320,12 +514,13 @@ public class Enemy : MonoBehaviour
 
         yield return new WaitForSeconds(duration);
 
-        if (skeletonAnimation != null) skeletonAnimation.timeScale = 1f;
+        if (RunSpine != null) RunSpine.timeScale = 1f;   // ★ 이동 Spine 기준
 
         speed = isSlowed ? originalSpeed * 0.5f : originalSpeed;
 
         isStunned = false;
     }
+
     public void ApplyFreeze(float duration) //아성덕이 작성
     {
         if (duration <= 0f) return;
@@ -337,22 +532,9 @@ public class Enemy : MonoBehaviour
             savedSpeed = speed;        // 기존 이동속도 저장
             speed = 0f;                // 속도 0으로
 
-            if (skeletonAnimation != null)
-                skeletonAnimation.timeScale = 0f; // 시간 0 = 멈춤
+            if (RunSpine != null)
+                RunSpine.timeScale = 0f; // 시간 0 = 멈춤
 
-            // (선택사항) 색상 변경 코드 필요 시: skeletonAnimation.skeleton.SetColor(...) 사용
-
-            //if (anim != null)
-            //{
-            //    originalAnimSpeed = anim.speed;
-            //    anim.speed = 0f;       // 애니메이션도 정지
-            //}
-
-            //if (spriter != null)
-            //{
-            //    // 살짝 푸른빛(원래 색에乘해 약간 파랗게). 필요하면 여기서 고정 색도 가능
-            //    spriter.color = originalColor * new Color(0.7f, 0.85f, 1.15f, 1f);
-            //}
             if (rb != null) rb.velocity = Vector2.zero;
         }
         else
@@ -361,19 +543,13 @@ public class Enemy : MonoBehaviour
             freezeRemain = Mathf.Max(freezeRemain, duration);
         }
     }
+
     private void Unfreeze() // 이성덕이 작성
     {
         isFrozen = false;
         speed = savedSpeed;
 
-        if (skeletonAnimation != null)
-            skeletonAnimation.timeScale = 1f;
-        //if (anim != null)
-        //    anim.speed = originalAnimSpeed;
-
-        //if (spriter != null)
-        //    spriter.color = originalColor;
+        if (RunSpine != null)
+            RunSpine.timeScale = 1f;
     }
 }
-
-

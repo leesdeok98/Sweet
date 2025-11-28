@@ -161,6 +161,11 @@ public class SkillManager : MonoBehaviour
     private bool icebreakerActive = false;     //아이스 브레이커
 
 
+    //세트효과 애니메이션 중복 방지용
+    private bool icebreakerFxPlayed = false;
+    private bool bittermeltChaosFxPlayed = false;
+    private bool twistOrTreatFxPlayed = false;
+
 
     public bool IsBittermeltChaosActive => bittermeltChaosActive;
     public bool IsIcebreakerActive => icebreakerActive;
@@ -499,10 +504,17 @@ public class SkillManager : MonoBehaviour
     }
 
 
-    void ApplyBittermeltChaosSet() //비터멜트 세트효과 로직
+        void ApplyBittermeltChaosSet() //비터멜트 세트효과 로직
     {
         bittermeltChaosActive = true;
         Debug.Log("[SkillManager] 비터멜트 카오스 세트 효과 발동!");
+
+        // ★ FX는 처음 발동할 때만 재생 (이미 재생했다면 다시 생성하지 않음)
+        if (bittermeltChaosFxPlayed)
+        {
+            return;
+        }
+        bittermeltChaosFxPlayed = true;
 
         if (player == null) return;
         if (bittermeltChaosSpinePrefab == null)
@@ -531,6 +543,7 @@ public class SkillManager : MonoBehaviour
         }
     }
 
+
     // 아이스브레이커 세트 효과 체크 (SnowflakeCandy + IcedJelly + PoppingCandy)
     void CheckIcebreakerSet()
     {
@@ -544,6 +557,7 @@ public class SkillManager : MonoBehaviour
     }
 
     // 아이스브레이커 세트 효과 실제 적용: 플래그 on + 슬로우 코루틴 시작
+        // 아이스브레이커 세트 효과 실제 적용: 플래그 on + 슬로우 코루틴 시작
     void ApplyIcebreakerSet()
     {
         icebreakerActive = true;
@@ -557,14 +571,17 @@ public class SkillManager : MonoBehaviour
 
         // ─────────────────────────────────────────────
         // 아이스브레이커 세트 발동 시 Spine FX 1회 재생
+        //  (이미 한 번 재생된 상태라면 FX는 다시 나오지 않음)
         // ─────────────────────────────────────────────
+        if (icebreakerFxPlayed) return;  // ★ FX는 한 번만
+        icebreakerFxPlayed = true;
+
         if (player == null) return;
         if (icebreakerSpinePrefab == null)
         {
             Debug.LogWarning("[SkillManager] icebreakerSpinePrefab 비어 있음 (세트 FX는 나중에 연결 가능)");
             return;
         }
-        //테스트
 
         GameObject fx = Instantiate(icebreakerSpinePrefab, player.transform);
         fx.name = "Icebreaker_SetFX";
@@ -574,17 +591,24 @@ public class SkillManager : MonoBehaviour
         if (sa != null)
         {
             var state = sa.AnimationState;
-            TrackEntry entry = state.SetAnimation(0, twistOrTreatAnimName, twistOrTreatAnimLoop);
 
-            Invoke(nameof(TwistorTreatSound), 1f);
+            // ★ 여기 원래 twistOrTreatAnimName / twistOrTreatAnimLoop 쓰고 있었음 (버그)
+            //    Icebreaker 전용 필드로 교체
+            TrackEntry entry = state.SetAnimation(0, icebreakerAnimName, icebreakerAnimLoop);
 
-            if (!twistOrTreatAnimLoop)
+            // Icebreaker 전용 사운드가 생기면 여기서 재생하면 됨
+            // AudioManager.instance.PlaySfx(...);
+            // (지금은 기존 TwistorTreatSound를 그대로 쓰고 싶다면
+            //  아래 줄을 살려서 같이 호출해도 됨)
+            // Invoke(nameof(TwistorTreatSound), 1f);
+
+            if (!icebreakerAnimLoop)
             {
                 StartCoroutine(DestroySpineEffectAfter(sa, entry));
             }
         }
-    
     }
+
 
 
     // 아이스브레이커 세트 효과 해제: 적 속도 원복 + 코루틴 정리
@@ -625,6 +649,8 @@ public class SkillManager : MonoBehaviour
 
     //트위스트 오어 트릿 세트 효과 적용
     //세트 플래그를 키면 각 3개의 스킬 효과 버프 적용
+        //트위스트 오어 트릿 세트 효과 적용
+    //세트 플래그를 키면 각 3개의 스킬 효과 버프 적용
     void ApplyTwistOrTreatSet() // 트위스트 오어 트릿 세트 효과 로직
     {
         // 세트 발동 플래그 ON
@@ -639,6 +665,13 @@ public class SkillManager : MonoBehaviour
 
         
         //  Spine 세트 이펙트 한 번만 재생 후 Destroy
+        // ★ FX는 처음 발동할 때만 재생 (이미 재생했다면 아래 FX 로직 스킵)
+        if (twistOrTreatFxPlayed)
+        {
+            return;
+        }
+        twistOrTreatFxPlayed = true;
+
         if (player == null) return;
 
         if (twistOrTreatSpinePrefab == null)
@@ -675,6 +708,7 @@ public class SkillManager : MonoBehaviour
             }
         }
     }
+
 
     void UpgradeHoneySpinForTwistOrTreat()
     {
