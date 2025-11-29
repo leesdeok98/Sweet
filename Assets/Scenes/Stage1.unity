@@ -12618,6 +12618,8 @@ GameObject:
   - component: {fileID: 1429503041}
   - component: {fileID: 1429503039}
   - component: {fileID: 1429503046}
+  - component: {fileID: 1429503048}
+  - component: {fileID: 1429503049}
   - component: {fileID: 1429503047}
   - component: {fileID: 1429503038}
   - component: {fileID: 1429503045}
@@ -12831,13 +12833,15 @@ MonoBehaviour:
   hasDarkChip: 0
   hasRollingChocolateBar: 0
   hasPoppingCandy: 0
-  hasSyrupTornado: 1
-  hasCocoaPowder: 0
-  hasStrawberryPopCore: 0
-  hasHoneySpin: 0
+  hasSyrupTornado: 0
+  hasCocoaPowder: 1
+  hasStrawberryPopCore: 1
+  hasHoneySpin: 1
   hasSnowflakeCandy: 0
-  hasCaramelCube: 0
-  hasSugarShield: 0
+  hasCaramelCube: 1
+  hasSugarShield: 1
+  hasSugarPorridge: 1
+  hasHyperCandyRushActive: 0
 --- !u!70 &1429503045
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -12885,6 +12889,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ee534aa0108fa040ac0e4432fea5fec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  caramelCubePrefab: {fileID: 6455817573866816834, guid: add6967beb92a1c41ae9d24f094ea1ff, type: 3}
   duration: 5
   cooldown: 20
   speedMultiplier: 2
@@ -12905,6 +12910,37 @@ MonoBehaviour:
   generationInterval: 20
   activeShield1: {fileID: 0}
   activeShield2: {fileID: 0}
+--- !u!114 &1429503048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429503034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fee6ebcef39b884f8722d46453bba56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  comboVisualPrefab: {fileID: 4997950841977934739, guid: e4b6c6e6c91e94b4aaa703b8daefc791, type: 3}
+  skeleton: {fileID: 0}
+  ShieldAnimation: animation
+  spineTimeScale: 1
+--- !u!114 &1429503049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429503034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f59bad244137b74193aaeaf5e2afa18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  comboVisualPrefab: {fileID: 7538336886891332679, guid: 3ccee298e04ca6f45ba7a9ddd7b22f52, type: 3}
+  RushAnimation: animation
+  spineTimeScale: 1
 --- !u!1 &1432312277
 GameObject:
   m_ObjectHideFlags: 0
@@ -14730,6 +14766,11 @@ MonoBehaviour:
   twistOrTreatAnimName: animation
   twistOrTreatAnimLoop: 0
   twistOrTreatLocalOffset: {x: 0, y: 0, z: 0}
+  hyperCandyRushSpinePrefab: {fileID: 7538336886891332679, guid: 3ccee298e04ca6f45ba7a9ddd7b22f52, type: 3}
+  hyperCandyRushAnimName: animation
+  hyperCandyRushAnimLoop: 0
+  hyperCandyRushLocalOffset: {x: 0, y: 0, z: 0}
+  sweetarmorComboVisualPrefab: {fileID: 4997950841977934739, guid: e4b6c6e6c91e94b4aaa703b8daefc791, type: 3}
   icebreakerSlowPercent: 0.1
   icebreakerBonusDamage: 5
 --- !u!114 &1648878447

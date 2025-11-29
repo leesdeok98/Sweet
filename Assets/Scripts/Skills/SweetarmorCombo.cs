@@ -1,0 +1,136 @@
+using UnityEngine;
+using System.Collections;
+using Spine.Unity;
+using System.Xml.Serialization;
+
+public class SweetarmorCombo : MonoBehaviour
+{
+    private Player player;
+    private SugarShieldSkill shieldSkill;
+
+
+    [Header("Visuals")]
+    public GameObject comboVisualPrefab;
+    private GameObject activeComboVisual = null;
+
+    // 실드 자동 발동 관련 변수
+    private bool isShieldCooldown = false;
+    private const float SHIELD_AUTOCAST_COOLDOWN = 20f;
+    private const float HP_THRESHOLD = 30f;
+
+    // 회복 관련 변수
+    private const float HEAL_AMOUNT = 3f;
+    private const float HEAL_INTERVAL = 5f;
+
+    // 스파인 관련 변수
+    public SkeletonAnimation skeleton;
+    public string ShieldAnimation = "animation";
+    public float spineTimeScale = 1.0f;
+
+
+    void Start()
+    {
+        // 컴포넌트 할당만 수행
+        player = GetComponent<Player>();
+        if (player == null)
+        {
+            Debug.LogError("SweetarmorCombo: Player 컴포넌트를 찾을 수 없습니다.");
+            Destroy(this);
+            return;
+        }
+
+        shieldSkill = player.GetComponent<SugarShieldSkill>();
+        if (shieldSkill == null)
+        {
+            Debug.LogWarning("SweetarmorCombo: SugarShieldSkill 컴포넌트가 없어 실드 자동 발동 기능이 작동하지 않습니다.");
+        }
+
+    }
+
+    public void ActivateComboEffect()
+    {
+        Debug.Log("[1] ActivateComboEffect 시작");
+
+        // 비주얼 생성
+        if (comboVisualPrefab != null)
+        {
+            activeComboVisual = Instantiate(comboVisualPrefab, transform.position, Quaternion.identity, transform);
+            activeComboVisual.transform.localPosition = Vector3.zero;
+
+            skeleton = activeComboVisual.GetComponentInChildren<SkeletonAnimation>();
+
+            Debug.Log($"[2] Skeleton 참조 결과: {(skeleton != null ? "성공" : "실패")}");
+        }
+        else
+        {
+            Debug.LogError("SweetarmorCombo: 비주얼 프리팹이 할당되지 않았습니다. 애니메이션이 실행되지 않습니다.");
+        }
+
+        // Spine 애니메이션 재생 (딱 한 번만 재생)
+        if (skeleton != null)   // 여나야 여기다 here 여기여!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        {
+            Debug.Log("[3] 스파인 애니메이션 재생 명령");
+            skeleton.timeScale = spineTimeScale;
+            skeleton.AnimationState.SetAnimation(0, ShieldAnimation, false);    // 여나야 여기가 바로 그 스파인이 작동하는 코드야!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+        }
+        else
+        {
+            Debug.LogError("[ERROR] Skeleton State가 null입니다. 데이터 로드 실패 가능성 높음.");
+        }
+
+        // 5초마다 체력 회복 코루틴 시작 (기존 기능 유지)
+        StartCoroutine(HealRoutine());
+    }
+
+    void Update()
+    {
+        // 체력 조건 및 쿨타임 확인 후 실드 자동 발동
+        if (!isShieldCooldown && player.health <= HP_THRESHOLD)
+        {
+            TryAutoCastShield();
+        }
+    }
+
+    IEnumerator HealRoutine()
+    {
+        // 5초마다 플레이어 회복
+        while (true)
+        {
+            yield return new WaitForSeconds(HEAL_INTERVAL);
+            player.Heal(HEAL_AMOUNT);
+            Debug.Log($"SweetarmorCombo: 5초마다 HP {HEAL_AMOUNT} 회복");
+        }
+    }
+
+    private void TryAutoCastShield()
+    {
+        //  실드 자동 발동 로직
+        if (shieldSkill != null && shieldSkill.CurrentShieldCount < 2)
+        {
+            Debug.Log("SweetarmorCombo: 체력 30 이하, 업그레이드 실드 자동 발동!");
+
+            shieldSkill.AutoCastUpgradeShield();
+
+            StartCoroutine(ShieldCooldownRoutine());
+        }
+    }
+
+    IEnumerator ShieldCooldownRoutine()
+    {
+        // 쿨타임 관리 로직
+        isShieldCooldown = true;
+        yield return new WaitForSeconds(SHIELD_AUTOCAST_COOLDOWN);
+        isShieldCooldown = false;
+        Debug.Log("SweetarmorCombo: 실드 자동 발동 쿨타임 종료.");
+    }
+
+    void OnDestroy()
+    {
+        if (activeComboVisual != null)
+        {
+            Destroy(activeComboVisual); // 비주얼 삭제해주기
+        }
+    }
+
+
+}

@@ -7,6 +7,7 @@ public class CaramelCubeSkill : MonoBehaviour
     private Player player;
 
     [Header("Caramel Cube Settings")]
+    public GameObject caramelCubePrefab; 
     public float duration = 5f;        // 5초 동안 유지
     public float cooldown = 20f;       // 20초 쿨타임
     public float speedMultiplier = 2f; // 공격 속도 2배 (100% 증가)
@@ -35,6 +36,15 @@ public class CaramelCubeSkill : MonoBehaviour
     IEnumerator CaramelCubeRoutine()
     {
         isActive = true;
+
+        // 비주얼 생성
+        if (caramelCubePrefab != null)
+        {
+            GameObject visual = Instantiate(caramelCubePrefab, transform.position, Quaternion.identity, transform);
+            visual.transform.localPosition = Vector3.zero;
+
+            // 효과가 발생하기 시작할 때 사운드가 난다고 해서 프리팹 생기고 소리 나는게 가장 자연스러울 거 같아서 여기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        }
 
         // 공격 속도 증가
         shooting.fireRate = originalFireRate / speedMultiplier;

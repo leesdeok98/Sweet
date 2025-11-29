@@ -131,6 +131,20 @@ public class SkillManager : MonoBehaviour
     [Tooltip("플레이어 기준 위치 오프셋")]
     [SerializeField] private Vector3 twistOrTreatLocalOffset = Vector3.zero;
 
+    // 하이퍼캔디 러쉬 세트 효과
+    [Header("하이퍼캔디 러쉬 설정")]
+    [SerializeField] private GameObject hyperCandyRushSpinePrefab;
+    [SerializeField] private string hyperCandyRushAnimName = "animation";
+    [SerializeField] private bool hyperCandyRushAnimLoop = false;
+    [Tooltip("플레이어 기준 위치 오프셋")]
+    [SerializeField] private Vector3 hyperCandyRushLocalOffset = Vector3.zero;
+    private HyperCandyRush hyperCandyRushComponent;
+
+    [Header("스위트아머 콤보 설정")]
+    // 스위트아머 콤보 프리팹 
+    public GameObject sweetarmorComboVisualPrefab;
+    private SweetarmorCombo sweetarmorComboComponent;
+
 
     // 다른 스크립트에서 세트 발동 여부 확인용 (읽기 전용)
     public bool IsTwistOrTreatActive => twistOrTreatActive;
@@ -159,6 +173,8 @@ public class SkillManager : MonoBehaviour
     //세트효과 발동 여부
     private bool bittermeltChaosActive = false; //비터멜트 카오스
     private bool icebreakerActive = false;     //아이스 브레이커
+    private bool hasHyperCandyRushActive = false; //하이퍼 캔디 러쉬
+    private bool hasSweetarmorComboActive = false; //스윗아머 콤보
 
 
     //세트효과 애니메이션 중복 방지용
@@ -319,6 +335,8 @@ public class SkillManager : MonoBehaviour
         CheckBittermeltChaosSet(); //DarkChip + CocoaPowder + RollingChocolateBar
         CheckIcebreakerSet(); // SnowflakeCandy + IcedJelly + PoppingCandy 세트 체크
         CheckTwistOrTreatSet(); //SyrupTornado + HoneySpin + RollingChocolateBar 세트 체크
+        CheckHyperCandyRushSet(); // HoneySpin + StrawberryPopCore + SugarPorridge 세트 체크
+        CheckSweetarmorCombo(); // SugarShield + CaramelCube + CocoaPowder 세트 체크
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -471,6 +489,112 @@ public class SkillManager : MonoBehaviour
         }
 
         Debug.Log("[SkillManager] 허니스핀 활성화: 구체 " + honeySpinOrbCount + "개 생성");
+    }
+
+    private void CheckSweetarmorCombo()
+    {
+        if (player.hasSugarShield && player.hasCaramelCube && player.hasCocoaPowder)
+        {
+            if (hasSweetarmorComboActive)
+            {
+                return;
+            }
+
+            ApplySweetarmorCombo();
+        }
+    }
+
+    private void ApplySweetarmorCombo()
+    {
+        hasSweetarmorComboActive = true;
+        Debug.Log("SweetarmorCombo 발동!");
+
+        sweetarmorComboComponent = player.gameObject.GetComponent<SweetarmorCombo>();
+        if (sweetarmorComboComponent == null)
+        {
+            sweetarmorComboComponent = player.gameObject.AddComponent<SweetarmorCombo>();
+        }
+
+        // 비주얼 프리팹 전달
+        if (sweetarmorComboVisualPrefab != null)
+        {
+            sweetarmorComboComponent.comboVisualPrefab = sweetarmorComboVisualPrefab;
+        }
+        else
+        {
+            Debug.LogError("SweetarmorCombo Visual Prefab이 SkillManager에 할당되지 않았습니다!");
+        }
+
+        // 컴포넌트의 활성화 함수를 명시적으로 호출하여 로직 시작
+        sweetarmorComboComponent.ActivateComboEffect();
+    }
+
+    void CheckHyperCandyRushSet()
+    {
+        if (player == null) return;
+
+        bool hasHoneySpin = player.hasHoneySpin;
+        bool hasPopCore = player.hasStrawberryPopCore;
+        bool hasSugarPorridge = player.hasSugarPorridge;
+
+        if (hasHoneySpin && hasPopCore && hasSugarPorridge)
+        {
+            if (!hasHyperCandyRushActive) // 아직 활성화되지 않았을 때만
+            {
+                ApplyHyperCandyRushSet(); 
+            }
+        }
+    }
+
+    void ApplyHyperCandyRushSet()
+    {
+        // 이미 활성화된 상태라면 중복 실행 방지
+        if (hasHyperCandyRushActive) return;
+
+
+        hasHyperCandyRushActive = true;
+        Debug.Log("[SkillManager] 하이퍼 캔디 러쉬 세트 효과 발동!");
+
+        // Player에게 효과 활성화 요청
+        player?.ActivateHyperCandyRush(true);
+
+        // HyperCandyRush 컴포넌트 추가 및 비주얼 / 기능 활성화 요청
+        if (hyperCandyRushComponent == null)
+        {
+            hyperCandyRushComponent = player.gameObject.AddComponent<HyperCandyRush>();
+
+            // SkillManager의 프리팹 정보를 HyperCandyRush 컴포넌트에 전달
+            if (hyperCandyRushSpinePrefab != null)
+            {
+                hyperCandyRushComponent.comboVisualPrefab = hyperCandyRushSpinePrefab;
+            }
+            else
+            {
+                Debug.LogWarning("[SkillManager] hyperCandyRushSpinePrefab 비어 있음. 비주얼이 나오지 않습니다.");
+            }
+            // 컴포넌트의 비주얼 생성 및 핵심 로직
+            hyperCandyRushComponent.ActivateSetEffect();
+        }
+
+        // Spine FX 1회 재생
+        if (player != null && hyperCandyRushSpinePrefab != null)
+        {
+            GameObject fx = Instantiate(hyperCandyRushSpinePrefab, player.transform);
+            fx.name = "HyperCandyRush_SetFX_OneShot";
+            fx.transform.localPosition = hyperCandyRushLocalOffset;
+
+            SkeletonAnimation sa = fx.GetComponent<SkeletonAnimation>();
+            if (sa != null)
+            {
+                var state = sa.AnimationState;
+                TrackEntry entry = state.SetAnimation(0, hyperCandyRushAnimName, hyperCandyRushAnimLoop);
+                if (!hyperCandyRushAnimLoop)
+                {
+                    StartCoroutine(DestroySpineEffectAfter(sa, entry));
+                }
+
+            }
+        }
     }
 
     // 허니스핀 오브젝트 전부 제거

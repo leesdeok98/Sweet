@@ -46,7 +46,7 @@ public class SugarShieldSkill : MonoBehaviour
         Debug.Log("슈가 실드 관리 시작. 실드 1 즉시 생성 및 20초 고정 타이머 시작.");
     }
 
-    
+
     IEnumerator ShieldGenerationRoutine()  // 실드 생성 주기 관리하는 코루틴
     {
         while (isGenerating)
@@ -80,6 +80,8 @@ public class SugarShieldSkill : MonoBehaviour
             // Player의 자식으로 생성
             activeShield1 = Instantiate(shieldPrefab1, transform.position, Quaternion.identity, transform);
             activeShield1.transform.localPosition = Vector3.zero;
+
+            // 여기에 적으면 될 거 같다 연화야 여기는 실드 생성 효과음 실드 1은 그냥 약해빠진 실드!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
         }
     }
 
@@ -90,6 +92,8 @@ public class SugarShieldSkill : MonoBehaviour
             // Player의 자식으로 생성
             activeShield2 = Instantiate(shieldPrefab2, transform.position, Quaternion.identity, transform);
             activeShield2.transform.localPosition = Vector3.zero;
+
+            // 여기도 실드 효과음 넣어주면 될 거 같은데 실드2는 중첩된 거라 좀 더 강한 놈 얘가 두 번째로 생기는 애야 혹시 실드마다 소리 다를까봐 적었드아!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         }
     }
 
@@ -97,6 +101,7 @@ public class SugarShieldSkill : MonoBehaviour
     {
         if (activeShield2 != null)
         {
+            // 여기가 소모되는 부분이라 깨지는 효과음은 여기에 하면 되겠지!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!그럴거야아마두~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             Destroy(activeShield2);
             activeShield2 = null;
             Debug.Log($"[Shield 2] 소모! (Player 본체 충돌 흡수)");
@@ -105,6 +110,7 @@ public class SugarShieldSkill : MonoBehaviour
 
         if (activeShield1 != null)
         {
+            // 이하생략~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             Destroy(activeShield1);
             activeShield1 = null;
             Debug.Log($"[Shield 1] 소모! (Player 본체 충돌 흡수)");
@@ -134,5 +140,15 @@ public class SugarShieldSkill : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void AutoCastUpgradeShield()     // 스위트 아머 콤보 효과용 (실드1, 실드2 한 번에 생기게 하는 메서드)
+    {
+        // 실드 1과 실드 2를 모두 생성 시도
+        GenerateShield1Visual();
+        GenerateShield2Visual();
+
+        Debug.Log("업그레이드 실드: S1과 S2 동시 생성 완료!");
+
     }
 }

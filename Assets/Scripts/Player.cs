@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
 {
     public Vector2 inputVec;
     public float speed = 5f;
+    private float initialSpeed; // 초기 속도 저장 (하이퍼캔디 러쉬에서 사용)
 
     private Rigidbody2D rigid;
    
@@ -42,9 +43,14 @@ public class Player : MonoBehaviour
     public bool hasSnowflakeCandy = false;
     public bool hasCaramelCube = false;
     public bool hasSugarShield = false;
-
+    public bool hasSugarPorridge = false;
     //인스펙터에서 체크된 스킬들을 한 번만 적용하기 위한 플래그
     private bool startingSkillsApplied = false;
+
+    //세트효과 확인용
+    [Header("has SetSkill")]
+    public bool hasHyperCandyRushActive = false; // HyperCandyRush 상태
+
 
     void Awake()
     {
@@ -73,6 +79,8 @@ public class Player : MonoBehaviour
         isLive = true;
 
         if (diepanel) diepanel.SetActive(false);
+
+        initialSpeed = speed; // 초기 속도 저장 (이거 지우시면 안돼요 이거 지우시면 하이퍼캔디 러쉬 효과 실행됐을 때 캐릭터 안 움직여요이유ㅠ)
     }
 
     void OnEnable()
@@ -295,6 +303,36 @@ public class Player : MonoBehaviour
         PlaySpineAnimation(nextAnim, loop);
     }
 
+    public void ActivateHyperCandyRush(bool activate)
+    {
+        if (hasHyperCandyRushActive == activate) return; // 상태 변화 없을 시 중단
+
+        hasHyperCandyRushActive = activate;
+
+        // 이동 속도 30% 증가 적용/복원
+        speed = activate ? (initialSpeed * 1.30f) : initialSpeed;
+
+        Debug.Log($"[HyperCandyRush] 활성화: 이동 속도 {initialSpeed:0.##} -> {speed:0.##}");
+
+        PlayerShooting shooting = GetComponent<PlayerShooting>();
+        if (shooting != null)
+        {
+            shooting.ApplyHyperCandyRushBaseAttackSpeed(activate);
+        }
+
+        HyperCandyRush hcrComponent = GetComponent<HyperCandyRush>();
+        if (hcrComponent != null)
+        {
+            if (activate)
+            {
+                hcrComponent.StartMovementCheck();
+            }
+            else
+            {
+                hcrComponent.StopMovementCheck();
+            }
+        }
+    }
 
     /// Spine 애니메이션을 재생하는 공통 함수.
 
