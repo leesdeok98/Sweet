@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2452797393362300091}
   - component: {fileID: -4278416636754574743}
   - component: {fileID: 9050661055322017148}
-  - component: {fileID: 3131936367391997358}
+  - component: {fileID: 6356079016847511575}
   m_Layer: 8
   m_Name: DoughSlime
   m_TagString: Enemy
@@ -192,7 +192,7 @@ CircleCollider2D:
   m_Offset: {x: 0.6773186, y: -7.499754}
   serializedVersion: 2
   m_Radius: 5.086084
---- !u!114 &3131936367391997358
+--- !u!114 &6356079016847511575
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -201,15 +201,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 926699699989198930}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f78fec4eebf8a34c8820cb09ce6845a, type: 3}
+  m_Script: {fileID: 11500000, guid: 374b4b38a51fafc4abce0568bced40ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   skeletonAnimation: {fileID: 2452797393362300091}
   runAnimName: move
   deadAnimName: dead
-  speed: 2
-  health: 10
-  maxHealth: 10
+  speed: 0
+  health: 0
+  maxHealth: 0
   dps: 0
   target: {fileID: 0}
   isSlowed: 0
@@ -218,3 +218,5 @@ MonoBehaviour:
   isStunned: 0
   isFrozen: 0
   vec2: {x: 0, y: 0}
+  moveTime: 0.833
+  stopTime: 0.5

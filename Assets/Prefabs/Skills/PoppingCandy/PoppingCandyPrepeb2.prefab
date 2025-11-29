@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5145988421867719204}
   - component: {fileID: 3614505489282323715}
   - component: {fileID: 2931699901323351167}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: PoppingCandyPrepeb2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,8 +71,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1569767775
-  m_SortingLayer: 6
+  m_SortingLayerID: 558078665
+  m_SortingLayer: 4
   m_SortingOrder: 300
   m_Sprite: {fileID: -1287664484, guid: 1eb4f7d4d06b88d41918253fe7946835, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

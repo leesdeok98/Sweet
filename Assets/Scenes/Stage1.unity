@@ -12831,7 +12831,7 @@ MonoBehaviour:
   hasDarkChip: 0
   hasRollingChocolateBar: 0
   hasPoppingCandy: 0
-  hasSyrupTornado: 0
+  hasSyrupTornado: 1
   hasCocoaPowder: 0
   hasStrawberryPopCore: 0
   hasHoneySpin: 0
@@ -17466,11 +17466,11 @@ MonoBehaviour:
   prefabs:
   - {fileID: 926699699989198930, guid: d85528ad43b631148aa3f60144807a67, type: 3}
   - {fileID: 3454054837596656730, guid: a300b805520e3bf43ae637cd295a7f5d, type: 3}
-  - {fileID: 6036541347627888680, guid: 89512658eea45f240bfd322fea3581b5, type: 3}
-  - {fileID: 3169144480671225973, guid: 3dc3c3645aea9964ba088e2bdd0548f1, type: 3}
+  - {fileID: 5412002776551693455, guid: 89512658eea45f240bfd322fea3581b5, type: 3}
+  - {fileID: 7354073742024556690, guid: 3dc3c3645aea9964ba088e2bdd0548f1, type: 3}
   - {fileID: 2663996054591021724, guid: eee7fa7d697720c42846bcaaf70928ac, type: 3}
-  - {fileID: 3169144480671225973, guid: 3dc3c3645aea9964ba088e2bdd0548f1, type: 3}
-  - {fileID: 6036541347627888680, guid: 7c35835c551464a4f9a1a627d20ced55, type: 3}
+  - {fileID: 926699699989198930, guid: d85528ad43b631148aa3f60144807a67, type: 3}
+  - {fileID: 7527312835341192310, guid: 2b0211414e2ff7a4697e2357377db165, type: 3}
 --- !u!4 &1988048209
 Transform:
   m_ObjectHideFlags: 0

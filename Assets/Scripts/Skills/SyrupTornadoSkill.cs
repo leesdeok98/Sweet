@@ -1,4 +1,4 @@
-// SyrupTornadoSkill.cs
+ï»¿// SyrupTornadoSkill.cs
 using UnityEngine;
 using Spine.Unity;
 using System.Xml.Serialization;
@@ -9,34 +9,38 @@ using System.Xml.Serialization;
 public class SyrupTornadoSkill : MonoBehaviour
 {
     [Header("Damage")]
-    [Tooltip("ÃÊ´ç °¡ÇÏ´Â ÇÇÇØ·®")]
-    public float damagePerSecond = 2f;          // ¡ç ¿ä±¸ 3
+    [Tooltip("ì´ˆë‹¹ ê°€í•˜ëŠ” í”¼í•´ëŸ‰")]
+    public float damagePerSecond = 2f;          // â† ìš”êµ¬ 3
 
     [Header("Area")]
-    [Tooltip("¿øÇü Æ®¸®°Å ¹İ°æ(¹ÌÅÍ)")]
-    public float radius = 1.5f;                 // ¡ç ¿ä±¸ 2
-    [Tooltip("Trigger ¾ÈÀÇ ´ë»ó ·¹ÀÌ¾î")]
+    [Tooltip("ì›í˜• íŠ¸ë¦¬ê±° ë°˜ê²½(ë¯¸í„°)")]
+    public float radius = 1.5f;                 // â† ìš”êµ¬ 2
+
+    [Tooltip("ì›í˜• ì½œë¼ì´ë” ì¤‘ì‹¬ ì˜¤í”„ì…‹ (ë¡œì»¬ ì¢Œí‘œ)")]
+    public Vector2 colliderOffset = Vector2.zero;
+
+    [Tooltip("Trigger ì•ˆì˜ ëŒ€ìƒ ë ˆì´ì–´")]
     public LayerMask enemyMask;
 
     [Header("Spine")]
-    [Tooltip("·çÇÁ½ÃÅ³ Spine ¾Ö´Ï¸ŞÀÌ¼Ç ÀÌ¸§")]
+    [Tooltip("ë£¨í”„ì‹œí‚¬ Spine ì• ë‹ˆë©”ì´ì…˜ ì´ë¦„")]
     public string loopAnimation = "loop";
-    [Tooltip("½ºÆÄÀÎ Àç»ı ¹è¼Ó")]
+    [Tooltip("ìŠ¤íŒŒì¸ ì¬ìƒ ë°°ì†")]
     public float timeScale = 1f;
 
     [Header("Optional")]
-    [Tooltip("°íÁ¤ Æ½À¸·Î °¡ÇÒÁö (false¸é ¸Å ÇÁ·¹ÀÓ deltaTime ´©Àû)")]
+    [Tooltip("ê³ ì • í‹±ìœ¼ë¡œ ê°€í• ì§€ (falseë©´ ë§¤ í”„ë ˆì„ deltaTime ëˆ„ì )")]
     public bool useFixedTick = false;
-    [Tooltip("°íÁ¤ Æ½ °£°İ(ÃÊ)")]
+    [Tooltip("ê³ ì • í‹± ê°„ê²©(ì´ˆ)")]
     public float tickInterval = 0.2f;
 
-    CircleCollider2D circle;
-    Rigidbody2D rb2d;
-    SkeletonAnimation skeleton;
+    private CircleCollider2D circle;
+    private Rigidbody2D rb2d;
+    private SkeletonAnimation skeleton;
 
-    float tickTimer;
+    private float tickTimer;
 
-    private bool twistBuffApplied = false; // Æ®¿ÀÆ® ¼¼Æ®È¿°ú Àû¿ë È®ÀÎ
+    private bool twistBuffApplied = false; // íŠ¸ì˜¤íŠ¸ ì„¸íŠ¸íš¨ê³¼ ì ìš© í™•ì¸
 
     private float lastSoundTime;
     private float SoundCooldown = 0.1f;
@@ -47,25 +51,38 @@ public class SyrupTornadoSkill : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
         skeleton = GetComponent<SkeletonAnimation>();
 
-        // Äİ¶óÀÌ´õ/¸®Áş¹Ùµğ ±âº»°ª ¼¼ÆÃ
-        circle.isTrigger = true;
-        circle.radius = radius;
+        // ì½œë¼ì´ë”/ë¦¬ì§“ë°”ë”” ê¸°ë³¸ê°’ ì„¸íŒ…
+        if (circle != null)
+        {
+            circle.isTrigger = true;
+            circle.radius = Mathf.Max(0.01f, radius);
+            circle.offset = colliderOffset;   // âœ… ì˜¤í”„ì…‹ ì ìš©
+        }
 
-        rb2d.isKinematic = true;   // Æ®¸®°Å ÀÌº¥Æ®¿ë
+        rb2d.isKinematic = true;   // íŠ¸ë¦¬ê±° ì´ë²¤íŠ¸ìš©
         rb2d.gravityScale = 0f;
 
-        // Spine ·çÇÁ Àç»ı
-        skeleton.Initialize(true);
-        skeleton.timeScale = timeScale;
-        if (!string.IsNullOrEmpty(loopAnimation))
-            skeleton.AnimationState.SetAnimation(0, loopAnimation, true);
+        // Spine ë£¨í”„ ì¬ìƒ
+        if (skeleton != null)
+        {
+            skeleton.Initialize(true);
+            skeleton.timeScale = timeScale;
+            if (!string.IsNullOrEmpty(loopAnimation))
+                skeleton.AnimationState.SetAnimation(0, loopAnimation, true);
+        }
     }
 
     void OnValidate()
     {
-        // ¿¡µğÅÍ¿¡¼­ °ª ¹Ù²î¸é Äİ¶óÀÌ´õ Áï½Ã ¹İ¿µ
-        if (circle == null) circle = GetComponent<CircleCollider2D>();
-        if (circle != null) circle.radius = Mathf.Max(0.01f, radius);
+        // ì—ë””í„°ì—ì„œ ê°’ ë°”ë€Œë©´ ì½œë¼ì´ë” ì¦‰ì‹œ ë°˜ì˜
+        if (circle == null)
+            circle = GetComponent<CircleCollider2D>();
+
+        if (circle != null)
+        {
+            circle.radius = Mathf.Max(0.01f, radius);
+            circle.offset = colliderOffset;   // âœ… ì˜¤í”„ì…‹ë„ í•¨ê»˜ ë°˜ì˜
+        }
     }
 
     void Update()
@@ -81,7 +98,7 @@ public class SyrupTornadoSkill : MonoBehaviour
         }
         else
         {
-            // ¸Å ÇÁ·¹ÀÓ deltaTime ¸¸Å­ DPS ´©Àû
+            // ë§¤ í”„ë ˆì„ deltaTime ë§Œí¼ DPS ëˆ„ì 
             DealDamageTick(Time.deltaTime);
         }
     }
@@ -90,8 +107,17 @@ public class SyrupTornadoSkill : MonoBehaviour
     {
         if (dt <= 0f || damagePerSecond <= 0f) return;
 
-        // ¿ø ¾ÈÀÇ Àû °Ë»ö (¿øÇü Æ®¸®°Å ¹İ°æ°ú µ¿ÀÏÇÏ°Ô »ç¿ë)
-        var hits = Physics2D.OverlapCircleAll(transform.position, circle != null ? circle.radius : radius, enemyMask);
+        if (circle == null)
+            circle = GetComponent<CircleCollider2D>();
+
+        // âœ… ì½œë¼ì´ë” ì¤‘ì‹¬ = ì˜¤ë¸Œì íŠ¸ ì›”ë“œ ìœ„ì¹˜ + ë¡œì»¬ ì˜¤í”„ì…‹
+        Vector2 center = (Vector2)transform.position +
+                         (circle != null ? circle.offset : colliderOffset);
+
+        float usedRadius = (circle != null ? circle.radius : radius);
+
+        // ì› ì•ˆì˜ ì  ê²€ìƒ‰
+        var hits = Physics2D.OverlapCircleAll(center, usedRadius, enemyMask);
         if (hits == null || hits.Length == 0) return;
 
         float damage = damagePerSecond * dt;
@@ -107,21 +133,21 @@ public class SyrupTornadoSkill : MonoBehaviour
     }
 
     /// <summary>
-    /// SkillManager¿¡¼­ 'Æ®À§½ºÆ® ¿À¾î Æ®¸´' ¼¼Æ® È¿°ú°¡ ¹ßµ¿µÉ ¶§
-    /// ÇÑ ¹ø¸¸ È£ÃâÇØ ÁÖ¸é µÇ´Â ¹öÇÁ ÇÔ¼öÀÔ´Ï´Ù.
-    /// rangeMultiplier : ¹üÀ§ ¹èÀ² (¿¹: 1.25f = 25% Áõ°¡)
-    /// damageMultiplier: µ¥¹ÌÁö ¹èÀ² (¿¹: 2f    = 2¹è µ¥¹ÌÁö)
+    /// SkillManagerì—ì„œ 'íŠ¸ìœ„ìŠ¤íŠ¸ ì˜¤ì–´ íŠ¸ë¦¿' ì„¸íŠ¸ íš¨ê³¼ê°€ ë°œë™ë  ë•Œ
+    /// í•œ ë²ˆë§Œ í˜¸ì¶œí•´ ì£¼ë©´ ë˜ëŠ” ë²„í”„ í•¨ìˆ˜ì…ë‹ˆë‹¤.
+    /// rangeMultiplier : ë²”ìœ„ ë°°ìœ¨ (ì˜ˆ: 1.25f = 25% ì¦ê°€)
+    /// damageMultiplier: ë°ë¯¸ì§€ ë°°ìœ¨ (ì˜ˆ: 2f    = 2ë°° ë°ë¯¸ì§€)
     /// </summary>
     public void ApplyTwistOrTreatBuff(float rangeMultiplier, float damageMultiplier)
     {
-        // ÀÌ¹Ì ¹öÇÁ°¡ Àû¿ëµÇ¾ú´Ù¸é ´Ù½Ã Àû¿ëÇÏÁö ¾ÊÀ½
+        // ì´ë¯¸ ë²„í”„ê°€ ì ìš©ë˜ì—ˆë‹¤ë©´ ë‹¤ì‹œ ì ìš©í•˜ì§€ ì•ŠìŒ
         if (twistBuffApplied) return;
         twistBuffApplied = true;
 
-        // 1) µ¥¹ÌÁö ¹èÀ² Àû¿ë (½Ã·´ Åä³×ÀÌµµ DPS 2¹è µî)
+        // 1) ë°ë¯¸ì§€ ë°°ìœ¨ ì ìš© (ì‹œëŸ½ í† ë„¤ì´ë„ DPS 2ë°° ë“±)
         damagePerSecond *= damageMultiplier;
 
-        // 2) ¹üÀ§ ¹èÀ² Àû¿ë (³í¸®°ª + ½ÇÁ¦ Äİ¶óÀÌ´õ µÑ ´Ù)
+        // 2) ë²”ìœ„ ë°°ìœ¨ ì ìš© (ë…¼ë¦¬ê°’ + ì‹¤ì œ ì½œë¼ì´ë” ë‘˜ ë‹¤)
         radius *= rangeMultiplier;
 
         if (circle == null)
@@ -129,16 +155,16 @@ public class SyrupTornadoSkill : MonoBehaviour
 
         if (circle != null)
         {
-            // ½ÇÁ¦ Ãæµ¹ ¹üÀ§µµ ÇÔ²² Å°¿öÁÜ
-            circle.radius = radius;
+            // ì‹¤ì œ ì¶©ëŒ ë²”ìœ„ë„ í•¨ê»˜ í‚¤ì›Œì¤Œ
+            circle.radius = Mathf.Max(0.01f, radius);
         }
 
-        Debug.Log("[SyrupTornadoSkill] Twist or Treat ¹öÇÁ Àû¿ë ¿Ï·á");
+        Debug.Log("[SyrupTornadoSkill] Twist or Treat ë²„í”„ ì ìš© ì™„ë£Œ");
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)  // ¹üÀ§ ¾È¿¡ µé¾î¿À¸é »ç¿îµå ³ª°Ô ÇÏ´Â ÄÚµå(¿¬È­)
+    private void OnTriggerEnter2D(Collider2D collision)  // ë²”ìœ„ ì•ˆì— ë“¤ì–´ì˜¤ë©´ ì‚¬ìš´ë“œ ë‚˜ê²Œ í•˜ëŠ” ì½”ë“œ(ì—°í™”)
     {
-        if (((1 << collision.gameObject.layer) & enemyMask) != 0) // LayerMask 
+        if (((1 << collision.gameObject.layer) & enemyMask) != 0) // LayerMask ì²´í¬
         {
             if (Time.time >= lastSoundTime + SoundCooldown)
             {
@@ -155,8 +181,15 @@ public class SyrupTornadoSkill : MonoBehaviour
 #if UNITY_EDITOR
     void OnDrawGizmosSelected()
     {
+        if (circle == null)
+            circle = GetComponent<CircleCollider2D>();
+
+        Vector2 center = (Vector2)transform.position +
+                         (circle != null ? circle.offset : colliderOffset);
+        float usedRadius = (circle != null ? circle.radius : radius);
+
         Gizmos.color = new Color(1f, 0.7f, 0.2f, 0.8f);
-        Gizmos.DrawWireSphere(transform.position, radius);
+        Gizmos.DrawWireSphere(center, usedRadius);
     }
 #endif
 }

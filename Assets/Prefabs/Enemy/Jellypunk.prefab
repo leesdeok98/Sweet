@@ -204,7 +204,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f78fec4eebf8a34c8820cb09ce6845a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonAnimation: {fileID: 0}
+  skeletonAnimation: {fileID: 1830516770729372633}
   runAnimName: move
   deadAnimName: dead
   speed: 1.2

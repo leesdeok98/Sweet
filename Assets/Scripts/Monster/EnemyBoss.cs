@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 using Spine.Unity;
 
@@ -7,13 +7,13 @@ public class EnemyBoss : Enemy
     [Header("Boss Settings")]
     public float patternInterval = 7.0f;
 
-    [Header("Pattern 1: Charge (µ¹Áø)")]
+    [Header("Pattern 1: Charge (ëŒì§„)")]
     public float chargeSpeed = 5.0f;
     public float chargeDuration = 3.0f;
     public float chargeDamage = 10.0f;
     [SpineAnimation] public string chargeAnimName = "Run";
 
-    [Header("Pattern 2: Shoot (¹ß»ç)")]
+    [Header("Pattern 2: Shoot (ë°œì‚¬)")]
     public GameObject bulletPrefab;
     public float bulletSpeed = 4.0f;
     public float bulletDamage = 15.0f;
@@ -25,18 +25,27 @@ public class EnemyBoss : Enemy
 
     void Start()
     {
-
         if (AudioManager.instance != null)
         {
             AudioManager.instance.PlayBgm(AudioManager.Bgm.Boss_BGM);
         }
 
-        if (GameManager.instance != null && GameManager.instance.player != null)
-            target = GameManager.instance.player.GetComponent<Rigidbody2D>();
-
         rb = GetComponent<Rigidbody2D>();
         if (skeletonAnimation == null)
             skeletonAnimation = GetComponent<SkeletonAnimation>();
+
+        //GameManagerì—ì„œ í”Œë ˆì´ì–´ ê°€ì ¸ì˜¤ê¸°
+        if (GameManager.instance != null && GameManager.instance.player != null)
+        {
+            target = GameManager.instance.player.GetComponent<Rigidbody2D>();
+        }
+        else
+        {
+            //í˜¹ì‹œ ëª°ë¼ì„œ Player íƒœê·¸ë¡œ í•œ ë²ˆ ë” ì°¾ê¸°
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+                target = playerObj.GetComponent<Rigidbody2D>();
+        }
 
         originalSpeed = speed;
         isLive = true;
@@ -45,29 +54,30 @@ public class EnemyBoss : Enemy
         StartCoroutine(BossPatternRoutine());
     }
 
+
     public override void FixedUpdate()
     {
-        // º¸½º´Â ÆĞÅÏ ÄÚ·çÆ¾À¸·Î ¿òÁ÷ÀÌ¹Ç·Î ºÎ¸ğÀÇ ÃßÀû ±â´É ²û
+        // ë³´ìŠ¤ëŠ” íŒ¨í„´ ì½”ë£¨í‹´ìœ¼ë¡œ ì›€ì§ì´ë¯€ë¡œ ë¶€ëª¨ì˜ ì¶”ì  ê¸°ëŠ¥ ë”
     }
 
     IEnumerator BossPatternRoutine()
     {
         while (isLive)
         {
-            // 7ÃÊ µ¿¾È ´ë±â (Idle)
+            // 7ì´ˆ ë™ì•ˆ ëŒ€ê¸° (Idle)
             yield return StartCoroutine(IdleState());
 
-            // ·£´ı »Ì±â (0 ¶Ç´Â 1)
+            // ëœë¤ ë½‘ê¸° (0 ë˜ëŠ” 1)
             int randomAction = Random.Range(0, 2);
 
             if (randomAction == 0)
             {
-                // 50% È®·ü·Î µ¹Áø
+                // 50% í™•ë¥ ë¡œ ëŒì§„
                 yield return StartCoroutine(ChargePattern());
             }
             else
             {
-                // 50% È®·ü·Î ¹ß»ç
+                // 50% í™•ë¥ ë¡œ ë°œì‚¬
                 yield return StartCoroutine(ShootPattern());
             }
         }
@@ -78,7 +88,7 @@ public class EnemyBoss : Enemy
         rb.velocity = Vector2.zero;
         skeletonAnimation.AnimationState.SetAnimation(0, idleAnimName, true);
 
-        // ¿©±â¼­ 7ÃÊ µ¿¾È ½°
+        // ì—¬ê¸°ì„œ 7ì´ˆ ë™ì•ˆ ì‰¼
         yield return new WaitForSeconds(patternInterval);
     }
 
@@ -86,24 +96,28 @@ public class EnemyBoss : Enemy
     {
         //isActing = true;
         float originalDps = dps;
-        dps = chargeDamage; // µ¥¹ÌÁö 10À¸·Î º¯°æ
+        dps = chargeDamage; // ë°ë¯¸ì§€ 10ìœ¼ë¡œ ë³€ê²½
 
         Vector2 dir = Vector2.zero;
         if (target != null)
             dir = (target.position - rb.position).normalized;
 
-        skeletonAnimation.AnimationState.SetAnimation(0, chargeAnimName, true);
+        if (dir == Vector2.zero)
+            dir = Vector2.left;
+
+        if (skeletonAnimation != null && !string.IsNullOrEmpty(chargeAnimName))
+            skeletonAnimation.AnimationState.SetAnimation(0, chargeAnimName, true);
 
         float timer = 0;
-        while (timer < chargeDuration) // 3ÃÊ µ¹Áø
+        while (timer < chargeDuration) // 3ì´ˆ ëŒì§„
         {
-            rb.velocity = dir * chargeSpeed; // ¼Óµµ 5
+            rb.velocity = dir * chargeSpeed; // ì†ë„ 5
             timer += Time.deltaTime;
             yield return null;
         }
 
         rb.velocity = Vector2.zero;
-        dps = originalDps; // µ¥¹ÌÁö º¹±¸
+        dps = originalDps; // ë°ë¯¸ì§€ ë³µêµ¬
         //isActing = false;
     }
 
@@ -114,7 +128,7 @@ public class EnemyBoss : Enemy
 
         var trackEntry = skeletonAnimation.AnimationState.SetAnimation(0, shootAnimName, false);
 
-        // ¹ß»ç ¾Ö´Ï¸ŞÀÌ¼Ç Å¸ÀÌ¹Ö¿¡ ¸ÂÃß·Á¸é ¿©±â¿¡ µô·¹ÀÌ Ãß°¡ °¡´É (¿¹: 0.5ÃÊ)
+        // ë°œì‚¬ ì• ë‹ˆë©”ì´ì…˜ íƒ€ì´ë°ì— ë§ì¶”ë ¤ë©´ ì—¬ê¸°ì— ë”œë ˆì´ ì¶”ê°€ ê°€ëŠ¥ (ì˜ˆ: 0.5ì´ˆ)
         // yield return new WaitForSeconds(0.5f);
 
         if (target != null)
@@ -122,7 +136,7 @@ public class EnemyBoss : Enemy
             Vector2 dir = (target.position - rb.position).normalized;
             GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
 
-            // Åº¼Ó 4, µ¥¹ÌÁö 15
+            // íƒ„ì† 4, ë°ë¯¸ì§€ 15
             bullet.GetComponent<EnemyBullet>().Initialize(dir, bulletDamage, bulletSpeed, bulletDuration);
         }
 
