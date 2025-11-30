@@ -30,12 +30,14 @@ public class PorridgeBulletSkill : MonoBehaviour
     private int porridgeDamage;
 
     private bool isExploded = false;
+    private int enemyLayer;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         skeletonAnimation = GetComponent<SkeletonAnimation>();
         porridgeCollider = GetComponent<CircleCollider2D>();
+        enemyLayer = LayerMask.NameToLayer("Enemy");
 
         // 콜라이더 생성 로직
         if (porridgeCollider == null)
@@ -43,6 +45,8 @@ public class PorridgeBulletSkill : MonoBehaviour
             porridgeCollider = gameObject.AddComponent<CircleCollider2D>();
             porridgeCollider.isTrigger = true;
         }
+
+
 
         if (skeletonAnimation == null)
         {
@@ -102,7 +106,7 @@ public class PorridgeBulletSkill : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (isExploded) return;
-        if (collision.CompareTag("Enemy") || collision.CompareTag("Boss"))
+        if (collision.gameObject.layer != enemyLayer) return;
         {
             TryExplode();
         }

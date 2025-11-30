@@ -51,6 +51,10 @@ public class Stage1Setting : MonoBehaviour
 
     void Update()
     {
+        // 게임 오버 패널이 떠 있는 동안에는 ESC 입력 무시
+        if (gameOverPanel != null && gameOverPanel.activeSelf)
+            return;
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             TogglePause(); 

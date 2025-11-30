@@ -42,6 +42,8 @@ public class HoneySpin : MonoBehaviour
     [Tooltip("스프라이트 기본 방향 보정(도 단위). \n기본 이미지가 오른쪽(+X)을 보고 있으면 0, \n위(+Y)를 보고 있으면 90 정도로 조정")]
     public float visualRotationOffset = 0f;
 
+    private int enemyLayer;
+
     void Awake()
     {
         col = GetComponent<Collider2D>();
@@ -58,6 +60,8 @@ public class HoneySpin : MonoBehaviour
             if (skeleton == null)
                 skeleton = GetComponentInChildren<SkeletonAnimation>();
         }
+
+        enemyLayer = LayerMask.NameToLayer("Enemy");
 
         // ★ 스파인 애니메이션 재생 설정
         if (skeleton != null && !string.IsNullOrEmpty(spinAnimationName))
@@ -142,6 +146,8 @@ public class HoneySpin : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+
+        if (other.gameObject.layer != enemyLayer) return;
         // Enemy(보스 포함)만 타격
         Enemy enemy = other.GetComponent<Enemy>();
         if (enemy == null) return;

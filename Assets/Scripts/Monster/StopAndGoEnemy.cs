@@ -33,6 +33,10 @@ public class StopAndGoEnemy : Enemy
             if (rb != null) rb.velocity = Vector2.zero;
             return;
         }
+        if (isKnockback)
+        {
+            return;
+        }
 
         timer += Time.fixedDeltaTime;
 

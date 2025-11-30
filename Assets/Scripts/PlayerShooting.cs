@@ -40,29 +40,27 @@ public class PlayerShooting : MonoBehaviour
 
     void Update()
     {
-        // 자동 사격
         if (Time.time >= nextFireTime)
         {
             bool shotPorridge = false;
 
-            // 1. 설탕 폭죽 발사 확률 체크 및 실행
-            if (porridgeBulletPrefab != null)
+            // 1. 설탕 폭죽 발사: 아이템을 갖고 있을 때만, 25% 확률로
+            if (player != null && player.hasSugarPorridge && porridgeBulletPrefab != null)
             {
-                // 25% 확률 확인 (0.25f보다 작으면 발사)
                 if (Random.Range(0f, 1f) < 0.25f)
                 {
-                    ShootPorridgeBullet(); // 설탕 폭죽 발사 함수 호출
-                    shotPorridge = true; // 폭죽이 발사되었음을 기록
+                    ShootPorridgeBullet();
+                    shotPorridge = true;
                 }
             }
 
             // 2. 폭죽이 발사되지 않았을 때만 일반 총알 발사
             if (!shotPorridge)
             {
-                Shoot(); // 일반 총알만 발사
+                Shoot();
             }
 
-            // 3. 쿨타임 업데이트 (기존 로직 유지)
+            // 3. 쿨타임 갱신
             if (player != null && player.hasHyperCandyRushActive)
             {
                 nextFireTime = Time.time + GetCurrentFireCoolDown();
@@ -73,6 +71,7 @@ public class PlayerShooting : MonoBehaviour
             }
         }
     }
+
 
     void Shoot()
     {

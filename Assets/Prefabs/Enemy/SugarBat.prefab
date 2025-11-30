@@ -190,6 +190,7 @@ MonoBehaviour:
   isKnockback: 0
   isStunned: 0
   isFrozen: 0
+  vec2: {x: 0, y: 0}
 --- !u!50 &6602340894276108076
 Rigidbody2D:
   serializedVersion: 4

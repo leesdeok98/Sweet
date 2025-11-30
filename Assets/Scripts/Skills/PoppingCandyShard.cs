@@ -22,6 +22,9 @@ public class PoppingCandyShard : MonoBehaviour
 
     SpriteRenderer sr;
 
+    //  Enemy 레이어 번호
+    private int enemyLayer;
+
     public void Setup(Vector2 direction, float speed, float maxDistance, int damage, float colliderRadius)
     {
         this.dir = direction.normalized;
@@ -36,6 +39,10 @@ public class PoppingCandyShard : MonoBehaviour
         col = GetComponent<CircleCollider2D>();
         col.isTrigger = true;
         //sr.sortingOrder = 15;
+
+        //  Enemy 레이어 캐싱
+        enemyLayer = LayerMask.NameToLayer("Enemy");
+
         // 프리팹에 SpriteRenderer가 없다면 자동 생성해 원형 시각화
         if (showVisual && GetComponent<SpriteRenderer>() == null)
         {
@@ -70,7 +77,9 @@ public class PoppingCandyShard : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.CompareTag("Enemy") && !other.CompareTag("Boss")) return;
+        // ★ Enemy 레이어가 아니면 무시
+        if (other.gameObject.layer != enemyLayer) return;
+
         var e = other.GetComponent<Enemy>();
         if (e == null) return;
         if (hitSet.Contains(e)) return;

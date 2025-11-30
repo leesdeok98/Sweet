@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 3497212277256519965}
   - component: {fileID: 1259089117161104572}
   - component: {fileID: -8484381311322652316}
+  - component: {fileID: -4335259631992737567}
   m_Layer: 8
   m_Name: FudgyGolem
   m_TagString: Enemy
@@ -244,3 +245,18 @@ MonoBehaviour:
   baseOrder: 10
   scale: 9
   sortingLayerName: 
+--- !u!114 &-4335259631992737567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5412002776551693455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7883c8fbe6626ad41bcda8d3f54e816a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseOrder: 10
+  scale: 9
+  sortingLayerName: Enemy

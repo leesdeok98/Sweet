@@ -12,6 +12,7 @@ public class CocoaPowderBullet : MonoBehaviour
 
     private SpriteRenderer sr;
     private Player player;
+    private int enemyLayer;
 
     private readonly Color cocoaColor = new Color(0.55f, 0.3f, 0.1f);
 
@@ -24,6 +25,7 @@ public class CocoaPowderBullet : MonoBehaviour
         // ������ ���� ����
         if (sr != null)
             sr.color = cocoaColor;
+        enemyLayer = LayerMask.NameToLayer("Enemy");
     }
 
     void OnEnable()
@@ -43,7 +45,7 @@ public class CocoaPowderBullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.CompareTag("Enemy")) return;
+        if (collision.gameObject.layer != enemyLayer) return;
 
         Enemy hitEnemy = collision.GetComponent<Enemy>();
         if (hitEnemy == null) return;

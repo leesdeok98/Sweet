@@ -12,12 +12,11 @@ public class Bullet : MonoBehaviour
     public GameObject icedJellySpinePrefab;
     [Range(0f, 1f)] public float icedJellyChance = 0.8f;
 
-    // ★ 눈꽃사탕 오라 내부용 참조
+    // 눈꽃사탕 오라 내부용 참조
     private SpriteRenderer auraSR;
 
-
     // ─────────────────────────────────────────────────────────────
-    // ★ 비터멜트 카오스 세트 효과용 설정값 (인스펙터에서 조절) ★
+    //  비터멜트 카오스 세트 효과 설정값
     [Header("Bittermelt Chaos Set Settings")]
     [Tooltip("세트 효과 지속 피해 (초당)")]
     public float bittermeltChaosDps = 2f;           // 5초간 초당 2의 지속 피해
@@ -26,6 +25,18 @@ public class Bullet : MonoBehaviour
     [Tooltip("플레이어 HP가 50% 이상일 때 적용될 공격력 배율 (1.3 = +30%)")]
     public float bittermeltChaosHpBuffMultiplier = 1.3f;
     // ─────────────────────────────────────────────────────────────
+
+    // 스킬별 넉백 세기
+    [Header("Knockback Settings")]
+    public float knockbackForce = 2f;
+
+    //  Enemy 레이어 번호 캐싱
+    private int enemyLayer;
+
+    void Awake()
+    {
+        enemyLayer = LayerMask.NameToLayer("Enemy");
+    }
 
     void Start()
     {
@@ -63,7 +74,7 @@ public class Bullet : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         // Enemy/Boss 외 무시
-        if (!collision.CompareTag("Enemy") && !collision.CompareTag("Boss")) return;
+        if (collision.gameObject.layer != enemyLayer) return;
 
         Enemy hitEnemy = collision.GetComponent<Enemy>();
         if (hitEnemy != null)
@@ -110,7 +121,7 @@ public class Bullet : MonoBehaviour
             }
 
             // ─────────────────────────────────────────────
-            // ★ 아이스브레이커 세트 효과:
+            //   아이스브레이커 세트 효과:
             //   SnowflakeCandy + IcedJelly + PoppingCandy 세트가 활성 상태라면
             //   얼음 계열 공격에 고정 데미지 +5 추가 (finalDamageFloat에 더함)
             // ─────────────────────────────────────────────
@@ -135,7 +146,7 @@ public class Bullet : MonoBehaviour
                 }
             }
 
-            // ★ 3) 눈꽃사탕: 15% 확률로 빙결
+            //  3) 눈꽃사탕: 15% 확률로 빙결
             var sm = SkillManager.Instance;
             if (sm != null && sm.player != null && sm.player.hasSnowflakeCandy)
             {
@@ -145,7 +156,7 @@ public class Bullet : MonoBehaviour
                 }
             }
 
-            // ★ 4) 팝핑캔디: 적 맞은 지점에서 8방향 버스트
+            //  4) 팝핑캔디: 적 맞은 지점에서 8방향 버스트
             if (sm != null && sm.player != null && sm.player.hasPoppingCandy)
             {
                 // 발동 확률 체크 (확률 쓰기 싫으면 이 if는 지워도 됨)
@@ -172,6 +183,10 @@ public class Bullet : MonoBehaviour
                     );
                 }
             }
+
+            //  넉백 적용 (Bullet 전용 넉백 세기 사용)
+            Vector2 knockDir = (hitEnemy.transform.position - transform.position).normalized;
+            hitEnemy.ApplyKnockback(knockDir, knockbackForce);
         }
 
         // 총알 소멸

@@ -11,6 +11,7 @@ public class RollingChocolateBarSkill : MonoBehaviour
 
     private float timer;
     private Player player;
+    public float knockbackPower = 2f;
 
     void Awake()
     {
@@ -40,14 +41,8 @@ public class RollingChocolateBarSkill : MonoBehaviour
             return;
         }
 
-        // ─────────────────────────────────────────────────────────────
-        // ★ Twist or Treat 세트 효과 반영
-        //   - 기본: 1개 생성, 기본 orbitRadius 사용
-        //   - 세트 발동 시:
-        //       · 2개 생성 (양쪽)
-        //       · SkillManager의 twistRangeMultiplier만큼 반지름(사거리) 증가
-        //       · 시작 각도 0도 / 180도 → 양쪽에서 일자처럼 보이도록 배치
-        // ─────────────────────────────────────────────────────────────
+        
+       
         int spawnCount = 1;
         float[] startAngles = { 0f };  // 기본 한 개는 0도에서 시작
         float useRadius = orbitRadius; // 기본 반지름
@@ -74,7 +69,7 @@ public class RollingChocolateBarSkill : MonoBehaviour
             if (attackScript != null)
             {
                 // 두 번째 인자는 기존 1.5f를 orbitRadius 대신 사용하도록 변경
-                attackScript.InitializeAttack(15, useRadius);
+                attackScript.InitializeAttack(15, knockbackPower);
 
                 // 시작 각도 결정
                 float startAngle =

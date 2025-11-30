@@ -178,18 +178,5 @@ public class SyrupTornadoSkill : MonoBehaviour
         }
     }
 
-#if UNITY_EDITOR
-    void OnDrawGizmosSelected()
-    {
-        if (circle == null)
-            circle = GetComponent<CircleCollider2D>();
 
-        Vector2 center = (Vector2)transform.position +
-                         (circle != null ? circle.offset : colliderOffset);
-        float usedRadius = (circle != null ? circle.radius : radius);
-
-        Gizmos.color = new Color(1f, 0.7f, 0.2f, 0.8f);
-        Gizmos.DrawWireSphere(center, usedRadius);
-    }
-#endif
 }

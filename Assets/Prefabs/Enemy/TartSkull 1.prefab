@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6848244112584680073}
   - component: {fileID: 6918002284796082288}
   - component: {fileID: 6188556567894647134}
+  - component: {fileID: 7016012416196784051}
   m_Layer: 8
   m_Name: TartSkull 1
   m_TagString: Boss
@@ -243,3 +244,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &7016012416196784051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7527312835341192310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7883c8fbe6626ad41bcda8d3f54e816a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseOrder: 10
+  scale: 9
+  sortingLayerName: Enemy

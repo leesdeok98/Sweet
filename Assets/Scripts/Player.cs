@@ -1,6 +1,7 @@
 using UnityEngine;
-using Spine.Unity;  // 🔹 Spine 사용
+using Spine.Unity;  
 using UnityEngine.UI;
+using System.Collections;
 
 public class Player : MonoBehaviour
 {
@@ -52,6 +53,11 @@ public class Player : MonoBehaviour
     public bool hasHyperCandyRushActive = false; // HyperCandyRush 상태
     public bool hasSugarBombPartyActive = false; // SugarBombParty 상태
 
+    [Header("Clear UI")]
+    [SerializeField] private GameObject clearPanel;
+    private bool bossWasSpawned = false;             // 보스를 한 번이라도 본 적 있는지
+    private bool stageCleared = false;
+
 
     void Awake()
     {
@@ -93,13 +99,15 @@ public class Player : MonoBehaviour
         // 씬 초기화 시 스킬 초기화
         startingSkillsApplied = false;
 
-        // 🔹 다시 활성화될 때 idle 상태로 초기화
+        //  다시 활성화될 때 idle 상태로 초기화
         PlaySpineAnimation(idleAnimationName, true);
     }
 
     void Update()
     {
         if (!isLive) return;
+
+        CheckBossStatus();
 
         // 이동 입력
         inputVec.x = Input.GetAxisRaw("Horizontal");
@@ -215,36 +223,58 @@ public class Player : MonoBehaviour
     }
 
     void Die()
-{
-    if (!isLive) return;
-
-    isLive = false;
-    if (rigid != null) rigid.velocity = Vector2.zero;
-
-    // 🔹 사망 애니메이션 재생
-    PlaySpineAnimation(deadAnimationName, false);
-
-    // 🔹 화면 캡쳐 + die panel 위에 띄우기
-    if (deathScreenCapture != null)
     {
-        deathScreenCapture.ShowDeathScreen();
-    }
-    else
-    {
-        Debug.LogWarning("[Player] DeathScreenCapture 참조가 비었습니다.");
-        // 만약 캡쳐 스크립트 연결 안 돼 있으면 최소한 기존처럼 패널만 켜기
-        if (diepanel)
-            diepanel.SetActive(true);
+        if (!isLive) return;
+
+        isLive = false;
+        if (rigid != null) rigid.velocity = Vector2.zero;
+
+        //  코루틴으로 사망 연출 처리
+        StartCoroutine(DieRoutine());
     }
 
-    // 🔹 기존 GameOver 로직 & 정지
-    if (GameManager.instance != null)
-        GameManager.instance.GameOver();
-    else
-        Debug.LogError("[Player] GameManager.instance가 null입니다.");
+    //  죽음 애니메이션 → 대기 → 패널 → 게임 정지
+    private IEnumerator DieRoutine()
+    {
+        // 1) 사망 애니메이션 재생
+        PlaySpineAnimation(deadAnimationName, false);
 
-    Time.timeScale = 0f;            // 게임 일시정지
-}
+        // 2) 애니메이션 길이만큼 기다리기
+        float waitTime = 10f; // 기본값(혹시 못 찾을 때 대비)
+        if (skeletonAnim != null && !string.IsNullOrEmpty(deadAnimationName))
+        {
+            var anim = skeletonAnim.Skeleton.Data.FindAnimation(deadAnimationName);
+            if (anim != null)
+            {
+                waitTime = anim.Duration; // 스파인 애니메이션 실제 길이
+            }
+        }
+
+        // 필요하면 살짝 여유를 더 줄 수도 있음 (ex: +0.2f)
+        yield return new WaitForSeconds(waitTime);
+
+        // 3) 화면 캡쳐 + 사망 패널 띄우기
+        if (deathScreenCapture != null)
+        {
+            deathScreenCapture.ShowDeathScreen();
+        }
+        else
+        {
+            Debug.LogWarning("[Player] DeathScreenCapture 참조가 비었습니다.");
+            if (diepanel)
+                diepanel.SetActive(true);
+        }
+
+        // 4) GameOver 처리
+        if (GameManager.instance != null)
+            GameManager.instance.GameOver();
+        else
+            Debug.LogError("[Player] GameManager.instance가 null입니다.");
+
+        // 5) 마지막에 게임 일시정지
+        Time.timeScale = 0f;
+    }
+
 
 
     // 물리 충돌로 지속 피해를 받는 경우(Non-Trigger)
@@ -345,4 +375,46 @@ public class Player : MonoBehaviour
         currentAnimationName = animName;
         skeletonAnim.AnimationState.SetAnimation(0, animName, loop);
     }
+
+    //보스 체크 후 처리 시 클리어 코루틴 실행
+    private void CheckBossStatus()
+    {
+        if (stageCleared) return;   // 이미 클리어 처리했으면 더 이상 체크 안 함
+
+        GameObject boss = GameObject.FindGameObjectWithTag("Boss");
+
+        // 1) 보스를 처음 발견한 경우
+        if (boss != null && boss.activeInHierarchy)
+        {
+            bossWasSpawned = true;
+            return;
+        }
+
+        // 2) 보스를 본 적이 있고, 이제는 보스가 씬에 없거나 비활성화된 경우
+        if (bossWasSpawned && (boss == null || !boss.activeInHierarchy))
+        {
+            stageCleared = true;
+            StartCoroutine(ShowClearPanelAfterDelay());
+        }
+    }
+
+    //  실제로 클리어 패널을 여는 코루틴
+    private System.Collections.IEnumerator ShowClearPanelAfterDelay()
+    {
+        //보스가 DIE 매서드 실행 후 3초 후에 클리어 패널 열기
+        yield return new WaitForSeconds(3f);
+
+        if (clearPanel != null)
+        {
+            clearPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("[Player] ClearPanel이 연결되지 않았습니다.");
+        }
+
+        // 스테이지 클리어 시에도 게임 정지
+        Time.timeScale = 0f;
+    }
+
 }

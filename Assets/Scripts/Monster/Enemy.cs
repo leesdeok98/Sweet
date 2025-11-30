@@ -13,6 +13,8 @@ public class Enemy : MonoBehaviour
     [SpineAnimation] public string runAnimName = "Run";
     [SpineAnimation] public string deadAnimName = "Die";
 
+    private Coroutine knockbackRoutine;
+
     // 🔸 전역 이벤트: 어떤 적이든 죽으면 한 번만 방송
     public static Action OnAnyEnemyDied;
 
@@ -101,12 +103,19 @@ public class Enemy : MonoBehaviour
 
     public virtual void FixedUpdate()
     {
-        if (isFrozen || isStunned || isKnockback)
+        //  수정: 빙결/스턴일 때만 강제로 멈춤
+        if (isFrozen || isStunned)
         {
             if (rb != null) rb.velocity = Vector2.zero;
             return;
         }
 
+        if (isKnockback)
+        {
+            return;
+        }
+
+        
         if (!isLive || target == null) return;
 
         // 플레이어를 향해 이동
@@ -187,6 +196,12 @@ public class Enemy : MonoBehaviour
             foreach (var col in colliders)
                 col.enabled = true;
         }
+
+        if (knockbackRoutine != null)
+        {
+            StopCoroutine(knockbackRoutine);
+            knockbackRoutine = null;
+        }
     }
 
     /// <summary>
@@ -234,6 +249,12 @@ public class Enemy : MonoBehaviour
         {
             foreach (var col in colliders)
                 col.enabled = true;
+        }
+
+        if (knockbackRoutine != null)
+        {
+            StopCoroutine(knockbackRoutine);
+            knockbackRoutine = null;
         }
     }
 
@@ -329,10 +350,48 @@ public class Enemy : MonoBehaviour
         removeSlowRoutine = null;
     }
 
+    // Enemy.cs 기존 ApplyKnockback 교체
     public void ApplyKnockback(Vector2 direction, float force) // 넉백 효과
     {
-        rb.AddForce(direction.normalized * force, ForceMode2D.Impulse);
+        if (!isLive) return;
+        if (rb == null) return;
+        if (!gameObject.activeInHierarchy) return;
+
+        // 이미 넉백 중이면 이전 코루틴 정지
+        if (knockbackRoutine != null)
+            StopCoroutine(knockbackRoutine);
+
+        knockbackRoutine = StartCoroutine(KnockbackRoutine(direction, force));
     }
+
+    // Enemy.cs 아무 곳(예: StunRoutine 아래)에 추가
+    IEnumerator KnockbackRoutine(Vector2 direction, float force)
+    {
+        isKnockback = true;
+
+        // 정규화된 방향
+        Vector2 knockDir = direction.normalized;
+
+        float elapsed = 0f;
+
+        // 넉백 동안에는 플레이어 추적 로직이 멈춤
+        // (FixedUpdate에서 isKnockback이면 바로 return 하도록 이미 되어 있음)
+        while (elapsed < knockbackDuration)
+        {
+            elapsed += Time.fixedDeltaTime;
+
+            // velocity로 직접 밀기
+            rb.velocity = knockDir * force;
+
+            yield return new WaitForFixedUpdate();
+        }
+
+        // 넉백 종료
+        rb.velocity = Vector2.zero;
+        isKnockback = false;
+        knockbackRoutine = null;
+    }
+
 
     public void ApplyStun(float duration)
     {
@@ -380,19 +439,7 @@ public class Enemy : MonoBehaviour
             if (skeletonAnimation != null)
                 skeletonAnimation.timeScale = 0f; // 시간 0 = 멈춤
 
-            // (선택사항) 색상 변경 코드 필요 시: skeletonAnimation.skeleton.SetColor(...) 사용
-
-            //if (anim != null)
-            //{
-            //    originalAnimSpeed = anim.speed;
-            //    anim.speed = 0f;       // 애니메이션도 정지
-            //}
-
-            //if (spriter != null)
-            //{
-            //    // 살짝 푸른빛(원래 색에乘해 약간 파랗게). 필요하면 여기서 고정 색도 가능
-            //    spriter.color = originalColor * new Color(0.7f, 0.85f, 1.15f, 1f);
-            //}
+            
             if (rb != null) rb.velocity = Vector2.zero;
         }
         else
