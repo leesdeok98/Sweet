@@ -50,6 +50,7 @@ public class Player : MonoBehaviour
     //세트효과 확인용
     [Header("has SetSkill")]
     public bool hasHyperCandyRushActive = false; // HyperCandyRush 상태
+    public bool hasSugarBombPartyActive = false; // SugarBombParty 상태
 
 
     void Awake()

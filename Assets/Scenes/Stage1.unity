@@ -12805,6 +12805,10 @@ MonoBehaviour:
   firePoint: {fileID: 1923159566}
   bulletSpeed: 10
   fireRate: 1
+  porridgeBulletPrefab: {fileID: 551257858881647464, guid: b011bb85f00a53b4d888d7db8779dba7, type: 3}
+  porridgeDamage: 12
+  porridgeRadius: 4
+  porridgeFlightTime: 0.625
 --- !u!114 &1429503044
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12842,6 +12846,7 @@ MonoBehaviour:
   hasSugarShield: 1
   hasSugarPorridge: 1
   hasHyperCandyRushActive: 0
+  hasSugarBombPartyActive: 0
 --- !u!70 &1429503045
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -14771,6 +14776,7 @@ MonoBehaviour:
   hyperCandyRushAnimLoop: 0
   hyperCandyRushLocalOffset: {x: 0, y: 0, z: 0}
   sweetarmorComboVisualPrefab: {fileID: 4997950841977934739, guid: e4b6c6e6c91e94b4aaa703b8daefc791, type: 3}
+  sugarBombPartyEffectPrefab: {fileID: 0}
   icebreakerSlowPercent: 0.1
   icebreakerBonusDamage: 5
 --- !u!114 &1648878447

@@ -13,7 +13,7 @@ public class SkillManager : MonoBehaviour
     [Tooltip("플레이어 참조 (비워두면 런타임 자동 탐색)")]
     public Player player;
 
-    
+
     //시럽 토네이도 설정
     [Header("Syrup Tornado Settings")]
     [SerializeField] private GameObject syrupTornadoPrefab;
@@ -99,7 +99,7 @@ public class SkillManager : MonoBehaviour
     [Tooltip("Spine 애니메이션 이름")]
     [SerializeField] private string icebreakerAnimName = "activate";
     [Tooltip("세트 FX는 1번만 재생하고 끝나야 하므로 기본값은 false 입니다.")]
-    [SerializeField] private bool icebreakerAnimLoop = false;  
+    [SerializeField] private bool icebreakerAnimLoop = false;
     [Tooltip("플레이어 기준 위치 오프셋")]
     [SerializeField] private Vector3 icebreakerLocalOffset = Vector3.zero;
 
@@ -126,7 +126,7 @@ public class SkillManager : MonoBehaviour
     [SerializeField] private string twistOrTreatAnimName = "animation";
 
     [Tooltip("세트 FX는 1번만 재생하고 끝나야 하므로 false로 두는걸 권장")]
-    [SerializeField] private bool twistOrTreatAnimLoop = true; 
+    [SerializeField] private bool twistOrTreatAnimLoop = true;
 
     [Tooltip("플레이어 기준 위치 오프셋")]
     [SerializeField] private Vector3 twistOrTreatLocalOffset = Vector3.zero;
@@ -248,6 +248,7 @@ public class SkillManager : MonoBehaviour
         player.hasHoneySpin = false;
         player.hasSnowflakeCandy = false;
         player.hasCaramelCube = false;
+        player.hasSugarPorridge = false;
 
         // 스탯 및 중첩 횟수 초기화
         darkChipLevel = 0;
@@ -295,6 +296,9 @@ public class SkillManager : MonoBehaviour
                 break;
             case ItemData.ItemType.CaramelCube:
                 player.hasCaramelCube = true;
+                break;
+            case ItemData.ItemType.SugarPorridge:
+                player.hasSugarPorridge = true;
                 break;
 
             // --- 코코아/딸기/허니스핀/슈가실드 ---
@@ -541,7 +545,7 @@ public class SkillManager : MonoBehaviour
         {
             if (!hasHyperCandyRushActive) // 아직 활성화되지 않았을 때만
             {
-                ApplyHyperCandyRushSet(); 
+                ApplyHyperCandyRushSet();
             }
         }
     }
@@ -628,7 +632,7 @@ public class SkillManager : MonoBehaviour
     }
 
 
-        void ApplyBittermeltChaosSet() //비터멜트 세트효과 로직
+    void ApplyBittermeltChaosSet() //비터멜트 세트효과 로직
     {
         bittermeltChaosActive = true;
         Debug.Log("[SkillManager] 비터멜트 카오스 세트 효과 발동!");
@@ -681,7 +685,7 @@ public class SkillManager : MonoBehaviour
     }
 
     // 아이스브레이커 세트 효과 실제 적용: 플래그 on + 슬로우 코루틴 시작
-        // 아이스브레이커 세트 효과 실제 적용: 플래그 on + 슬로우 코루틴 시작
+    // 아이스브레이커 세트 효과 실제 적용: 플래그 on + 슬로우 코루틴 시작
     void ApplyIcebreakerSet()
     {
         icebreakerActive = true;
@@ -773,7 +777,7 @@ public class SkillManager : MonoBehaviour
 
     //트위스트 오어 트릿 세트 효과 적용
     //세트 플래그를 키면 각 3개의 스킬 효과 버프 적용
-        //트위스트 오어 트릿 세트 효과 적용
+    //트위스트 오어 트릿 세트 효과 적용
     //세트 플래그를 키면 각 3개의 스킬 효과 버프 적용
     void ApplyTwistOrTreatSet() // 트위스트 오어 트릿 세트 효과 로직
     {
@@ -781,13 +785,13 @@ public class SkillManager : MonoBehaviour
         twistOrTreatActive = true;
         Debug.Log("[SkillManager] 트위스트 오어 트릿 세트 효과 발동!");
 
-        
+
         //   (시럽토네이도 / 허니스핀 / 롤링초코바 강화 함수 호출 등)
         UpgradeHoneySpinForTwistOrTreat();
         UpgradeSyrupTornadoForTwistOrTreat();
         UpgradeRollingChocolateBarForTwistOrTreat();
 
-        
+
         //  Spine 세트 이펙트 한 번만 재생 후 Destroy
         // ★ FX는 처음 발동할 때만 재생 (이미 재생했다면 아래 FX 로직 스킵)
         if (twistOrTreatFxPlayed)
