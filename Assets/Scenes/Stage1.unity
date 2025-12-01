@@ -17090,6 +17090,50 @@ MonoBehaviour:
   gridHeight: 8
   activeZoneStartY: 3
   itemLayerRect: {fileID: 341056784}
+  slotImages:
+  - {fileID: 824117161}
+  - {fileID: 987602079}
+  - {fileID: 1989331743}
+  - {fileID: 106080738}
+  - {fileID: 744809894}
+  - {fileID: 1347652122}
+  - {fileID: 1810070119}
+  - {fileID: 267693327}
+  - {fileID: 129990282}
+  - {fileID: 2037931625}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 756047509}
+  - {fileID: 392772051}
+  - {fileID: 1027990380}
+  - {fileID: 988741761}
+  - {fileID: 20409995}
+  - {fileID: 1859689418}
+  - {fileID: 765804803}
+  - {fileID: 1355642319}
+  - {fileID: 1346894068}
+  - {fileID: 2008449310}
+  - {fileID: 198101872}
+  - {fileID: 988241340}
+  - {fileID: 2090559931}
+  - {fileID: 796557270}
+  - {fileID: 831525139}
+  - {fileID: 1995839875}
+  - {fileID: 721369509}
+  - {fileID: 13882621}
+  - {fileID: 282787707}
+  - {fileID: 1343330447}
+  - {fileID: 1998300075}
+  - {fileID: 1406691387}
+  - {fileID: 1061152402}
+  - {fileID: 1479536721}
+  - {fileID: 169201231}
+  lockedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  unlockedColor: {r: 1, g: 1, b: 1, a: 1}
+  placeItemSound: {fileID: 0}
   isDirty: 0
 --- !u!114 &1905553305
 MonoBehaviour:
