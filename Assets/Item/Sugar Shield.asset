@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Sugar Shield
   m_EditorClassIdentifier: 
   itemName: Sugar Shield
-  icon: {fileID: 21300000, guid: 656828efb15b0eb47bcad686aa5f7c8f, type: 3}
+  icon: {fileID: 21300000, guid: 816f30980e6fc184095e7d00c4a52c6b, type: 3}
   skillType: 2
   width: 1
   height: 2

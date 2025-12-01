@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Cocoa Powder
   m_EditorClassIdentifier: 
   itemName: Cocoa Powder
-  icon: {fileID: 21300000, guid: 1b7185a583203be46b888e7050467e40, type: 3}
+  icon: {fileID: 21300000, guid: 7932bc9cc26c2f94ba4df412797d4f1b, type: 3}
   skillType: 5
   width: 1
   height: 2

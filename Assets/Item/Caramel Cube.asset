@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Caramel Cube
   m_EditorClassIdentifier: 
   itemName: Rolling Chocolate Bar
-  icon: {fileID: 21300000, guid: be2c55b7a8eab7145b036b8fed3a540f, type: 3}
+  icon: {fileID: 21300000, guid: fd2c18b0ecd6f854293f51b6748b370f, type: 3}
   skillType: 1
   width: 1
   height: 1

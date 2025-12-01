@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Dark Chip
   m_EditorClassIdentifier: 
   itemName: Dark Chip
-  icon: {fileID: 21300000, guid: 0fc6f0c31f58813499367947e146cf9d, type: 3}
+  icon: {fileID: 21300000, guid: dda6f2fa876d50d44b231eaf5ba29654, type: 3}
   skillType: 8
   width: 1
   height: 2

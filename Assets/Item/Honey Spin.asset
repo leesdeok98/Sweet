@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Honey Spin
   m_EditorClassIdentifier: 
   itemName: Honey Spin
-  icon: {fileID: 21300000, guid: 5841091402cce5e459015528557a7b26, type: 3}
+  icon: {fileID: 21300000, guid: 3df0e1b146f735c488f9e3a9edb46875, type: 3}
   skillType: 11
   width: 3
   height: 2
