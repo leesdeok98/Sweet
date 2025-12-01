@@ -1115,6 +1115,7 @@ MonoBehaviour:
   gameOverPanel: {fileID: 91834491}
   tetrisInventoryPanel: {fileID: 1111181473}
   itemSelectionUI: {fileID: 1648878445}
+  ClearPanel: {fileID: 0}
   inventoryEscPosition: {x: -875, y: 0}
 --- !u!4 &109812375
 Transform:

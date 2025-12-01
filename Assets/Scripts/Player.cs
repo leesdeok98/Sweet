@@ -402,7 +402,7 @@ public class Player : MonoBehaviour
     private System.Collections.IEnumerator ShowClearPanelAfterDelay()
     {
         //보스가 DIE 매서드 실행 후 3초 후에 클리어 패널 열기
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(2f);
 
         if (clearPanel != null)
         {

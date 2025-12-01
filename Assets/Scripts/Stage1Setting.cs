@@ -16,6 +16,9 @@ public class Stage1Setting : MonoBehaviour
     [SerializeField] private GameObject tetrisInventoryPanel; 
     [SerializeField] private ItemSelectionUI itemSelectionUI; 
 
+    [Header("Clear Panel")]
+    [SerializeField] private GameObject ClearPanel;
+ 
     [SerializeField] private Vector2 inventoryEscPosition = new Vector2(-300f, 0f);
     private RectTransform inventoryRect;
     private Vector2 inventoryOriginalPosition;
@@ -52,7 +55,8 @@ public class Stage1Setting : MonoBehaviour
     void Update()
     {
         // 게임 오버 패널이 떠 있는 동안에는 ESC 입력 무시
-        if (gameOverPanel != null && gameOverPanel.activeSelf)
+        if ((gameOverPanel != null && gameOverPanel.activeSelf) ||
+            (ClearPanel != null && ClearPanel.activeSelf))
             return;
 
         if (Input.GetKeyDown(KeyCode.Escape))
