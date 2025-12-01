@@ -13273,8 +13273,8 @@ MonoBehaviour:
   idleAnimationName: idle
   walkAnimationName: walk
   deadAnimationName: dead
-  maxHealth: 1
-  health: 1
+  maxHealth: 100
+  health: 100
   hasIcedJellySkill: 0
   hasDarkChip: 0
   hasRollingChocolateBar: 0
