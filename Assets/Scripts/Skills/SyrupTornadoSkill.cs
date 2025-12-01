@@ -81,7 +81,7 @@ public class SyrupTornadoSkill : MonoBehaviour
         if (circle != null)
         {
             circle.radius = Mathf.Max(0.01f, radius);
-            circle.offset = colliderOffset;   // ✅ 오프셋도 함께 반영
+            circle.offset = colliderOffset;   //  오프셋도 함께 반영
         }
     }
 
@@ -110,7 +110,7 @@ public class SyrupTornadoSkill : MonoBehaviour
         if (circle == null)
             circle = GetComponent<CircleCollider2D>();
 
-        // ✅ 콜라이더 중심 = 오브젝트 월드 위치 + 로컬 오프셋
+        //  콜라이더 중심 = 오브젝트 월드 위치 + 로컬 오프셋
         Vector2 center = (Vector2)transform.position +
                          (circle != null ? circle.offset : colliderOffset);
 

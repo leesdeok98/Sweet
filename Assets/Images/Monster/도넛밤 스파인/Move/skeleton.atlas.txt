@@ -1,0 +1,19 @@
+skeleton.png
+size:1703,958
+filter:Linear,Linear
+pma:true
+도넛밤 (1)
+bounds:2,493,463,651
+offsets:757,377,1949,1614
+rotate:90
+폭발2
+bounds:655,2,1046,954
+offsets:1,2,1048,957
+
+skeleton_2.png
+size:1102,1096
+filter:Linear,Linear
+pma:true
+도넛밤
+bounds:2,2,1098,1092
+offsets:433,264,1949,1614

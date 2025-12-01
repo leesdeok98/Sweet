@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
 using Spine.Unity;
 using UnityEditor.U2D.Sprites;
+using Spine;
 
 public class Enemy : MonoBehaviour
 {
@@ -12,6 +13,10 @@ public class Enemy : MonoBehaviour
     public SkeletonAnimation skeletonAnimation;
     [SpineAnimation] public string runAnimName = "Run";
     [SpineAnimation] public string deadAnimName = "Die";
+
+    [Header("Shadow")]
+    [SerializeField] private SpriteRenderer shadowRenderer;
+    private Color shadowOriginalColor;
 
     private Coroutine knockbackRoutine;
 
@@ -56,20 +61,31 @@ public class Enemy : MonoBehaviour
     // ★ 추가: 죽을 때 물리 끄기용 콜라이더 모음
     private Collider2D[] colliders;
 
+    private Coroutine shadowFadeRoutine;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         originalSpeed = speed; // 인스펙터의 초기 speed 저장 
 
-        //스파인 초기 스케일 저장(좌우 반전용)
+        // 스파인 초기 스케일 저장(좌우 반전용)
         if (skeletonAnimation != null)
             spineInitialScaleX = skeletonAnimation.transform.localScale.x;
         else
             spineInitialScaleX = transform.localScale.x;
 
-        // ★ 추가: 자기 자신 + 자식에 붙은 Collider2D 모두 미리 저장
+        // 자기 자신 + 자식에 붙은 Collider2D 모두 미리 저장
         colliders = GetComponentsInChildren<Collider2D>();
+
+        // 🔹 그림자(SpriteRenderer) 찾기
+        if (shadowRenderer == null)
+            shadowRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        // 🔹 원래 그림자 색 저장
+        if (shadowRenderer != null)
+            shadowOriginalColor = shadowRenderer.color;
     }
+
 
     void Start()
     {
@@ -202,6 +218,17 @@ public class Enemy : MonoBehaviour
             StopCoroutine(knockbackRoutine);
             knockbackRoutine = null;
         }
+
+        // 그림자 색 복구
+        if (shadowRenderer != null)
+            shadowRenderer.color = shadowOriginalColor;
+
+        // 그림자 페이드 코루틴 정리
+        if (shadowFadeRoutine != null)
+        {
+            StopCoroutine(shadowFadeRoutine);
+            shadowFadeRoutine = null;
+        }
     }
 
     /// <summary>
@@ -282,7 +309,14 @@ public class Enemy : MonoBehaviour
 
         isLive = false;
 
-        // ★ 추가: 물리 완전 차단
+        //  넉백 코루틴 정리
+        if (knockbackRoutine != null)
+        {
+            StopCoroutine(knockbackRoutine);
+            knockbackRoutine = null;
+        }
+
+        //  물리 완전 차단
         if (rb != null)
         {
             rb.velocity = Vector2.zero;
@@ -295,11 +329,23 @@ public class Enemy : MonoBehaviour
                 col.enabled = false;
         }
 
-        if (skeletonAnimation != null)
-            skeletonAnimation.AnimationState.SetAnimation(0, deadAnimName, false);
+        float deactivateDelay = 1f; // 기본값(예비용)
 
-        //if (anim != null)
-        //    anim.SetTrigger("Dead");
+        if (skeletonAnimation != null)
+        {
+            // 혹시 이전에 얼음/스턴 등으로 바뀐 timeScale을 정속으로 맞춰줌
+            skeletonAnimation.timeScale = 1f;
+
+            // 죽음 애니메이션 재생
+            TrackEntry entry =
+                skeletonAnimation.AnimationState.SetAnimation(0, deadAnimName, false);
+
+            // ★ 실제 죽음 애니메이션 길이를 가져와서 딜레이로 사용
+            if (entry != null && entry.Animation != null)
+            {
+                deactivateDelay = entry.Animation.Duration;
+            }
+        }
 
         // 🔸 처치수는 정확히 한 번만 증가
         if (!hasCountedKill)
@@ -308,9 +354,57 @@ public class Enemy : MonoBehaviour
             OnAnyEnemyDied?.Invoke();
         }
 
-        // 비주얼 연출 후 비활성화 (오브젝트 풀 전제)
-        StartCoroutine(DeactivateAfterDelay(1f));
+        //  그림자 페이드 시작 (애니메이션 길이에 맞춰서)
+        if (shadowRenderer != null)
+        {
+            if (shadowFadeRoutine != null)
+                StopCoroutine(shadowFadeRoutine);
+
+            shadowFadeRoutine = StartCoroutine(FadeShadowOut(deactivateDelay + 0.1f));
+        }
+
+        // 죽음 애니메이션이 끝난 뒤 살짝 여유 주고 비활성화
+        StartCoroutine(DeactivateAfterDelay(deactivateDelay + 0.1f));
     }
+    //그림자 코루틴
+    IEnumerator FadeShadowOut(float duration)
+    {
+        if (shadowRenderer == null || duration <= 0f)
+            yield break;
+
+        float elapsed = 0f;
+        Color c = shadowOriginalColor;
+
+        // 추가: Inspector에서 설정한 원래 알파값 저장
+        float startAlpha = shadowOriginalColor.a;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+
+            if (shadowRenderer != null)
+            {
+
+                c.a = Mathf.Lerp(startAlpha, 0f, t);
+                shadowRenderer.color = c;
+            }
+
+            yield return null;
+        }
+
+        // 끝까지 다 사라지게 보정
+        if (shadowRenderer != null)
+        {
+            c.a = 0f;
+            shadowRenderer.color = c;
+        }
+
+        shadowFadeRoutine = null;
+    }
+
+
+
 
     IEnumerator DeactivateAfterDelay(float delay)
     {
@@ -455,11 +549,7 @@ public class Enemy : MonoBehaviour
         speed = savedSpeed;
 
         if (skeletonAnimation != null)
-            skeletonAnimation.timeScale = 2f;
-        //if (anim != null)
-        //    anim.speed = originalAnimSpeed;
-
-        //if (spriter != null)
-        //    spriter.color = originalColor;
+            skeletonAnimation.timeScale = 1f;
+        
     }
 }

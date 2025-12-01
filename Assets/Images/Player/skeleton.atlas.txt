@@ -1,0 +1,43 @@
+skeleton.png
+size:1982,1912
+filter:Linear,Linear
+pma:true
+레이어 3
+bounds:993,24,544,478
+offsets:1,0,545,478
+레이어 4
+bounds:2,2,584,500
+머리 복사
+bounds:2,504,1309,1406
+offsets:36,39,1365,1477
+몸통 복사
+bounds:588,8,494,403
+offsets:19,10,516,460
+rotate:90
+오른다리 복사
+bounds:1313,1187,191,340
+offsets:3,4,196,346
+오른발 복사
+bounds:1437,520,141,112
+offsets:8,8,151,130
+rotate:90
+오른손+무기 복사
+bounds:1313,663,584,522
+offsets:13,3,602,527
+오른팔 복사
+bounds:1551,436,341,225
+offsets:0,5,342,254
+왼다리 복사
+bounds:1539,125,274,309
+offsets:6,6,282,316
+왼발 복사
+bounds:1313,519,142,122
+offsets:4,4,150,127
+rotate:90
+왼팔 복사
+bounds:1539,1221,306,422
+offsets:7,5,317,433
+rotate:90
+치마(하체) 복사
+bounds:1313,1529,667,381
+offsets:20,18,705,411
