@@ -277,7 +277,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -305,7 +305,12 @@ MonoBehaviour:
   runAnimName: walk
   deadAnimName: dead
   shadowRenderer: {fileID: 7565264769138820946}
-  speed: 0
+  separateRadius: 0.5
+  separateForce: 0.5
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
+  speed: 2
   health: 0
   maxHealth: 0
   dps: 0
@@ -316,17 +321,21 @@ MonoBehaviour:
   isStunned: 0
   isFrozen: 0
   vec2: {x: 0, y: 0}
-  patternInterval: 7
-  chargeSpeed: 5
-  chargeDuration: 3
+  hitFlashDuration: 0.05
+  hitFlashCooldown: 0.5
+  followDuration: 4
+  chargeSpeed: 15
+  chargeDuration: 1
   chargeDamage: 10
   chargeAnimName: run
-  bulletPrefab: {fileID: 0}
-  bulletSpeed: 4
+  bulletPrefab: {fileID: 6154045554656098179, guid: 779d33176abe1bd4db1faf706bd70b0c, type: 3}
+  bulletSpeed: 15
   bulletDamage: 15
   bulletDuration: 5
   shootAnimName: bomb
-  idleAnimName: bomb
+  idleAnimName: walk
+  chargeWindupTime: 0.5
+  shootDelay: 2
 --- !u!114 &-8092732007463287505
 MonoBehaviour:
   m_ObjectHideFlags: 0

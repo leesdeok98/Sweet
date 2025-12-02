@@ -12,6 +12,10 @@ public class CaramelCubeSkill : MonoBehaviour
     public float cooldown = 20f;       // 20초 쿨타임
     public float speedMultiplier = 2f; // 공격 속도 2배 (100% 증가)
 
+    [Header("Visual Position")]
+    [Tooltip("플레이어 기준 로컬 위치 오프셋")]
+    public Vector3 visualOffset = Vector3.zero;
+
     private bool isActive = false;
     private float originalFireRate;
 
@@ -41,7 +45,7 @@ public class CaramelCubeSkill : MonoBehaviour
         if (caramelCubePrefab != null)
         {
             GameObject visual = Instantiate(caramelCubePrefab, transform.position, Quaternion.identity, transform);
-            visual.transform.localPosition = Vector3.zero;
+            visual.transform.localPosition = visualOffset;
 
             // 효과가 발생하기 시작할 때 사운드가 난다고 해서 프리팹 생기고 소리 나는게 가장 자연스러울 거 같아서 여기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         }

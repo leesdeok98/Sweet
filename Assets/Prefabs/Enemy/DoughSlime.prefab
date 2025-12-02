@@ -293,6 +293,11 @@ MonoBehaviour:
   runAnimName: move
   deadAnimName: dead
   shadowRenderer: {fileID: 5639369850791707469}
+  separateRadius: 0.5
+  separateForce: 0.5
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
   speed: 0
   health: 0
   maxHealth: 0
@@ -304,5 +309,7 @@ MonoBehaviour:
   isStunned: 0
   isFrozen: 0
   vec2: {x: 0, y: 0}
+  hitFlashDuration: 0.05
+  hitFlashCooldown: 0.5
   moveTime: 0.833
   stopTime: 0.5

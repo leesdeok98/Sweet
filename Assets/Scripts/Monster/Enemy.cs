@@ -4,7 +4,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
 using Spine.Unity;
-using UnityEditor.U2D.Sprites;
 using Spine;
 
 public class Enemy : MonoBehaviour
@@ -17,6 +16,11 @@ public class Enemy : MonoBehaviour
     [Header("Shadow")]
     [SerializeField] private SpriteRenderer shadowRenderer;
     private Color shadowOriginalColor;
+
+    [Header("Overlap Settings")]
+    [SerializeField] private float separateRadius = 0.3f;   // 서로 떨어질 최소 거리
+    [SerializeField] private float separateForce = 1.5f;    // 얼마나 세게 밀어낼지
+    [SerializeField] private LayerMask enemyLayerMask;      // Enemy가 있는 레이어
 
     private Coroutine knockbackRoutine;
 
@@ -64,6 +68,10 @@ public class Enemy : MonoBehaviour
     //스파인 컬러
     private Color hitOriginalColor = Color.white;
     private Coroutine hitFlashRoutine;
+    private float lastHitFlashTime = -999f;
+
+    [SerializeField] private float hitFlashDuration = 0.05f; //빨간색 유지 시간
+    [SerializeField] private float hitFlashCooldown = 0.1f; // 쿨타임
 
     private Coroutine shadowFadeRoutine;
 
@@ -175,9 +183,8 @@ public class Enemy : MonoBehaviour
                 t.localScale.z
             );
         }
-
-        // 좌우 플립
-        //spriter.flipX = target.position.x < rb.position.x;
+        //겹침 방지
+        SeparateFromOthers();
     }
 
     protected virtual void OnEnable()
@@ -241,6 +248,39 @@ public class Enemy : MonoBehaviour
             shadowFadeRoutine = null;
         }
     }
+
+    void SeparateFromOthers()
+    {
+        if (rb == null) return;
+
+        // 내 주변에 있는 다른 Enemy 찾기
+        Collider2D[] hits = Physics2D.OverlapCircleAll(rb.position, separateRadius, enemyLayerMask);
+
+        Vector2 pushDir = Vector2.zero;
+        int count = 0;
+
+        foreach (var hit in hits)
+        {
+            if (hit.attachedRigidbody == rb) continue; // 자기 자신은 제외
+
+            Vector2 diff = rb.position - hit.attachedRigidbody.position;
+            float dist = diff.magnitude;
+            if (dist < 0.0001f) continue;
+
+            // 가까울수록 더 세게 밀어내기
+            pushDir += diff.normalized / dist;
+            count++;
+        }
+
+        if (count > 0)
+        {
+            pushDir /= count;
+            // 약하게 한 번 더 이동시켜 겹침 풀기
+            Vector2 newPos = rb.position + pushDir * separateForce * Time.fixedDeltaTime;
+            rb.MovePosition(newPos);
+        }
+    }
+
 
     /// <summary>
     /// 스폰 시 외부에서 스탯 일괄 설정 (스폰러가 호출)
@@ -311,31 +351,36 @@ public class Enemy : MonoBehaviour
         health -= damage;
         if (health <= 0f)
             Die();
-        
-        //피격시 컬러 변경
-         if (hitFlashRoutine != null)
-        StopCoroutine(hitFlashRoutine);
 
-        hitFlashRoutine = StartCoroutine(HitFlashOneFrame());
+        // 피격시 컬러 변경 (쿨타임 적용)
+        if (Time.time >= lastHitFlashTime + hitFlashCooldown)
+        {
+            lastHitFlashTime = Time.time;
+
+            if (hitFlashRoutine != null)
+                StopCoroutine(hitFlashRoutine);
+
+            hitFlashRoutine = StartCoroutine(HitFlashOneFrame());
+        }
     }
 
     private IEnumerator HitFlashOneFrame()
-{
-    if (skeletonAnimation == null || skeletonAnimation.Skeleton == null)
-        yield break;
+    {
+        if (skeletonAnimation == null || skeletonAnimation.Skeleton == null)
+            yield break;
 
-    Color flashColor = new Color(1f, 0.4f, 0.4f, 0.6f);
-    skeletonAnimation.Skeleton.SetColor(flashColor);
-    
+        Color flashColor = new Color(1f, 0.4f, 0.4f, 0.6f);
+        skeletonAnimation.Skeleton.SetColor(flashColor);
 
-    //  1프레임만 유지
-    yield return new WaitForSecondsRealtime(0.05f);     
+        // 설정한 시간 동안만 빨간색 유지
+        yield return new WaitForSecondsRealtime(hitFlashDuration);
 
-    // 원래 색으로 복구
-    skeletonAnimation.Skeleton.SetColor(hitOriginalColor);
+        // 원래 색으로 복구
+        skeletonAnimation.Skeleton.SetColor(hitOriginalColor);
 
-    hitFlashRoutine = null;
-}
+        hitFlashRoutine = null;
+    }
+
 
 
     /// <summary>

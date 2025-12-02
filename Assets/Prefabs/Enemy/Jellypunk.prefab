@@ -222,6 +222,11 @@ MonoBehaviour:
   runAnimName: move
   deadAnimName: dead
   shadowRenderer: {fileID: 8602043751902522645}
+  separateRadius: 0.5
+  separateForce: 0.5
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
   speed: 0
   health: 0
   maxHealth: 0
@@ -233,6 +238,8 @@ MonoBehaviour:
   isStunned: 0
   isFrozen: 0
   vec2: {x: 0, y: 0}
+  hitFlashDuration: 0.05
+  hitFlashCooldown: 0.5
   bulletPrefab: {fileID: 1684995378667661010, guid: 79ba8fbf0abfc224b822e3d7fc531a2e, type: 3}
   stopDistance: 10
   fireInterval: 3

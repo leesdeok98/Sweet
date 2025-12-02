@@ -12404,7 +12404,7 @@ Transform:
   m_GameObject: {fileID: 1152682868}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.03, y: 1.07, z: 0.041373577}
+  m_LocalPosition: {x: -0.01, y: 1.07, z: 0.041373577}
   m_LocalScale: {x: 0.08, y: 0.08, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15191,7 +15191,7 @@ MonoBehaviour:
   hasDarkChip: 0
   hasRollingChocolateBar: 0
   hasPoppingCandy: 0
-  hasSyrupTornado: 1
+  hasSyrupTornado: 0
   hasCocoaPowder: 0
   hasStrawberryPopCore: 0
   hasHoneySpin: 0
@@ -15253,6 +15253,7 @@ MonoBehaviour:
   duration: 5
   cooldown: 20
   speedMultiplier: 2
+  visualOffset: {x: -0.05, y: -0.4, z: 0}
 --- !u!114 &1429503047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20174,11 +20175,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabs:
   - {fileID: 8645179148039481334, guid: d85528ad43b631148aa3f60144807a67, type: 3}
-  - {fileID: 6282673277702568439, guid: a300b805520e3bf43ae637cd295a7f5d, type: 3}
+  - {fileID: 1867705781196112151, guid: a300b805520e3bf43ae637cd295a7f5d, type: 3}
   - {fileID: 6209733559883107525, guid: 89512658eea45f240bfd322fea3581b5, type: 3}
-  - {fileID: 6354218910786643846, guid: 15c1756fc4db03346b0c2699eed2c1ce, type: 3}
+  - {fileID: 4844216729306248592, guid: 15c1756fc4db03346b0c2699eed2c1ce, type: 3}
   - {fileID: 3233106479709150757, guid: eee7fa7d697720c42846bcaaf70928ac, type: 3}
-  - {fileID: 6905305933481701160, guid: 3dc3c3645aea9964ba088e2bdd0548f1, type: 3}
+  - {fileID: 57282356398903611, guid: 3dc3c3645aea9964ba088e2bdd0548f1, type: 3}
   - {fileID: 3992737701259309621, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
 --- !u!4 &1988048209
 Transform:

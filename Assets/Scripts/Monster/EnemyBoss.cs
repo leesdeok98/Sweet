@@ -5,7 +5,8 @@ using Spine.Unity;
 public class EnemyBoss : Enemy
 {
     [Header("Boss Settings")]
-    public float patternInterval = 7.0f;
+    [Tooltip("플레이어를 추적하는 시간(초)")]
+    public float followDuration = 4.0f;
 
     [Header("Pattern 1: Charge (돌진)")]
     public float chargeSpeed = 5.0f;
@@ -21,27 +22,34 @@ public class EnemyBoss : Enemy
     [SpineAnimation] public string shootAnimName = "Attack";
     [SpineAnimation] public string idleAnimName = "Idle";
 
-    //private bool isActing = false;
+    [Header("스킬 딜레이")]
+    public float chargeWindupTime = 0.5f;
+    public float shootDelay = 2f;
+
+    private bool isActing = false;   // 패턴 동작 중인지(추적 off)
+
 
     void Start()
     {
+        // BGM 재생
         if (AudioManager.instance != null)
         {
             AudioManager.instance.PlayBgm(AudioManager.Bgm.Boss_BGM);
         }
 
+        // 기본 컴포넌트 확보
         rb = GetComponent<Rigidbody2D>();
         if (skeletonAnimation == null)
             skeletonAnimation = GetComponent<SkeletonAnimation>();
 
-        //GameManager에서 플레이어 가져오기
+        // GameManager에서 플레이어 가져오기
         if (GameManager.instance != null && GameManager.instance.player != null)
         {
             target = GameManager.instance.player.GetComponent<Rigidbody2D>();
         }
         else
         {
-            //혹시 몰라서 Player 태그로 한 번 더 찾기
+            // 혹시 몰라서 Player 태그로 한 번 더 찾기
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
                 target = playerObj.GetComponent<Rigidbody2D>();
@@ -51,101 +59,206 @@ public class EnemyBoss : Enemy
         isLive = true;
         health = maxHealth;
 
+        // 기본 추적 애니메이션
+        if (skeletonAnimation != null && !string.IsNullOrEmpty(runAnimName))
+            skeletonAnimation.AnimationState.SetAnimation(0, runAnimName, true);
+
         StartCoroutine(BossPatternRoutine());
     }
 
-
+    //  기본적으로는 Enemy의 움직임을 비슷하게 사용하되,
+    //    패턴(isActing=true)일 때만 추적 이동을 막는다.
     public override void FixedUpdate()
     {
-        // 보스는 패턴 코루틴으로 움직이므로 부모의 추적 기능 끔
+        // 빙결/스턴이면 무조건 멈춤
+        if (isFrozen || isStunned)
+        {
+            if (rb != null) rb.velocity = Vector2.zero;
+            return;
+        }
+
+        // 넉백 중이면 Enemy 쪽 코루틴이 밀고 있을 것이므로 여기선 건드리지 않음
+        if (isKnockback)
+            return;
+
+        if (!isLive || target == null)
+        {
+            if (rb != null) rb.velocity = Vector2.zero;
+            return;
+        }
+
+        //  패턴 동작 중이면 기본 추적은 잠시 꺼둔다
+        if (isActing)
+            return;
+
+        //  여기서 일반 Enemy처럼 플레이어 방향으로 추적
+        Vector2 dir = target.position - rb.position;
+        Vector2 nextVec = dir.normalized * speed * Time.fixedDeltaTime;
+
+        vec2 = dir.normalized;  // Enemy.LateUpdate에서 좌우 반전에 사용
+        rb.MovePosition(rb.position + nextVec);
+        rb.velocity = Vector2.zero;
     }
 
+    //  “추적 4초 → 랜덤 패턴 → 다시 추적 4초 …” 루프
     IEnumerator BossPatternRoutine()
     {
         while (isLive)
         {
-            // 7초 동안 대기 (Idle)
-            yield return StartCoroutine(IdleState());
+            // 1) 추적 구간 (followDuration 초 동안 플레이어 추적)
+            isActing = false;
 
-            // 랜덤 뽑기 (0 또는 1)
-            int randomAction = Random.Range(0, 2);
+            if (skeletonAnimation != null && !string.IsNullOrEmpty(runAnimName))
+                skeletonAnimation.AnimationState.SetAnimation(0, runAnimName, true);
 
-            if (randomAction == 0)
+            float timer = 0f;
+            while (timer < followDuration && isLive)
             {
-                // 50% 확률로 돌진
+                timer += Time.deltaTime;
+                yield return null;
+            }
+
+            if (!isLive) yield break;
+
+            // 2) 패턴 실행 구간
+            isActing = true;
+
+            // 패턴 선택: 50% 돌진 / 50% 발사
+            float r = Random.value;
+            if (r < 0.5f)
+            {
                 yield return StartCoroutine(ChargePattern());
             }
             else
             {
-                // 50% 확률로 발사
                 yield return StartCoroutine(ShootPattern());
             }
+
+            // 패턴이 끝나면 while 루프 반복 → 다시 추적 단계로 돌아감
         }
     }
 
-    IEnumerator IdleState()
-    {
-        rb.velocity = Vector2.zero;
-        skeletonAnimation.AnimationState.SetAnimation(0, idleAnimName, true);
-
-        // 여기서 7초 동안 쉼
-        yield return new WaitForSeconds(patternInterval);
-    }
-
+    //  패턴 1: 돌진
     IEnumerator ChargePattern()
     {
-        //isActing = true;
         float originalDps = dps;
-        dps = chargeDamage; // 데미지 10으로 변경
+        dps = chargeDamage; // 돌진 중 데미지 강화
 
-        Vector2 dir = Vector2.zero;
+        // 1) 돌진 방향(플레이어 기준)
+        Vector2 dir;
         if (target != null)
-            dir = (target.position - rb.position).normalized;
-
-        if (dir == Vector2.zero)
+            dir = (target.position - rb.position);
+        else
             dir = Vector2.left;
 
+        if (dir.sqrMagnitude < 0.0001f)
+            dir = Vector2.left;
+
+        dir = dir.normalized;
+        vec2 = dir;  // 방향 정보(좌우 반전용)
+
+        // 2) 돌진 애니메이션 재생 (준비동작 포함)
         if (skeletonAnimation != null && !string.IsNullOrEmpty(chargeAnimName))
             skeletonAnimation.AnimationState.SetAnimation(0, chargeAnimName, true);
 
-        float timer = 0;
-        while (timer < chargeDuration) // 3초 돌진
+        // 3)  준비동작 동안은 "애니만 재생, 이동은 없음"
+        if (chargeWindupTime > 0f)
         {
-            rb.velocity = dir * chargeSpeed; // 속도 5
-            timer += Time.deltaTime;
-            yield return null;
+            float windup = 0f;
+            while (windup < chargeWindupTime && isLive)
+            {
+                // 스턴/빙결 중이면 그냥 기다리기만 함
+                if (isFrozen || isStunned)
+                {
+                    if (rb != null) rb.velocity = Vector2.zero;
+                }
+
+                windup += Time.deltaTime;
+                yield return null;
+            }
         }
 
-        rb.velocity = Vector2.zero;
-        dps = originalDps; // 데미지 복구
-        //isActing = false;
-    }
-
-    IEnumerator ShootPattern()
-    {
-        //isActing = true;
-        rb.velocity = Vector2.zero;
-
-        var trackEntry = skeletonAnimation.AnimationState.SetAnimation(0, shootAnimName, false);
-
-        // 발사 애니메이션 타이밍에 맞추려면 여기에 딜레이 추가 가능 (예: 0.5초)
-        // yield return new WaitForSeconds(0.5f);
-
+        // 준비동작 동안 플레이어가 많이 움직였을 수 있으니,
+        //  실제 돌진 직전에 한 번 더 방향 재계산(원하면 유지해도 됨)
         if (target != null)
         {
-            Vector2 dir = (target.position - rb.position).normalized;
-            GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
-
-            // 탄속 4, 데미지 15
-            bullet.GetComponent<EnemyBullet>().Initialize(dir, bulletDamage, bulletSpeed, bulletDuration);
+            Vector2 newDir = (target.position - rb.position);
+            if (newDir.sqrMagnitude >= 0.0001f)
+                dir = newDir.normalized;
         }
 
-        yield return new WaitForSeconds(trackEntry.Animation.Duration);
-        //isActing = false;
+        float timer = 0f;
+
+        // 4) 여기부터 진짜 이동 시작 (chargeDuration 동안만)
+        while (timer < chargeDuration && isLive)
+        {
+            timer += Time.fixedDeltaTime;
+
+            if (!isFrozen && !isStunned && rb != null)
+            {
+                Vector2 nextPos = rb.position + dir * chargeSpeed * Time.fixedDeltaTime;
+                rb.MovePosition(nextPos);
+                vec2 = dir;
+            }
+            else if (rb != null)
+            {
+                rb.velocity = Vector2.zero;
+            }
+
+            yield return new WaitForFixedUpdate();
+        }
+
+        if (rb != null)
+            rb.velocity = Vector2.zero;
+
+        dps = originalDps; // dps 원래대로 복구
+    }
+
+
+    //  패턴 2: 탄 발사
+    IEnumerator ShootPattern()
+    {
+        if (rb != null)
+            rb.velocity = Vector2.zero;
+
+        // 공격 애니메이션 재생
+        float waitTime = 0.5f;
+
+        if (skeletonAnimation != null && !string.IsNullOrEmpty(shootAnimName))
+        {
+            var trackEntry = skeletonAnimation.AnimationState.SetAnimation(0, shootAnimName, false);
+
+            if (trackEntry != null && trackEntry.Animation != null)
+                waitTime = trackEntry.Animation.Duration;
+        }
+
+        if (shootDelay > 0f)
+            yield return new WaitForSeconds(shootDelay);
+
+        // 🔹 총알 발사 부분을 JellyPunk 스타일로 통일
+        if (target != null && bulletPrefab != null)
+        {
+            Vector2 fireDirection = (target.position - (Vector2)transform.position).normalized;
+
+            GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+
+            var enemyBullet = bullet.GetComponent<EnemyBullet>();
+            if (enemyBullet != null)
+            {
+                // JellyPunk: Initialize(fireDir, dps, bulletSpeed, bulletDuration)
+                // 보스는 bulletDamage를 쓰고 싶으면 dps 대신 bulletDamage 넣으면 됨
+                enemyBullet.Initialize(fireDirection, bulletDamage, bulletSpeed, bulletDuration);
+            }
+        }
+
+        // 애니메이션 길이만큼 대기
+        yield return new WaitForSeconds(waitTime);
     }
 
     void OnDisable()
     {
         StopAllCoroutines();
+        if (rb != null)
+            rb.velocity = Vector2.zero;
     }
 }

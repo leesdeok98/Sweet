@@ -110,11 +110,23 @@ public class SyrupTornadoSkill : MonoBehaviour
         if (circle == null)
             circle = GetComponent<CircleCollider2D>();
 
-        //  콜라이더 중심 = 오브젝트 월드 위치 + 로컬 오프셋
-        Vector2 center = (Vector2)transform.position +
-                         (circle != null ? circle.offset : colliderOffset);
+        //  실제 물리 콜라이더와 완전히 같은 월드 중심/반경 사용
+        Vector2 center;
+        float usedRadius;
 
-        float usedRadius = (circle != null ? circle.radius : radius);
+        if (circle != null)
+        {
+            Bounds b = circle.bounds; // 스케일, 오프셋 모두 반영된 AABB
+            center = b.center;
+            usedRadius = Mathf.Max(b.extents.x, b.extents.y); // 원이라 x=y지만 안전하게 Max 사용
+        }
+        else
+        {
+            // 혹시라도 콜라이더가 없는 예외 상황 대비
+            center = (Vector2)transform.position + colliderOffset;
+            float maxScale = Mathf.Max(transform.lossyScale.x, transform.lossyScale.y);
+            usedRadius = radius * maxScale;
+        }
 
         // 원 안의 적 검색
         var hits = Physics2D.OverlapCircleAll(center, usedRadius, enemyMask);
@@ -131,6 +143,7 @@ public class SyrupTornadoSkill : MonoBehaviour
             }
         }
     }
+
 
     /// <summary>
     /// SkillManager에서 '트위스트 오어 트릿' 세트 효과가 발동될 때
