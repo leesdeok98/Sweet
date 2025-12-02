@@ -56,9 +56,9 @@ public class ItemSelectionUI : MonoBehaviour
     [Tooltip("아이템 이름과 설명 사이에 넣을 빈 줄 수")]
     [Range(0, 10)]
     public float nameDescEmptyLines = 0;
-    
-    // ★★★ [추가] 선택 횟수 및 해금 횟수 카운트 ★★★
-    private int selectionCount = 0;
+
+    // ★★★ [수정] 선택 횟수가 아니라 '창이 열린 횟수'로 해금 타이밍을 잽니다 ★★★
+    private int openCount = 0;
     private int unlockTriggerCount = 0;
 
     void Start()
@@ -69,7 +69,7 @@ public class ItemSelectionUI : MonoBehaviour
         // 버튼 클릭 이벤트 등록
         for (int i = 0; i < itemButtons.Length; i++)
         {
-            int index = i; 
+            int index = i;
             itemButtons[i].onClick.AddListener(() => OnItemSelected(index));
         }
     }
@@ -84,14 +84,42 @@ public class ItemSelectionUI : MonoBehaviour
 
         Time.timeScale = 0f; // 게임 시간 정지
 
+        // ─────────────────────────────────────────────────────────────
+        // ★★★ [핵심 수정] 창이 열릴 때 해금 로직을 미리 실행합니다! ★★★
+        // ─────────────────────────────────────────────────────────────
+        openCount++; // 창 열린 횟수 증가 (아이템 선택 횟수와 동일)
+
+        // 짝수 번째(2, 4, 6...)로 열릴 때마다 해금 시도
+        if (openCount % 2 == 0)
+        {
+            if (InventoryManager.instance != null)
+            {
+                unlockTriggerCount++;
+
+                // ★★★ [수정됨] 기본적으로 3칸씩 해금 ★★★
+                int amountToUnlock = 3;
+
+                // 5번째 해금(총 10회차 오픈)일 때는 4칸 해금 (테두리 총 16칸을 맞추기 위함: 3+3+3+3+4 = 16)
+                if (unlockTriggerCount == 5)
+                {
+                    amountToUnlock = 4;
+                }
+
+                // 해금 실행 (화면 뒤의 인벤토리에서 미리 열립니다)
+                InventoryManager.instance.UnlockRandomOuterCells(amountToUnlock);
+            }
+        }
+
         ChooseItems(); // 아이템 3개 무작위 선택
         UpdateUI();    // UI 표시
 
         if (panelRoot != null) panelRoot.SetActive(true);
+
+        // 선택할 때 인벤토리 상황을 보면서 고를 수 있게 같이 켜줍니다.
         if (tetrisInventoryPanel != null) tetrisInventoryPanel.SetActive(true);
-        
-        // 버튼 다시 활성화 (투명도 등은 UpdateUI에서 재설정됨)
-        foreach(var btn in itemButtons) btn.interactable = true;
+
+        // 버튼 다시 활성화
+        foreach (var btn in itemButtons) btn.interactable = true;
     }
 
     void ChooseItems()
@@ -114,11 +142,11 @@ public class ItemSelectionUI : MonoBehaviour
         }
     }
 
+    // 투명화 로직이 포함된 UpdateUI
     void UpdateUI()
     {
         for (int i = 0; i < itemButtons.Length; i++)
         {
-            // 투명도 조절을 위한 로컬 함수
             void SetAlpha(Graphic graphic, float alpha)
             {
                 if (graphic != null)
@@ -131,7 +159,6 @@ public class ItemSelectionUI : MonoBehaviour
 
             if (i < currentChoices.Count)
             {
-                // [아이템 있음] 버튼 활성화 및 불투명하게(1f) 설정
                 itemButtons[i].gameObject.SetActive(true);
                 itemButtons[i].interactable = true;
                 SetAlpha(itemButtons[i].GetComponent<Image>(), 1f);
@@ -145,14 +172,13 @@ public class ItemSelectionUI : MonoBehaviour
                 if (itemLabels != null && i < itemLabels.Length && itemLabels[i] != null)
                 {
                     TMP_Text label = itemLabels[i];
-                    SetAlpha(label, 1f); // 텍스트 보이게
+                    SetAlpha(label, 1f);
 
-                    // 텍스트 스타일 적용
                     if (applyLabelStyle)
                     {
                         label.alignment = TextAlignmentOptions.TopLeft;
                         label.enableAutoSizing = labelAutoSize;
-                        if (!labelAutoSize) label.fontSize = labelFontSize; 
+                        if (!labelAutoSize) label.fontSize = labelFontSize;
                     }
 
                     string nameText = currentChoices[i].itemName;
@@ -160,32 +186,28 @@ public class ItemSelectionUI : MonoBehaviour
 
                     string formattedName = $"<align=\"center\"><size={nameSizeMultiplier * 100f}%><b>{nameText}</size></align>";
                     string formattedDesc = $"<align=\"left\">{descText}</align>";
-                    
-                    string gap = "\n"; 
+
+                    string gap = "\n";
                     for (int n = 0; n < nameDescEmptyLines; n++)
                     {
                         gap += "\n";
-                    }  
-                    
+                    }
+
                     label.text = $"{formattedName}{gap}{formattedDesc}";
                 }
             }
             else
             {
-                // [아이템 없음] 버튼은 켜두되(레이아웃 유지), 투명하게(0f) 만들고 클릭 방지
-                itemButtons[i].gameObject.SetActive(true); // 켜둠 (자리 차지)
-                itemButtons[i].interactable = false;       // 클릭 불가
+                itemButtons[i].gameObject.SetActive(true);
+                itemButtons[i].interactable = false;
 
-                // 배경 이미지 투명하게
                 SetAlpha(itemButtons[i].GetComponent<Image>(), 0f);
 
-                // 아이콘 투명하게
                 if (itemIcons != null && i < itemIcons.Length && itemIcons[i] != null)
                 {
                     SetAlpha(itemIcons[i], 0f);
                 }
 
-                // 라벨 투명하게
                 if (itemLabels != null && i < itemLabels.Length && itemLabels[i] != null)
                 {
                     SetAlpha(itemLabels[i], 0f);
@@ -220,27 +242,7 @@ public class ItemSelectionUI : MonoBehaviour
             InventoryManager.instance.AddItem(tetrisItemToAdd);
         }
 
-        // ─────────────────────────────────────────────────────────────
-        // ★★★ [해금 로직] 2회 선택 시마다 테두리 해금 ★★★
-        // ─────────────────────────────────────────────────────────────
-        selectionCount++;
-        
-        // 짝수 번째(2, 4, 6...) 선택일 때 해금 시도
-        if (selectionCount % 2 == 0)
-        {
-            if (InventoryManager.instance != null)
-            {
-                unlockTriggerCount++;
-
-                // ★★★ [수정됨] 3번째 해금(6회 선택)까지는 2칸씩 엽니다! ★★★
-                // 1, 2, 3번째 해금 -> 2칸
-                // 4번째 이후 해금 -> 1칸
-                int amountToUnlock = (unlockTriggerCount <= 3) ? 2 : 1;
-
-                // 개수만큼 반복해서 해금 함수 호출
-                InventoryManager.instance.UnlockRandomOuterCells(amountToUnlock);
-            }
-        }
+        // 해금 로직은 Open()으로 이동됨
 
         // 선택창 끄기
         if (panelRoot != null)
@@ -248,19 +250,16 @@ public class ItemSelectionUI : MonoBehaviour
             panelRoot.SetActive(false);
         }
 
-        // 인벤토리 켜기 (정리 화면)
+        // 인벤토리 켜기 (정리 화면 유지)
         if (tetrisInventoryPanel != null)
         {
             tetrisInventoryPanel.SetActive(true);
         }
 
-        Debug.Log($"[ItemSelectionUI] 아이템 선택 완료 (누적 {selectionCount}회). 확인 버튼 대기 중.");
+        Debug.Log($"[ItemSelectionUI] 아이템 선택 완료. (현재 {openCount}회차 진행 중)");
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // 연결 함수들 (InventoryInput.cs에서 호출)
-    // ─────────────────────────────────────────────────────────────────────
-
+    // 연결 함수들
     public void ClosePanelAndResume()
     {
         if (tetrisInventoryPanel != null) tetrisInventoryPanel.SetActive(false);
@@ -268,20 +267,15 @@ public class ItemSelectionUI : MonoBehaviour
 
         isOpen = false;
         IsEscMenuOpen = false;
-        Time.timeScale = 1f; 
+        Time.timeScale = 1f;
 
         Debug.Log("[ItemSelectionUI] Closed & Resumed.");
     }
 
     public bool IsWaitingForClose()
     {
-        // 1. 인벤토리 패널 켜짐 (정리 중)
         bool isInventoryOpen = tetrisInventoryPanel != null && tetrisInventoryPanel.activeSelf;
-
-        // 2. 선택창 패널 꺼짐 (선택 완료)
         bool isSelectionDone = panelRoot != null && !panelRoot.activeSelf;
-
-        // 두 조건 만족 시 '확인 버튼' 노출
         return isInventoryOpen && isSelectionDone;
     }
 }

@@ -15191,7 +15191,7 @@ MonoBehaviour:
   hasDarkChip: 0
   hasRollingChocolateBar: 0
   hasPoppingCandy: 0
-  hasSyrupTornado: 0
+  hasSyrupTornado: 1
   hasCocoaPowder: 0
   hasStrawberryPopCore: 0
   hasHoneySpin: 0
