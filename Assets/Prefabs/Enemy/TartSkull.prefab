@@ -72,7 +72,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.39215687}
   m_FlipX: 0
@@ -99,6 +99,7 @@ GameObject:
   - component: {fileID: 2520477695205531146}
   - component: {fileID: 2311517150612470122}
   - component: {fileID: 630079333229565891}
+  - component: {fileID: -8092732007463287505}
   m_Layer: 8
   m_Name: TartSkull
   m_TagString: Boss
@@ -326,3 +327,18 @@ MonoBehaviour:
   bulletDuration: 5
   shootAnimName: bomb
   idleAnimName: bomb
+--- !u!114 &-8092732007463287505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3992737701259309621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7883c8fbe6626ad41bcda8d3f54e816a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseOrder: 0
+  scale: 9
+  sortingLayerName: 

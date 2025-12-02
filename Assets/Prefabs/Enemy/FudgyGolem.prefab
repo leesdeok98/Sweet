@@ -72,7 +72,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.39215687}
   m_FlipX: 0
@@ -99,6 +99,7 @@ GameObject:
   - component: {fileID: 1219604147269953114}
   - component: {fileID: 4956395670062717810}
   - component: {fileID: 7491876570273638431}
+  - component: {fileID: -6761210494384181904}
   m_Layer: 8
   m_Name: FudgyGolem
   m_TagString: Enemy
@@ -314,3 +315,18 @@ MonoBehaviour:
   vec2: {x: 0, y: 0}
   moveTime: 0.833
   stopTime: 0.5
+--- !u!114 &-6761210494384181904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6209733559883107525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7883c8fbe6626ad41bcda8d3f54e816a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseOrder: 0
+  scale: 9
+  sortingLayerName: 

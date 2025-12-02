@@ -61,6 +61,10 @@ public class Enemy : MonoBehaviour
     // ★ 추가: 죽을 때 물리 끄기용 콜라이더 모음
     private Collider2D[] colliders;
 
+    //스파인 컬러
+    private Color hitOriginalColor = Color.white;
+    private Coroutine hitFlashRoutine;
+
     private Coroutine shadowFadeRoutine;
 
     void Awake()
@@ -84,6 +88,13 @@ public class Enemy : MonoBehaviour
         // 🔹 원래 그림자 색 저장
         if (shadowRenderer != null)
             shadowOriginalColor = shadowRenderer.color;
+
+            if (skeletonAnimation != null && skeletonAnimation.Skeleton != null)
+            {
+                var s = skeletonAnimation.Skeleton;
+                hitOriginalColor = new Color(s.R, s.G, s.B, s.A);
+            }
+
     }
 
 
@@ -187,7 +198,7 @@ public class Enemy : MonoBehaviour
         speed = originalSpeed;
         isSlowed = false;
 
-        // 🔸 처치 집계 플래그 초기화 (오브젝트 풀 대비)
+        //  처치 집계 플래그 초기화 (오브젝트 풀 대비)
         hasCountedKill = false;
 
         isFrozen = false;          // 빙결 상태 해제
@@ -295,10 +306,37 @@ public class Enemy : MonoBehaviour
     {
         if (!isLive) return;
 
+        
+
         health -= damage;
         if (health <= 0f)
             Die();
+        
+        //피격시 컬러 변경
+         if (hitFlashRoutine != null)
+        StopCoroutine(hitFlashRoutine);
+
+        hitFlashRoutine = StartCoroutine(HitFlashOneFrame());
     }
+
+    private IEnumerator HitFlashOneFrame()
+{
+    if (skeletonAnimation == null || skeletonAnimation.Skeleton == null)
+        yield break;
+
+    Color flashColor = new Color(1f, 0.4f, 0.4f, 0.6f);
+    skeletonAnimation.Skeleton.SetColor(flashColor);
+    
+
+    //  1프레임만 유지
+    yield return new WaitForSecondsRealtime(0.05f);     
+
+    // 원래 색으로 복구
+    skeletonAnimation.Skeleton.SetColor(hitOriginalColor);
+
+    hitFlashRoutine = null;
+}
+
 
     /// <summary>
     /// 사망 처리 (애니메이션 트리거 + 처치 이벤트 + 비활성)

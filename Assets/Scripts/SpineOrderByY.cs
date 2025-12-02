@@ -3,14 +3,14 @@ using UnityEngine;
 [RequireComponent(typeof(Renderer))]
 public class SpineOrderByY : MonoBehaviour
 {
-    [Header("Y±âÁØ Á¤·Ä ¼³Á¤")]
-    [Tooltip("¾À ÀüÃ¼ÀÇ ±âÁØ ¿À´õ (±âº»°ª 0)")]
+    [Header("Yï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½")]
+    [Tooltip("ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½âº»ï¿½ï¿½ 0)")]
     public int baseOrder = 0;
 
-    [Tooltip("Y°ªÀ» SortingOrder·Î º¯È¯ÇÒ ¶§ÀÇ ½ºÄÉÀÏ")]
+    [Tooltip("Yï¿½ï¿½ï¿½ï¿½ SortingOrderï¿½ï¿½ ï¿½ï¿½È¯ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")]
     public int scale = 9;
 
-    [Tooltip("°íÁ¤ÇÒ Sorting Layer ÀÌ¸§ (ºñ¿öµÎ¸é ÇöÀç ·¹ÀÌ¾î À¯Áö)")]
+    [Tooltip("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Sorting Layer ï¿½Ì¸ï¿½ (ï¿½ï¿½ï¿½ï¿½Î¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½)")]
     public string sortingLayerName = "";
 
     private Renderer myRenderer;
@@ -24,11 +24,11 @@ public class SpineOrderByY : MonoBehaviour
     {
         if (!myRenderer) return;
 
-        // y°¡ ³·À»¼ö·Ï(¾Æ·¡ÂÊÀÏ¼ö·Ï) È­¸é ¾Õ¿¡ ¿À°Ô²û ºÎÈ£¸¦ -·Î
+        // yï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½Æ·ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½) È­ï¿½ï¿½ ï¿½Õ¿ï¿½ ï¿½ï¿½ï¿½Ô²ï¿½ ï¿½ï¿½È£ï¿½ï¿½ -ï¿½ï¿½
         int order = baseOrder - Mathf.RoundToInt(transform.position.y * scale);
         myRenderer.sortingOrder = order;
 
-        // ¼±ÅÃÀûÀ¸·Î Æ¯Á¤ Sorting Layer °íÁ¤
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Æ¯ï¿½ï¿½ Sorting Layer ï¿½ï¿½ï¿½ï¿½
         if (!string.IsNullOrEmpty(sortingLayerName))
             myRenderer.sortingLayerName = sortingLayerName;
     }
