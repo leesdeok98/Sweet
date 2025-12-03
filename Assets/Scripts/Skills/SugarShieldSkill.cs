@@ -81,7 +81,7 @@ public class SugarShieldSkill : MonoBehaviour
             activeShield1 = Instantiate(shieldPrefab1, transform.position, Quaternion.identity, transform);
             activeShield1.transform.localPosition = Vector3.zero;
 
-            // 여기에 적으면 될 거 같다 연화야 여기는 실드 생성 효과음 실드 1은 그냥 약해빠진 실드!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+           AudioManager.instance.PlaySfx(AudioManager.Sfx.SugarShield_Generate_SFX);
         }
     }
 
@@ -93,7 +93,7 @@ public class SugarShieldSkill : MonoBehaviour
             activeShield2 = Instantiate(shieldPrefab2, transform.position, Quaternion.identity, transform);
             activeShield2.transform.localPosition = Vector3.zero;
 
-            // 여기도 실드 효과음 넣어주면 될 거 같은데 실드2는 중첩된 거라 좀 더 강한 놈 얘가 두 번째로 생기는 애야 혹시 실드마다 소리 다를까봐 적었드아!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.SugarShield_Generate_SFX);
         }
     }
 
@@ -101,7 +101,6 @@ public class SugarShieldSkill : MonoBehaviour
     {
         if (activeShield2 != null)
         {
-            // 여기가 소모되는 부분이라 깨지는 효과음은 여기에 하면 되겠지!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!그럴거야아마두~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             Destroy(activeShield2);
             activeShield2 = null;
             Debug.Log($"[Shield 2] 소모! (Player 본체 충돌 흡수)");
@@ -110,7 +109,6 @@ public class SugarShieldSkill : MonoBehaviour
 
         if (activeShield1 != null)
         {
-            // 이하생략~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             Destroy(activeShield1);
             activeShield1 = null;
             Debug.Log($"[Shield 1] 소모! (Player 본체 충돌 흡수)");
@@ -127,6 +125,7 @@ public class SugarShieldSkill : MonoBehaviour
             Destroy(activeShield2);
             activeShield2 = null;
             Debug.Log($"[Shield 2] 소모! (Visual 직접 충돌)");
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.SugarShield_Deflect_SFX);
             return true;
         }
 
@@ -136,6 +135,7 @@ public class SugarShieldSkill : MonoBehaviour
             Destroy(activeShield1);
             activeShield1 = null;
             Debug.Log($"[Shield 1] 소모! (Visual 직접 충돌)");
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.SugarShield_Deflect_SFX);
             return true;
         }
 

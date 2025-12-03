@@ -53,10 +53,11 @@ public class HyperCandyRush : MonoBehaviour
         }
 
         // Spine 애니메이션 재생
-        if (skeleton != null)   // 여나야 여기다!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if (skeleton != null)  
         {
             skeleton.timeScale = spineTimeScale;
-            skeleton.AnimationState.SetAnimation(0, RushAnimation, false);   // 이게 스파인 한 번만 실행되게 해주는 코드야!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
+            skeleton.AnimationState.SetAnimation(0, RushAnimation, false);   
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.HyperCandyRush_SFX);
         }
 
         // HyperCandyRush의 핵심 로직 시작 (이동 기반 공격속도 체크)

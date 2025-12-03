@@ -386,7 +386,7 @@ public class Enemy : MonoBehaviour
     /// <summary>
     /// 사망 처리 (애니메이션 트리거 + 처치 이벤트 + 비활성)
     /// </summary>
-    void Die()
+    protected virtual void Die()
     {
         if (!isLive) return;
 

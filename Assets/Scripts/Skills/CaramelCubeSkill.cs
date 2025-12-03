@@ -46,6 +46,7 @@ public class CaramelCubeSkill : MonoBehaviour
         {
             GameObject visual = Instantiate(caramelCubePrefab, transform.position, Quaternion.identity, transform);
             visual.transform.localPosition = visualOffset;
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.CaramelCube_SFX);
 
             // 효과가 발생하기 시작할 때 사운드가 난다고 해서 프리팹 생기고 소리 나는게 가장 자연스러울 거 같아서 여기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         }

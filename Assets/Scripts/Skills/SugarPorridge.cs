@@ -90,6 +90,7 @@ public class PorridgeBulletSkill : MonoBehaviour
 
             skeletonAnimation.enabled = true;
             skeletonAnimation.AnimationState.SetAnimation(0, flyingAnimName, true);
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.SugarCraker_Fly_SFX);
         }
 
         // Rigidbody 활성화 및 이동 시작
@@ -147,6 +148,7 @@ public class PorridgeBulletSkill : MonoBehaviour
         {
             // 폭발 애니메이션 재생 (단발)
             var trackEntry = skeletonAnimation.AnimationState.SetAnimation(0, explosionAnimName, false);
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.SugarCracker_Explode_SFX);
             trackEntry.Complete += OnExplosionComplete;
         }
         else

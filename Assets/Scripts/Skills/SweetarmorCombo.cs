@@ -67,11 +67,12 @@ public class SweetarmorCombo : MonoBehaviour
         }
 
         // Spine 애니메이션 재생 (딱 한 번만 재생)
-        if (skeleton != null)   // 여나야 여기다 here 여기여!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if (skeleton != null)  
         {
             Debug.Log("[3] 스파인 애니메이션 재생 명령");
             skeleton.timeScale = spineTimeScale;
-            skeleton.AnimationState.SetAnimation(0, ShieldAnimation, false);    // 여나야 여기가 바로 그 스파인이 작동하는 코드야!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+            skeleton.AnimationState.SetAnimation(0, ShieldAnimation, false);
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.SweetArmorCombo_SFX);
         }
         else
         {

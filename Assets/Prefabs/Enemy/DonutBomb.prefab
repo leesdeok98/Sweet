@@ -96,10 +96,10 @@ GameObject:
   - component: {fileID: 3793058166392648831}
   - component: {fileID: 6793213950029584082}
   - component: {fileID: 6847054308366844302}
-  - component: {fileID: 3236266302322171655}
   - component: {fileID: 5183739252124656099}
   - component: {fileID: 8868313887707168508}
   - component: {fileID: 6700478800256728882}
+  - component: {fileID: 650588385912655895}
   m_Layer: 8
   m_Name: DonutBomb
   m_TagString: Enemy
@@ -217,40 +217,6 @@ MonoBehaviour:
   _animationName: move
   loop: 1
   timeScale: 1
---- !u!114 &3236266302322171655
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4844216729306248592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f78fec4eebf8a34c8820cb09ce6845a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  skeletonAnimation: {fileID: 6847054308366844302}
-  runAnimName: move
-  deadAnimName: dead
-  shadowRenderer: {fileID: 7573148291496957726}
-  separateRadius: 0.5
-  separateForce: 0.5
-  enemyLayerMask:
-    serializedVersion: 2
-    m_Bits: 256
-  speed: 0
-  health: 0
-  maxHealth: 0
-  dps: 0
-  target: {fileID: 0}
-  isSlowed: 0
-  knockbackDuration: 0.1
-  isKnockback: 0
-  isStunned: 0
-  isFrozen: 0
-  vec2: {x: 0, y: 0}
-  hitFlashDuration: 0.05
-  hitFlashCooldown: 0.5
 --- !u!50 &5183739252124656099
 Rigidbody2D:
   serializedVersion: 4
@@ -328,3 +294,44 @@ MonoBehaviour:
   baseOrder: 10
   scale: 9
   sortingLayerName: 
+--- !u!114 &650588385912655895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4844216729306248592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d68fc72d35f74449959b66508a16ebe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skeletonAnimation: {fileID: 6847054308366844302}
+  runAnimName: move
+  deadAnimName: dead
+  shadowRenderer: {fileID: 7573148291496957726}
+  separateRadius: 0.3
+  separateForce: 1.5
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  speed: 0
+  health: 0
+  maxHealth: 0
+  dps: 0
+  target: {fileID: 0}
+  isSlowed: 0
+  knockbackDuration: 0.1
+  isKnockback: 0
+  isStunned: 0
+  isFrozen: 0
+  vec2: {x: 0, y: 0}
+  hitFlashDuration: 0.05
+  hitFlashCooldown: 0.1
+  explosionRadius: 0.92
+  explosionDamage: 10
+  explosionDelay: 0.1
+  explosionAnimName: bomb
+  Player:
+    serializedVersion: 2
+    m_Bits: 128

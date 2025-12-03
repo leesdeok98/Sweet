@@ -70,7 +70,9 @@ public class Spawner : MonoBehaviour
         for (int i = 0; i < rule.spawnCount; i++)
         {
             GameObject enemy = GameManager.instance.pool.Get(rule.prefabIndex);
-            enemy.transform.position = spawnPoint[Random.Range(1, spawnPoint.Length)].position;
+            Vector3 basePosition = spawnPoint[Random.Range(1, spawnPoint.Length)].position;
+            Vector2 randomOffset = Random.insideUnitCircle * 1.5f;
+            enemy.transform.position = basePosition + (Vector3)randomOffset;
             enemy.GetComponent<Enemy>().Init(dataForEnemy);
         }
     }

@@ -49,8 +49,8 @@ public class SugarBombParty : MonoBehaviour
         if (skeleton != null)
         {
             skeleton.timeScale = spineTimeScale;
-            // 스파인 애니메이션 한 번만 재생 여나야 여기다!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             skeleton.AnimationState.SetAnimation(0, PartyAnimation, false);
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.SugarBombParty_SFX);
         }
 
         // PlayerShooting에 폭발 반경 증가 및 미니 폭죽 발사 활성화 요청
