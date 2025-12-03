@@ -7,31 +7,34 @@ public class Player : MonoBehaviour
 {
     public Vector2 inputVec;
     public float speed = 5f;
-    private float initialSpeed; // ì´ˆê¸° ì†ë„ ì €ì¥ (í•˜ì´í¼ìº”ë”” ëŸ¬ì‰¬ì—ì„œ ì‚¬ìš©)
+    private float initialSpeed; // ÃÊ±â ¼Óµµ ÀúÀå (ÇÏÀÌÆÛÄµµğ ·¯½¬¿¡¼­ »ç¿ë)
 
     private Rigidbody2D rigid;
+    
+    [SerializeField] private LayerMask enemyLayerMask;
+
    
     [SerializeField] private GameObject diepanel;
     [SerializeField] private DeathScreenCapture deathScreenCapture; 
     public StrawberryPopCoreSkill popCoreSkill;
     public SugarShieldSkill sugarShieldSkill;
 
-    //  Spine ê´€ë ¨ í•„ë“œ
+    //  Spine °ü·Ã ÇÊµå
     [Header("Spine")]
-    [SerializeField] private SkeletonAnimation skeletonAnim;   // í”Œë ˆì´ì–´ Spine ì»´í¬ë„ŒíŠ¸ (ì§ì ‘ í• ë‹¹ or ìì‹ì—ì„œ ìë™ íƒìƒ‰)
-    [SpineAnimation] public string idleAnimationName = "idle";  // ê°€ë§Œíˆ ìˆì„ ë•Œ
-    [SpineAnimation] public string walkAnimationName = "walk";  // ì´ë™ ì‹œ
-    [SpineAnimation] public string deadAnimationName = "dead";  // ì‚¬ë§ ì‹œ
+    [SerializeField] private SkeletonAnimation skeletonAnim;   // ÇÃ·¹ÀÌ¾î Spine ÄÄÆ÷³ÍÆ® (Á÷Á¢ ÇÒ´ç or ÀÚ½Ä¿¡¼­ ÀÚµ¿ Å½»ö)
+    [SpineAnimation] public string idleAnimationName = "idle";  // °¡¸¸È÷ ÀÖÀ» ¶§
+    [SpineAnimation] public string walkAnimationName = "walk";  // ÀÌµ¿ ½Ã
+    [SpineAnimation] public string deadAnimationName = "dead";  // »ç¸Á ½Ã
 
-    private string currentAnimationName = ""; //  í˜„ì¬ ì¬ìƒ ì¤‘ì¸ ì• ë‹ˆë©”ì´ì…˜ ì´ë¦„
-    private float spineInitialScaleX = 1f;    //  ì¢Œìš° ë°˜ì „ì„ ìœ„í•œ ê¸°ë³¸ ìŠ¤ì¼€ì¼
+    private string currentAnimationName = ""; //  ÇöÀç Àç»ı ÁßÀÎ ¾Ö´Ï¸ŞÀÌ¼Ç ÀÌ¸§
+    private float spineInitialScaleX = 1f;    //  ÁÂ¿ì ¹İÀüÀ» À§ÇÑ ±âº» ½ºÄÉÀÏ
 
     [Header("HP")]
     public float maxHealth = 100f;
     public float health = 100f;
     private bool isLive = true;
 
-    // ìŠ¤í‚¬ ë³´ìœ  ìƒíƒœ (ì¸ìŠ¤í™í„°ì—ì„œ ì²´í¬)
+    // ½ºÅ³ º¸À¯ »óÅÂ (ÀÎ½ºÆåÅÍ¿¡¼­ Ã¼Å©)
     [Header("has skill")]
     public bool hasIcedJellySkill = false;
     public bool hasDarkChip = false;
@@ -45,17 +48,17 @@ public class Player : MonoBehaviour
     public bool hasCaramelCube = false;
     public bool hasSugarShield = false;
     public bool hasSugarPorridge = false;
-    //ì¸ìŠ¤í™í„°ì—ì„œ ì²´í¬ëœ ìŠ¤í‚¬ë“¤ì„ í•œ ë²ˆë§Œ ì ìš©í•˜ê¸° ìœ„í•œ í”Œë˜ê·¸
+    //ÀÎ½ºÆåÅÍ¿¡¼­ Ã¼Å©µÈ ½ºÅ³µéÀ» ÇÑ ¹ø¸¸ Àû¿ëÇÏ±â À§ÇÑ ÇÃ·¡±×
     private bool startingSkillsApplied = false;
 
-    //ì„¸íŠ¸íš¨ê³¼ í™•ì¸ìš©
+    //¼¼Æ®È¿°ú È®ÀÎ¿ë
     [Header("has SetSkill")]
-    public bool hasHyperCandyRushActive = false; // HyperCandyRush ìƒíƒœ
-    public bool hasSugarBombPartyActive = false; // SugarBombParty ìƒíƒœ
+    public bool hasHyperCandyRushActive = false; // HyperCandyRush »óÅÂ
+    public bool hasSugarBombPartyActive = false; // SugarBombParty »óÅÂ
 
     [Header("Clear UI")]
     [SerializeField] private GameObject clearPanel;
-    private bool bossWasSpawned = false;             // ë³´ìŠ¤ë¥¼ í•œ ë²ˆì´ë¼ë„ ë³¸ ì  ìˆëŠ”ì§€
+    private bool bossWasSpawned = false;             // º¸½º¸¦ ÇÑ ¹øÀÌ¶óµµ º» Àû ÀÖ´ÂÁö
     private bool stageCleared = false;
 
 
@@ -64,42 +67,42 @@ public class Player : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>();
 
 
-        //  Spine SkeletonAnimation ìë™/ìˆ˜ë™ í• ë‹¹
+        //  Spine SkeletonAnimation ÀÚµ¿/¼öµ¿ ÇÒ´ç
         if (skeletonAnim == null)
             skeletonAnim = GetComponentInChildren<SkeletonAnimation>();
 
         if (skeletonAnim != null)
         {
             spineInitialScaleX = skeletonAnim.transform.localScale.x;
-            // ì‹œì‘ ì‹œ idle ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ
+            // ½ÃÀÛ ½Ã idle ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı
             PlaySpineAnimation(idleAnimationName, true);
         }
         else
         {
-            Debug.LogWarning("[Player] SkeletonAnimationì´ í• ë‹¹ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. Spine ì• ë‹ˆë©”ì´ì…˜ì´ ì¬ìƒë˜ì§€ ì•ŠìŠµë‹ˆë‹¤.");
+            Debug.LogWarning("[Player] SkeletonAnimationÀÌ ÇÒ´çµÇÁö ¾Ê¾Ò½À´Ï´Ù. Spine ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ Àç»ıµÇÁö ¾Ê½À´Ï´Ù.");
         }
 
         popCoreSkill = GetComponent<StrawberryPopCoreSkill>();
 
-        // í•­ìƒ í’€í”¼ë¡œ ì‹œì‘
+        // Ç×»ó Ç®ÇÇ·Î ½ÃÀÛ
         health = maxHealth;
         isLive = true;
 
         if (diepanel) diepanel.SetActive(false);
 
-        initialSpeed = speed; // ì´ˆê¸° ì†ë„ ì €ì¥ (ì´ê±° ì§€ìš°ì‹œë©´ ì•ˆë¼ìš” ì´ê±° ì§€ìš°ì‹œë©´ í•˜ì´í¼ìº”ë”” ëŸ¬ì‰¬ íš¨ê³¼ ì‹¤í–‰ëì„ ë•Œ ìºë¦­í„° ì•ˆ ì›€ì§ì—¬ìš”ì´ìœ ã… )
+        initialSpeed = speed; // ÃÊ±â ¼Óµµ ÀúÀå (ÀÌ°Å Áö¿ì½Ã¸é ¾ÈµÅ¿ä ÀÌ°Å Áö¿ì½Ã¸é ÇÏÀÌÆÛÄµµğ ·¯½¬ È¿°ú ½ÇÇàµÆÀ» ¶§ Ä³¸¯ÅÍ ¾È ¿òÁ÷¿©¿äÀÌÀ¯¤Ğ)
     }
 
     void OnEnable()
     {
-        // ì”¬ ì´ˆê¸°í™” ì‹œ ì´ë™
+        // ¾À ÃÊ±âÈ­ ½Ã ÀÌµ¿
         isLive = true;
         if (rigid) rigid.velocity = Vector2.zero;
 
-        // ì”¬ ì´ˆê¸°í™” ì‹œ ìŠ¤í‚¬ ì´ˆê¸°í™”
+        // ¾À ÃÊ±âÈ­ ½Ã ½ºÅ³ ÃÊ±âÈ­
         startingSkillsApplied = false;
 
-        //  ë‹¤ì‹œ í™œì„±í™”ë  ë•Œ idle ìƒíƒœë¡œ ì´ˆê¸°í™”
+        //  ´Ù½Ã È°¼ºÈ­µÉ ¶§ idle »óÅÂ·Î ÃÊ±âÈ­
         PlaySpineAnimation(idleAnimationName, true);
     }
 
@@ -109,14 +112,14 @@ public class Player : MonoBehaviour
 
         CheckBossStatus();
 
-        // ì´ë™ ì…ë ¥
+        // ÀÌµ¿ ÀÔ·Â
         inputVec.x = Input.GetAxisRaw("Horizontal");
         inputVec.y = Input.GetAxisRaw("Vertical");
 
-        // ì´ë™ëŸ‰ì— ë”°ë¼ idle / walk ì• ë‹ˆë©”ì´ì…˜ ì „í™˜
+        // ÀÌµ¿·®¿¡ µû¶ó idle / walk ¾Ö´Ï¸ŞÀÌ¼Ç ÀüÈ¯
         UpdateSpineAnimationByMove();
 
-        //ì¸ìŠ¤í™í„°ì—ì„œ ì²´í¬ëœ ìŠ¤í‚¬ë“¤ì„ ë³´ê³  ìŠ¤í‚¬ì„ í•œ ë²ˆë§Œ ì ìš©
+        //ÀÎ½ºÆåÅÍ¿¡¼­ Ã¼Å©µÈ ½ºÅ³µéÀ» º¸°í ½ºÅ³À» ÇÑ ¹ø¸¸ Àû¿ë
         TryApplyStartingSkills();
     }
 
@@ -134,7 +137,7 @@ public class Player : MonoBehaviour
 
         if (inputVec.x != 0)
         {
-            // ì¢Œìš° ì´ë™ ë°©í–¥ì— ë”°ë¼ Spine ìºë¦­í„° ì¢Œìš° ë°˜ì „
+            // ÁÂ¿ì ÀÌµ¿ ¹æÇâ¿¡ µû¶ó Spine Ä³¸¯ÅÍ ÁÂ¿ì ¹İÀü
             if (skeletonAnim != null)
             {
                 Transform t = skeletonAnim.transform;
@@ -146,18 +149,18 @@ public class Player : MonoBehaviour
         }
     }
 
-    /// ê²Œì„ ì‹œì‘/ë¶€í™œ í›„, ì¸ìŠ¤í™í„°ì—ì„œ ì²´í¬ëœ ìŠ¤í‚¬ë“¤ì„ SkillManagerì— í•œ ë²ˆë§Œ ì „ë‹¬
+    /// °ÔÀÓ ½ÃÀÛ/ºÎÈ° ÈÄ, ÀÎ½ºÆåÅÍ¿¡¼­ Ã¼Å©µÈ ½ºÅ³µéÀ» SkillManager¿¡ ÇÑ ¹ø¸¸ Àü´Ş
     void TryApplyStartingSkills()
     {
-        // ì´ë¯¸ í•œ ë²ˆ ì²˜ë¦¬í–ˆìœ¼ë©´ ë‹¤ì‹œ ì•ˆ í•¨
+        // ÀÌ¹Ì ÇÑ ¹ø Ã³¸®ÇßÀ¸¸é ´Ù½Ã ¾È ÇÔ
         if (startingSkillsApplied) return;
 
-        // SkillManagerê°€ ì•„ì§ ì¤€ë¹„ ì•ˆ ëìœ¼ë©´, ë‹¤ìŒ í”„ë ˆì„ì— ë‹¤ì‹œ ì‹œë„
+        // SkillManager°¡ ¾ÆÁ÷ ÁØºñ ¾È µÆÀ¸¸é, ´ÙÀ½ ÇÁ·¹ÀÓ¿¡ ´Ù½Ã ½Ãµµ
         if (SkillManager.Instance == null) return;
 
         var sm = SkillManager.Instance;
 
-        // â”€â”€â”€â”€â”€â”€â”€â”€â”€ ì¸ìŠ¤í™í„° bool â†’ SkillManager.ActivateSkill ë§¤í•‘ â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡ ÀÎ½ºÆåÅÍ bool ¡æ SkillManager.ActivateSkill ¸ÅÇÎ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
         if (hasIcedJellySkill) sm.ActivateSkill(ItemData.ItemType.IcedJelly);
         if (hasSugarShield) sm.ActivateSkill(ItemData.ItemType.SugarShield);
         if (hasRollingChocolateBar) sm.ActivateSkill(ItemData.ItemType.RollingChocolateBar);
@@ -166,15 +169,15 @@ public class Player : MonoBehaviour
         if (hasStrawberryPopCore) sm.ActivateSkill(ItemData.ItemType.StrawberryPopCore);
         if (hasCaramelCube) sm.ActivateSkill(ItemData.ItemType.CaramelCube);
 
-        // ğŸ”¥ ì—¬ê¸° ì„¸ ê°œê°€ â€œì•ˆ ë˜ë˜ ì• ë“¤â€ â†’ ì´ì œ ì‹œì‘ ì‹œì—ë„ ê°•ì œë¡œ ì‹¤í–‰
+        // ? ¿©±â ¼¼ °³°¡ ¡°¾È µÇ´ø ¾Öµé¡± ¡æ ÀÌÁ¦ ½ÃÀÛ ½Ã¿¡µµ °­Á¦·Î ½ÇÇà
         if (hasHoneySpin) sm.ActivateSkill(ItemData.ItemType.HoneySpin);
         if (hasSyrupTornado) sm.ActivateSkill(ItemData.ItemType.SyrupTornado);
         if (hasDarkChip) sm.ActivateSkill(ItemData.ItemType.DarkChip);
 
-        // â˜… ì¶”ê°€: ëˆˆê½ƒì‚¬íƒ• ìë™ ì ìš©
+        // ¡Ú Ãß°¡: ´«²É»çÅÁ ÀÚµ¿ Àû¿ë
         if (hasSnowflakeCandy) sm.ActivateSkill(ItemData.ItemType.SnowflakeCandy);
 
-        // í•œ ë²ˆ ì ìš© ì™„ë£Œ
+        // ÇÑ ¹ø Àû¿ë ¿Ï·á
         startingSkillsApplied = true;
     }
 
@@ -182,17 +185,17 @@ public class Player : MonoBehaviour
     {
         if (!isLive) return;
 
-        // ìŠˆê°€ ì‹¤ë“œ ì²´í¬ ë° ë°ë¯¸ì§€ í¡ìˆ˜ (ë³¸ì²´ ì¶©ëŒ)
-        if (hasSugarShield && sugarShieldSkill != null && sugarShieldSkill.CurrentShieldCount > 0)   // ëª¬ìŠ¤í„°ë‚˜ ì´ì•Œì´ í”Œë ˆì´ì–´ ë³¸ì²´ì— ì§ì ‘ ë‹¿ì•˜ì„ ë•Œ
+        // ½´°¡ ½Çµå Ã¼Å© ¹× µ¥¹ÌÁö Èí¼ö (º»Ã¼ Ãæµ¹)
+        if (hasSugarShield && sugarShieldSkill != null && sugarShieldSkill.CurrentShieldCount > 0)   // ¸ó½ºÅÍ³ª ÃÑ¾ËÀÌ ÇÃ·¹ÀÌ¾î º»Ã¼¿¡ Á÷Á¢ ´ê¾ÒÀ» ¶§
         {
-            // ì‹¤ë“œê°€ ìˆìœ¼ë©´ ì‹¤ë“œ 1ê°œ ì†Œëª¨ (ConsumeShieldByVisualì´ ì•„ë‹Œ ConsumeShield í˜¸ì¶œ)
+            // ½Çµå°¡ ÀÖÀ¸¸é ½Çµå 1°³ ¼Ò¸ğ (ConsumeShieldByVisualÀÌ ¾Æ´Ñ ConsumeShield È£Ãâ)
             bool shieldConsumed = sugarShieldSkill.ConsumeShield();
 
             if (shieldConsumed)
             {
-                Debug.Log($"ìŠˆê°€ ì‹¤ë“œê°€ ë°ë¯¸ì§€({damage:0.##})ë¥¼ ë§‰ì•˜ìŠµë‹ˆë‹¤. (ë³¸ì²´ ì¶©ëŒ)");
+                Debug.Log($"½´°¡ ½Çµå°¡ µ¥¹ÌÁö({damage:0.##})¸¦ ¸·¾Ò½À´Ï´Ù. (º»Ã¼ Ãæµ¹)");
 
-                // Health UI ê°•ì œ ì—…ë°ì´íŠ¸
+                // Health UI °­Á¦ ¾÷µ¥ÀÌÆ®
                 Health healthComponent = GetComponentInChildren<Health>();
                 if (healthComponent != null) healthComponent.ForceRefresh();
 
@@ -200,26 +203,53 @@ public class Player : MonoBehaviour
             }
         }
 
-        // ì‹¤ë“œê°€ ì—†ê±°ë‚˜ í¡ìˆ˜ì— ì‹¤íŒ¨í–ˆì„ ë•Œë§Œ í”Œë ˆì´ì–´ HP ê°ì†Œ (ê¸°ì¡´ì— ì‡ë˜ ì½”ë“œ)
+        // ½Çµå°¡ ¾ø°Å³ª Èí¼ö¿¡ ½ÇÆĞÇßÀ» ¶§¸¸ ÇÃ·¹ÀÌ¾î HP °¨¼Ò (±âÁ¸¿¡ ÀÕ´ø ÄÚµå)
 
         health -= damage;
 
-        // Health UI ì—…ë°ì´íŠ¸ 
+        // Health UI ¾÷µ¥ÀÌÆ® 
         Health healthComp = GetComponentInChildren<Health>();
         if (healthComp != null) healthComp.ForceRefresh();
 
-        Debug.Log($"[Player] í”¼í•´: {damage:0.##}, HP: {Mathf.Max(health, 0):0.##}/{maxHealth}");
+        Debug.Log($"[Player] ÇÇÇØ: {damage:0.##}, HP: {Mathf.Max(health, 0):0.##}/{maxHealth}");
 
         if (health <= 0f)
             Die();
     }
+
+    // ¹°¸® Ãæµ¹(Non-Trigger)·Î Àû°ú ´ê¾Æ ÀÖ´Â µ¿¾È Áö¼Ó ÇÇÇØ
+void OnCollisionStay2D(Collision2D collision)
+{
+    if (!isLive) return;
+
+    // 1) Ãæµ¹ÇÑ ¿ÀºêÁ§Æ®ÀÇ ·¹ÀÌ¾î °¡Á®¿À±â
+    int otherLayer = collision.collider.gameObject.layer;
+
+    // 2) enemyLayerMask ¾È¿¡ ÀÌ ·¹ÀÌ¾î°¡ Æ÷ÇÔµÇ¾î ÀÖÁö ¾ÊÀ¸¸é ¹Ù·Î ¸®ÅÏ
+    //    (enemyLayerMask.value ½áµµ µÇ°í, ±×³É enemyLayerMask ½áµµ µÊ)
+    if ((enemyLayerMask & (1 << otherLayer)) == 0)
+        return;
+
+    // 3) Enemy ÄÄÆ÷³ÍÆ® Ã£±â
+    Enemy enemy = collision.collider.GetComponent<Enemy>();
+    if (enemy == null) return;
+
+    // 4) dps(ÃÊ´ç µ¥¹ÌÁö) ¡¿ fixedDeltaTime = ÀÌ¹ø ¹°¸®ÇÁ·¹ÀÓ¿¡¼­ ¹Ş¾Æ¾ß ÇÒ µ¥¹ÌÁö
+    float dmg = enemy.dps * Time.fixedDeltaTime;
+
+    if (dmg > 0f)
+    {
+        TakeDamage(dmg);
+    }
+}
+
 
 
     public void Heal(float amount)
     {
         if (!isLive) return;
         health = Mathf.Clamp(health + amount, 0f, maxHealth);
-        Debug.Log($"[Player] íšŒë³µ: {amount:0.##}, HP: {health:0.##}");
+        Debug.Log($"[Player] È¸º¹: {amount:0.##}, HP: {health:0.##}");
     }
 
     void Die()
@@ -229,68 +259,58 @@ public class Player : MonoBehaviour
         isLive = false;
         if (rigid != null) rigid.velocity = Vector2.zero;
 
-        //  ì½”ë£¨í‹´ìœ¼ë¡œ ì‚¬ë§ ì—°ì¶œ ì²˜ë¦¬
+        //  ÄÚ·çÆ¾À¸·Î »ç¸Á ¿¬Ãâ Ã³¸®
         StartCoroutine(DieRoutine());
     }
 
-    //  ì£½ìŒ ì• ë‹ˆë©”ì´ì…˜ â†’ ëŒ€ê¸° â†’ íŒ¨ë„ â†’ ê²Œì„ ì •ì§€
+    //  Á×À½ ¾Ö´Ï¸ŞÀÌ¼Ç ¡æ ´ë±â ¡æ ÆĞ³Î ¡æ °ÔÀÓ Á¤Áö
     private IEnumerator DieRoutine()
     {
-        // 1) ì‚¬ë§ ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ
+        // 1) »ç¸Á ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı
         PlaySpineAnimation(deadAnimationName, false);
 
-        // 2) ì• ë‹ˆë©”ì´ì…˜ ê¸¸ì´ë§Œí¼ ê¸°ë‹¤ë¦¬ê¸°
-        float waitTime = 10f; // ê¸°ë³¸ê°’(í˜¹ì‹œ ëª» ì°¾ì„ ë•Œ ëŒ€ë¹„)
+        // 2) ¾Ö´Ï¸ŞÀÌ¼Ç ±æÀÌ¸¸Å­ ±â´Ù¸®±â
+        float waitTime = 10f; // ±âº»°ª(È¤½Ã ¸ø Ã£À» ¶§ ´ëºñ)
         if (skeletonAnim != null && !string.IsNullOrEmpty(deadAnimationName))
         {
             var anim = skeletonAnim.Skeleton.Data.FindAnimation(deadAnimationName);
             if (anim != null)
             {
-                waitTime = anim.Duration; // ìŠ¤íŒŒì¸ ì• ë‹ˆë©”ì´ì…˜ ì‹¤ì œ ê¸¸ì´
+                waitTime = anim.Duration; // ½ºÆÄÀÎ ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÁ¦ ±æÀÌ
             }
         }
 
-        // í•„ìš”í•˜ë©´ ì‚´ì§ ì—¬ìœ ë¥¼ ë” ì¤„ ìˆ˜ë„ ìˆìŒ (ex: +0.2f)
+        // ÇÊ¿äÇÏ¸é »ìÂ¦ ¿©À¯¸¦ ´õ ÁÙ ¼öµµ ÀÖÀ½ (ex: +0.2f)
         yield return new WaitForSeconds(waitTime);
 
-        // 3) í™”ë©´ ìº¡ì³ + ì‚¬ë§ íŒ¨ë„ ë„ìš°ê¸°
+        // 3) È­¸é Ä¸ÃÄ + »ç¸Á ÆĞ³Î ¶ç¿ì±â
         if (deathScreenCapture != null)
         {
             deathScreenCapture.ShowDeathScreen();
         }
         else
         {
-            Debug.LogWarning("[Player] DeathScreenCapture ì°¸ì¡°ê°€ ë¹„ì—ˆìŠµë‹ˆë‹¤.");
+            Debug.LogWarning("[Player] DeathScreenCapture ÂüÁ¶°¡ ºñ¾ú½À´Ï´Ù.");
             if (diepanel)
                 diepanel.SetActive(true);
         }
 
-        // 4) GameOver ì²˜ë¦¬
+        // 4) GameOver Ã³¸®
         if (GameManager.instance != null)
             GameManager.instance.GameOver();
         else
-            Debug.LogError("[Player] GameManager.instanceê°€ nullì…ë‹ˆë‹¤.");
+            Debug.LogError("[Player] GameManager.instance°¡ nullÀÔ´Ï´Ù.");
 
-        // 5) ë§ˆì§€ë§‰ì— ê²Œì„ ì¼ì‹œì •ì§€
+        // 5) ¸¶Áö¸·¿¡ °ÔÀÓ ÀÏ½ÃÁ¤Áö
         Time.timeScale = 0f;
     }
 
 
 
-    // ë¬¼ë¦¬ ì¶©ëŒë¡œ ì§€ì† í”¼í•´ë¥¼ ë°›ëŠ” ê²½ìš°(Non-Trigger)
-    void OnCollisionStay2D(Collision2D collision)
-    {
-        if (!isLive) return;
-        if (!collision.collider.CompareTag("Enemy")) return;
+    
+   
 
-        Enemy enemy = collision.collider.GetComponent<Enemy>();
-        if (enemy == null) return;
-
-        float dmg = enemy.dps * Time.fixedDeltaTime;
-        if (dmg > 0f) TakeDamage(dmg);
-    }
-
-    // ì¬ì‹œì‘/ë¶€í™œ ì‹œ í˜¸ì¶œí•˜ë©´ ì²´ë ¥/ìƒíƒœ ì´ˆê¸°í™”(ì”¬ ë¦¬ë¡œë“œ ì—†ì´ë„ ì‚¬ìš© ê°€ëŠ¥)
+    // Àç½ÃÀÛ/ºÎÈ° ½Ã È£ÃâÇÏ¸é Ã¼·Â/»óÅÂ ÃÊ±âÈ­(¾À ¸®·Îµå ¾øÀÌµµ »ç¿ë °¡´É)
     public void ResetForRetry()
     {
         health = maxHealth;
@@ -301,16 +321,16 @@ public class Player : MonoBehaviour
 
         startingSkillsApplied = false;
 
-        // ë¶€í™œ ì‹œ idle ì• ë‹ˆë©”ì´ì…˜ìœ¼ë¡œ ëŒì•„ê°€ê¸°
+        // ºÎÈ° ½Ã idle ¾Ö´Ï¸ŞÀÌ¼ÇÀ¸·Î µ¹¾Æ°¡±â
         PlaySpineAnimation(idleAnimationName, true);
     }
 
-    // ì”¬ì´ ë°”ë€” ë•Œ ìƒˆ ì‚¬ë§ íŒ¨ë„ì„ ë‹¤ì‹œ ì—°ê²°í•˜ê¸° ìœ„í•œ ì„¸í„°
+    // ¾ÀÀÌ ¹Ù²ğ ¶§ »õ »ç¸Á ÆĞ³ÎÀ» ´Ù½Ã ¿¬°áÇÏ±â À§ÇÑ ¼¼ÅÍ
     public void SetDiePanel(GameObject panel)
     {
         diepanel = panel;
         if (diepanel != null)
-            diepanel.SetActive(false);  // ê¸°ë³¸ì€ êº¼ì§„ ìƒíƒœ
+            diepanel.SetActive(false);  // ±âº»Àº ²¨Áø »óÅÂ
     }
 
 
@@ -318,7 +338,7 @@ public class Player : MonoBehaviour
     {
         if (skeletonAnim == null) return;
 
-        // ì£½ì—ˆìœ¼ë©´ ì—¬ê¸°ì„œëŠ” ìƒíƒœë¥¼ ê±´ë“œë¦¬ì§€ ì•Šê³  Die()ì—ì„œ deadë¥¼ ì¬ìƒ
+        // Á×¾úÀ¸¸é ¿©±â¼­´Â »óÅÂ¸¦ °Çµå¸®Áö ¾Ê°í Die()¿¡¼­ dead¸¦ Àç»ı
         if (!isLive) return;
 
         string nextAnim;
@@ -328,7 +348,7 @@ public class Player : MonoBehaviour
         else
             nextAnim = idleAnimationName;
 
-        if (currentAnimationName == nextAnim) return; // ì• ë‹ˆ ì¤‘ë³µ ë°©ì§€
+        if (currentAnimationName == nextAnim) return; // ¾Ö´Ï Áßº¹ ¹æÁö
 
         bool loop = nextAnim != deadAnimationName;
         PlaySpineAnimation(nextAnim, loop);
@@ -336,14 +356,14 @@ public class Player : MonoBehaviour
 
     public void ActivateHyperCandyRush(bool activate)
     {
-        if (hasHyperCandyRushActive == activate) return; // ìƒíƒœ ë³€í™” ì—†ì„ ì‹œ ì¤‘ë‹¨
+        if (hasHyperCandyRushActive == activate) return; // »óÅÂ º¯È­ ¾øÀ» ½Ã Áß´Ü
 
         hasHyperCandyRushActive = activate;
 
-        // ì´ë™ ì†ë„ 30% ì¦ê°€ ì ìš©/ë³µì›
+        // ÀÌµ¿ ¼Óµµ 30% Áõ°¡ Àû¿ë/º¹¿ø
         speed = activate ? (initialSpeed * 1.30f) : initialSpeed;
 
-        Debug.Log($"[HyperCandyRush] í™œì„±í™”: ì´ë™ ì†ë„ {initialSpeed:0.##} -> {speed:0.##}");
+        Debug.Log($"[HyperCandyRush] È°¼ºÈ­: ÀÌµ¿ ¼Óµµ {initialSpeed:0.##} -> {speed:0.##}");
 
         PlayerShooting shooting = GetComponent<PlayerShooting>();
         if (shooting != null)
@@ -365,7 +385,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    /// Spine ì• ë‹ˆë©”ì´ì…˜ì„ ì¬ìƒí•˜ëŠ” ê³µí†µ í•¨ìˆ˜.
+    /// Spine ¾Ö´Ï¸ŞÀÌ¼ÇÀ» Àç»ıÇÏ´Â °øÅë ÇÔ¼ö.
 
     void PlaySpineAnimation(string animName, bool loop)
     {
@@ -376,21 +396,21 @@ public class Player : MonoBehaviour
         skeletonAnim.AnimationState.SetAnimation(0, animName, loop);
     }
 
-    //ë³´ìŠ¤ ì²´í¬ í›„ ì²˜ë¦¬ ì‹œ í´ë¦¬ì–´ ì½”ë£¨í‹´ ì‹¤í–‰
+    //º¸½º Ã¼Å© ÈÄ Ã³¸® ½Ã Å¬¸®¾î ÄÚ·çÆ¾ ½ÇÇà
     private void CheckBossStatus()
     {
-        if (stageCleared) return;   // ì´ë¯¸ í´ë¦¬ì–´ ì²˜ë¦¬í–ˆìœ¼ë©´ ë” ì´ìƒ ì²´í¬ ì•ˆ í•¨
+        if (stageCleared) return;   // ÀÌ¹Ì Å¬¸®¾î Ã³¸®ÇßÀ¸¸é ´õ ÀÌ»ó Ã¼Å© ¾È ÇÔ
 
         GameObject boss = GameObject.FindGameObjectWithTag("Boss");
 
-        // 1) ë³´ìŠ¤ë¥¼ ì²˜ìŒ ë°œê²¬í•œ ê²½ìš°
+        // 1) º¸½º¸¦ Ã³À½ ¹ß°ßÇÑ °æ¿ì
         if (boss != null && boss.activeInHierarchy)
         {
             bossWasSpawned = true;
             return;
         }
 
-        // 2) ë³´ìŠ¤ë¥¼ ë³¸ ì ì´ ìˆê³ , ì´ì œëŠ” ë³´ìŠ¤ê°€ ì”¬ì— ì—†ê±°ë‚˜ ë¹„í™œì„±í™”ëœ ê²½ìš°
+        // 2) º¸½º¸¦ º» ÀûÀÌ ÀÖ°í, ÀÌÁ¦´Â º¸½º°¡ ¾À¿¡ ¾ø°Å³ª ºñÈ°¼ºÈ­µÈ °æ¿ì
         if (bossWasSpawned && (boss == null || !boss.activeInHierarchy))
         {
             stageCleared = true;
@@ -398,10 +418,10 @@ public class Player : MonoBehaviour
         }
     }
 
-    //  ì‹¤ì œë¡œ í´ë¦¬ì–´ íŒ¨ë„ì„ ì—¬ëŠ” ì½”ë£¨í‹´
+    //  ½ÇÁ¦·Î Å¬¸®¾î ÆĞ³ÎÀ» ¿©´Â ÄÚ·çÆ¾
     private System.Collections.IEnumerator ShowClearPanelAfterDelay()
     {
-        //ë³´ìŠ¤ê°€ DIE ë§¤ì„œë“œ ì‹¤í–‰ í›„ 3ì´ˆ í›„ì— í´ë¦¬ì–´ íŒ¨ë„ ì—´ê¸°
+        //º¸½º°¡ DIE ¸Å¼­µå ½ÇÇà ÈÄ 3ÃÊ ÈÄ¿¡ Å¬¸®¾î ÆĞ³Î ¿­±â
         yield return new WaitForSeconds(2f);
 
         if (clearPanel != null)
@@ -410,11 +430,12 @@ public class Player : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[Player] ClearPanelì´ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
+            Debug.LogWarning("[Player] ClearPanelÀÌ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
         }
 
-        // ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´ ì‹œì—ë„ ê²Œì„ ì •ì§€
+        // ½ºÅ×ÀÌÁö Å¬¸®¾î ½Ã¿¡µµ °ÔÀÓ Á¤Áö
         Time.timeScale = 0f;
     }
 
 }
+

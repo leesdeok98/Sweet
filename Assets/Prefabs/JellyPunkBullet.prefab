@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1075035263817978083}
   - component: {fileID: 2805020543278349504}
   - component: {fileID: 1804182473348439915}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: JellyPunkBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}

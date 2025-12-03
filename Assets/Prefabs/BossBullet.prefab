@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: -9090930381184054895}
   - component: {fileID: 7258841677086086445}
   - component: {fileID: 5988412257868528231}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BossBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
