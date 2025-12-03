@@ -14,11 +14,18 @@ public class PlayerShooting : MonoBehaviour
     private float hcrMovingAttackSpeedIncrease = 0f;     // 이동 시 누적 공격증가 (최대 30%)
 
     [Header("Sugar Porridge Skill")]
-    [Tooltip("설탕 폭죽 발사체 프리팹 (PorridgeBulletSkill 스크립트가 붙어 있어야 함)")]
     public GameObject porridgeBulletPrefab;
     public float porridgeDamage = 12f;      // 폭죽의 기본 데미지
     public float porridgeRadius = 4.96f;     // 폭죽의 폭발 반경
+    private float initialPorridgeRadius;
     public float porridgeFlightTime = 1.0f; // 폭죽의 최대 비행 시간 (사거리)
+
+    [Header("SugarBombParty")]
+    bool sugarBombPartyEnabled = false;
+    public GameObject miniFireworkPrefab; // 미니 폭죽 프리팹
+    private const float MINI_FIREWORK_DAMAGE = 6f;
+    private const float MINI_FIREWORK_RADIUS = 0.3f;
+    private const float MINI_FIREWORK_PROBABILITY = 0.30f; // 미니 폭죽 발사 확률
 
     private float nextFireTime = 0f;
 
@@ -34,42 +41,57 @@ public class PlayerShooting : MonoBehaviour
         }
 
         initialFireRate = fireRate;
+        initialPorridgeRadius = porridgeRadius;
     }
 
     // PlayerShooting.cs (Update 함수 수정)
 
     void Update()
     {
-        if (Time.time >= nextFireTime)
+        // 1. 쿨타임 체크: 발사 시간이 되지 않았으면 함수 종료
+        if (Time.time < nextFireTime)
         {
-            bool shotPorridge = false;
+            return;
+        }
 
-            // 1. 설탕 폭죽 발사: 아이템을 갖고 있을 때만, 25% 확률로
-            if (player != null && player.hasSugarPorridge && porridgeBulletPrefab != null)
-            {
-                if (Random.Range(0f, 1f) < 0.25f)
-                {
-                    ShootPorridgeBullet();
-                    shotPorridge = true;
-                }
-            }
+        // 2. 다음 쿨타임 설정: 발사 시간이 되었으므로, 다음 쿨타임을 먼저 계산하여 설정합니다.
+        if (player != null && player.hasHyperCandyRushActive)
+        {
+            nextFireTime = Time.time + GetCurrentFireCoolDown();
+        }
+        else
+        {
+            nextFireTime = Time.time + fireRate;
+        }
 
-            // 2. 폭죽이 발사되지 않았을 때만 일반 총알 발사
-            if (!shotPorridge)
+        // 3. 설탕 폭죽 발사: 아이템을 갖고 있을 때만, 25% 확률로
+        if (player != null && player.hasSugarPorridge && porridgeBulletPrefab != null)
+        {
+            if (Random.Range(0f, 1f) < 0.25f)
             {
-                Shoot();
-            }
-
-            // 3. 쿨타임 갱신
-            if (player != null && player.hasHyperCandyRushActive)
-            {
-                nextFireTime = Time.time + GetCurrentFireCoolDown();
-            }
-            else
-            {
-                nextFireTime = Time.time + fireRate;
+                ShootPorridgeBullet();
+                return; // 설탕 폭죽이 발사되었으므로, 일반 총알 발사를 막기 위해 함수 종료
             }
         }
+
+        // 4. 슈가 밤 파티의 미니 폭죽
+        if (sugarBombPartyEnabled && player.hasSugarBombParty && miniFireworkPrefab != null)
+        {
+            if (Random.Range(0f, 1f) < MINI_FIREWORK_PROBABILITY)
+            {
+                float miniRadius = MINI_FIREWORK_RADIUS;
+
+                ShootMiniPorridgeBullet(miniFireworkPrefab, miniRadius, (int)MINI_FIREWORK_DAMAGE);
+
+                // 미니 폭죽이 발사되었으므로, 일반 총알 발사를 막기 위해 함수 종료
+                return;
+            }
+        }
+
+        // 5. 기본 총알 발사 (폭죽들이 발사되지 않았을 때만 실행)
+        Shoot();
+
+
     }
 
 
@@ -171,5 +193,49 @@ public class PlayerShooting : MonoBehaviour
         hcrMovingAttackSpeedIncrease = Mathf.Clamp(increase, 0f, 0.30f);
 
         // Debug.Log($"[HyperCandyRush] 이동 누적 공속: {(hcrMovingAttackSpeedIncrease * 100):0.##}%");
+    }
+
+    public void ShootMiniPorridgeBullet(GameObject prefab, float radius, int damage)
+    {
+        if (prefab == null) return;
+
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePos.z = firePoint.position.z;
+        Vector2 direction = ((Vector2)(mousePos - firePoint.position)).normalized;
+
+        GameObject bulletGO = Instantiate(prefab, firePoint.position, Quaternion.identity);
+
+        PorridgeBulletSkill porridgeSkill = bulletGO.GetComponent<PorridgeBulletSkill>();
+
+        if (porridgeSkill != null)
+        {
+            // 미니 폭죽 초기화
+            porridgeSkill.Initialize(radius, damage, bulletSpeed, porridgeFlightTime, direction);
+        }
+        else
+        {
+            Debug.LogError("PorridgeBulletSkill component not found on the Porridge Bullet Prefab!");
+            Destroy(bulletGO);
+        }
+    }
+
+    public void ActivateSugarBombParty(bool activate)
+    {
+        if (sugarBombPartyEnabled == activate) return;
+
+        sugarBombPartyEnabled = activate;
+
+        if (activate)
+        {
+            // 폭죽 반경 30% 증가 적용
+            porridgeRadius = initialPorridgeRadius * 1.30f;
+            Debug.Log($"[SugarBombParty] 설탕 폭죽 반경 30% 증가 적용: {initialPorridgeRadius:0.##} -> {porridgeRadius:0.##}");
+        }
+        else
+        {
+            // 초기값으로 복원
+            porridgeRadius = initialPorridgeRadius;
+            Debug.Log($"[SugarBombParty] 설탕 폭죽 반경 복원: {porridgeRadius:0.##}");
+        }
     }
 }

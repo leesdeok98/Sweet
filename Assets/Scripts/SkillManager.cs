@@ -145,6 +145,11 @@ public class SkillManager : MonoBehaviour
     public GameObject sweetarmorComboVisualPrefab;
     private SweetarmorCombo sweetarmorComboComponent;
 
+    [Header("슈가 밤 파티 설정")]
+    public GameObject sugarBombPartySpinePrefab;
+    public Vector3 sugarBombPartyLocalOffset = Vector3.zero;
+    private SugarBombParty sugarBombPartyComponent;
+
 
     // 다른 스크립트에서 세트 발동 여부 확인용 (읽기 전용)
     public bool IsTwistOrTreatActive => twistOrTreatActive;
@@ -175,6 +180,7 @@ public class SkillManager : MonoBehaviour
     private bool icebreakerActive = false;     //아이스 브레이커
     private bool hasHyperCandyRushActive = false; //하이퍼 캔디 러쉬
     private bool hasSweetarmorComboActive = false; //스윗아머 콤보
+    private bool isSugarBombPartyActive = false; //슈가밤 파티
 
 
     //세트효과 애니메이션 중복 방지용
@@ -341,6 +347,7 @@ public class SkillManager : MonoBehaviour
         CheckTwistOrTreatSet(); //SyrupTornado + HoneySpin + RollingChocolateBar 세트 체크
         CheckHyperCandyRushSet(); // HoneySpin + StrawberryPopCore + SugarPorridge 세트 체크
         CheckSweetarmorCombo(); // SugarShield + CaramelCube + CocoaPowder 세트 체크
+        CheckSugarBombParty(); //PoppingCandy + StrawberryPopCore + SugarPorridge 세트 체크
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -531,6 +538,55 @@ public class SkillManager : MonoBehaviour
 
         // 컴포넌트의 활성화 함수를 명시적으로 호출하여 로직 시작
         sweetarmorComboComponent.ActivateComboEffect();
+    }
+
+    public void CheckSugarBombParty()
+    {
+        if (player == null) return;
+
+        if (player.hasPoppingCandy && player.hasStrawberryPopCore && player.hasSugarPorridge)
+        {
+            if (!isSugarBombPartyActive) // 아직 활성화되지 않았을 때만
+            {
+                ApplySugarBombPartySet();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 슈가밤 파티 세트 효과를 플레이어에게 적용하고 코루틴을 시작합니다.
+    /// </summary>
+    private void ApplySugarBombPartySet()
+    {
+        if (player.hasSugarBombParty) return;
+
+        player.hasSugarBombParty = true;
+
+        // 플레이어 오브젝트에 SugarBombParty 스크립트 추가
+        sugarBombPartyComponent = player.gameObject.AddComponent<SugarBombParty>();
+
+        if (sugarBombPartySpinePrefab != null)
+        {
+            sugarBombPartyComponent.comboVisualPrefab = sugarBombPartySpinePrefab;
+            // 필요하다면 오프셋도 전달
+            // sugarBombPartyComponent.visualLocalOffset = sugarBombPartyLocalOffset;
+        }
+        else
+        {
+            // 프리팹이 할당되지 않은 경우 경고
+            Debug.LogWarning("[SkillManager] sugarBombPartySpinePrefab이 SkillManager에 할당되지 않았습니다. 비주얼이 나오지 않습니다.");
+        }
+
+        if (player != null)
+        {
+            player.StartSugarBombPartyActivation(sugarBombPartyComponent);
+        }
+        else
+        {
+            Debug.LogError("Player 참조가 null입니다. SugarBombParty 코루틴을 시작할 수 없습니다.");
+        }
+
+        Debug.Log("[SugarBombParty] 컴포넌트 추가 및 활성화 예약됨.");
     }
 
     void CheckHyperCandyRushSet()

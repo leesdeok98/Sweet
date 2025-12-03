@@ -54,7 +54,7 @@ public class Player : MonoBehaviour
     //세트효과 확인용
     [Header("has SetSkill")]
     public bool hasHyperCandyRushActive = false; // HyperCandyRush 상태
-    public bool hasSugarBombPartyActive = false; // SugarBombParty 상태
+    public bool hasSugarBombParty = false; // SugarBombParty 상태
 
     [Header("Clear UI")]
     [SerializeField] private GameObject clearPanel;
@@ -382,6 +382,26 @@ void OnCollisionStay2D(Collision2D collision)
             {
                 hcrComponent.StopMovementCheck();
             }
+        }
+    }
+
+    public void StartSugarBombPartyActivation(SugarBombParty sbpComponent)
+    {
+        // 이미 죽었거나 컴포넌트가 할당되어잇지 않으면 실행 X
+        if (!isLive || sbpComponent == null) return;
+        
+        StartCoroutine(ActivateSugarBombPartyNextFrame(sbpComponent));
+    }
+
+    private IEnumerator ActivateSugarBombPartyNextFrame(SugarBombParty sbp)
+    {
+        // 1 프레임 대기 (Spine 애니메이션 및 초기화 충돌 방지)
+        yield return null;
+
+        if (sbp != null)
+        {
+            // SugarBombParty.cs의 ActivateSetEffect 호출
+            sbp.ActivateSetEffect();
         }
     }
 

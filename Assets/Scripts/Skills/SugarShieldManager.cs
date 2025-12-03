@@ -34,7 +34,7 @@ public class SugarShieldManager : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        // 태그 확인 → 레이어 확인으로 변경
+        // 태그 확인 -> 레이어 확인으로 변경
         if (other.gameObject.layer == enemyLayer)
         {
             if (skillManager != null)

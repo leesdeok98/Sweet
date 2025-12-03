@@ -105,7 +105,7 @@ public class SweetarmorCombo : MonoBehaviour
     private void TryAutoCastShield()
     {
         //  실드 자동 발동 로직
-        if (shieldSkill != null && shieldSkill.CurrentShieldCount < 2)
+        if (shieldSkill != null && shieldSkill.CurrentShieldCount < 2 && player.hasCaramelCube && player.hasCocoaPowder && player.hasSugarShield)
         {
             Debug.Log("SweetarmorCombo: 체력 30 이하, 업그레이드 실드 자동 발동!");
 

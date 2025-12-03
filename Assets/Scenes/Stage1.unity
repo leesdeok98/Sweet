@@ -14988,6 +14988,7 @@ GameObject:
   - component: {fileID: 1429503039}
   - component: {fileID: 1429503046}
   - component: {fileID: 1429503048}
+  - component: {fileID: 1429503050}
   - component: {fileID: 1429503049}
   - component: {fileID: 1429503047}
   - component: {fileID: 1429503038}
@@ -15180,6 +15181,7 @@ MonoBehaviour:
   porridgeDamage: 12
   porridgeRadius: 4
   porridgeFlightTime: 0.625
+  miniFireworkPrefab: {fileID: 551257858881647464, guid: 51f94d363ca2df9409a670e74fc3fe11, type: 3}
 --- !u!114 &1429503044
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15210,17 +15212,17 @@ MonoBehaviour:
   hasIcedJellySkill: 0
   hasDarkChip: 0
   hasRollingChocolateBar: 0
-  hasPoppingCandy: 0
+  hasPoppingCandy: 1
   hasSyrupTornado: 0
   hasCocoaPowder: 0
-  hasStrawberryPopCore: 0
+  hasStrawberryPopCore: 1
   hasHoneySpin: 0
   hasSnowflakeCandy: 0
   hasCaramelCube: 0
   hasSugarShield: 0
-  hasSugarPorridge: 0
+  hasSugarPorridge: 1
   hasHyperCandyRushActive: 0
-  hasSugarBombPartyActive: 0
+  hasSugarBombParty: 0
   clearPanel: {fileID: 1005356874}
 --- !u!70 &1429503045
 CapsuleCollider2D:
@@ -15321,6 +15323,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   comboVisualPrefab: {fileID: 7538336886891332679, guid: 3ccee298e04ca6f45ba7a9ddd7b22f52, type: 3}
   RushAnimation: animation
+  spineTimeScale: 1
+--- !u!114 &1429503050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429503034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a10cda2d782f1d41a26e9ea08e0e29a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  comboVisualPrefab: {fileID: 1753177350405735749, guid: cf5fdbea2310cc64c8ea5e7c2bc73223, type: 3}
+  PartyAnimation: animation
   spineTimeScale: 1
 --- !u!1 &1432312277
 GameObject:
@@ -21102,6 +21119,8 @@ MonoBehaviour:
   hyperCandyRushAnimLoop: 0
   hyperCandyRushLocalOffset: {x: 0, y: 0, z: 0}
   sweetarmorComboVisualPrefab: {fileID: 4997950841977934739, guid: e4b6c6e6c91e94b4aaa703b8daefc791, type: 3}
+  sugarBombPartySpinePrefab: {fileID: 1753177350405735749, guid: cf5fdbea2310cc64c8ea5e7c2bc73223, type: 3}
+  sugarBombPartyLocalOffset: {x: 0, y: 0, z: 0}
   icebreakerSlowPercent: 0.1
   icebreakerBonusDamage: 5
 --- !u!1 &2047834936
