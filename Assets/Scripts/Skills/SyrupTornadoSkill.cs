@@ -2,6 +2,7 @@
 using UnityEngine;
 using Spine.Unity;
 using System.Xml.Serialization;
+using Spine;
 
 [RequireComponent(typeof(CircleCollider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
@@ -34,6 +35,11 @@ public class SyrupTornadoSkill : MonoBehaviour
     [Tooltip("고정 틱 간격(초)")]
     public float tickInterval = 0.2f;
 
+    [Header("Visual Offset")]
+    [Tooltip("플레이어 기준으로 애니메이션 이미지를 얼마나 옮길지 (기본: Y -0.04)")]
+    public Vector2 imageOffset = new Vector2(0f, -0.04f);
+
+
     private CircleCollider2D circle;
     private Rigidbody2D rb2d;
     private SkeletonAnimation skeleton;
@@ -44,6 +50,8 @@ public class SyrupTornadoSkill : MonoBehaviour
 
     private float lastSoundTime;
     private float SoundCooldown = 0.1f;
+
+
 
     void Awake()
     {
@@ -56,10 +64,10 @@ public class SyrupTornadoSkill : MonoBehaviour
         {
             circle.isTrigger = true;
             circle.radius = Mathf.Max(0.01f, radius);
-            circle.offset = colliderOffset;   // ✅ 오프셋 적용
+            circle.offset = colliderOffset;
         }
 
-        rb2d.isKinematic = true;   // 트리거 이벤트용
+        rb2d.isKinematic = true;
         rb2d.gravityScale = 0f;
 
         // Spine 루프 재생
@@ -67,10 +75,15 @@ public class SyrupTornadoSkill : MonoBehaviour
         {
             skeleton.Initialize(true);
             skeleton.timeScale = timeScale;
+
             if (!string.IsNullOrEmpty(loopAnimation))
                 skeleton.AnimationState.SetAnimation(0, loopAnimation, true);
+
+            // 🔹 애니메이션 적용 이후에 항상 위치를 덮어쓰기 위해 이벤트 등록
+            skeleton.UpdateLocal += OnSpineUpdateLocal;
         }
     }
+
 
     void OnValidate()
     {
@@ -143,6 +156,24 @@ public class SyrupTornadoSkill : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// Spine 애니메이션이 뼈대를 업데이트한 직후 호출됨.
+    /// 여기서 RootBone 위치를 강제로 imageOffset으로 맞춰준다.
+    /// </summary>
+    private void OnSpineUpdateLocal(ISkeletonAnimation anim)
+    {
+        var skel = anim.Skeleton;
+        if (skel == null) return;
+
+        var root = skel.RootBone;
+        if (root == null) return;
+
+        // 🔻 여기서 플레이어 기준 Y -0.04로 고정 (기본값)
+        root.X = imageOffset.x;   // 기본 0
+        root.Y = imageOffset.y;   // 기본 -0.04
+    }
+
 
 
     /// <summary>

@@ -1,5 +1,7 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
+using Spine;
+using Spine.Unity;   // ğŸ”¹ Spine ì• ë‹ˆë©”ì´ì…˜ ì»¨íŠ¸ë¡¤ìš©
 
 public class CaramelCubeSkill : MonoBehaviour
 {
@@ -7,17 +9,35 @@ public class CaramelCubeSkill : MonoBehaviour
     private Player player;
 
     [Header("Caramel Cube Settings")]
-    public GameObject caramelCubePrefab; 
-    public float duration = 5f;        // 5ÃÊ µ¿¾È À¯Áö
-    public float cooldown = 20f;       // 20ÃÊ ÄğÅ¸ÀÓ
-    public float speedMultiplier = 2f; // °ø°İ ¼Óµµ 2¹è (100% Áõ°¡)
+    [Tooltip("ìŠ¤íŒŒì¸ SkeletonAnimation ì´ ë‹¬ë ¤ ìˆëŠ” ì¹´ë¼ë©œ íë¸Œ í”„ë¦¬íŒ¹")]
+    public GameObject caramelCubePrefab;
+
+    [Tooltip("ë²„í”„ ì§€ì† ì‹œê°„ (ì´ˆ)")]
+    public float duration = 5f;        // 5ì´ˆ ë™ì•ˆ ìœ ì§€
+
+    [Tooltip("ë²„í”„ ì¢…ë£Œ í›„ ë‹¤ìŒ ë°œë™ê¹Œì§€ ì¿¨íƒ€ì„ (ì´ˆ)")]
+    public float cooldown = 20f;       // 20ì´ˆ ì¿¨íƒ€ì„
+
+    [Tooltip("ê³µê²© ì†ë„ ë°°ìœ¨ (2ë©´ 2ë°° ë¹ ë¥´ê²Œ)")]
+    public float speedMultiplier = 2f; // ê³µê²© ì†ë„ 2ë°° (100% ì¦ê°€)
 
     [Header("Visual Position")]
-    [Tooltip("ÇÃ·¹ÀÌ¾î ±âÁØ ·ÎÄÃ À§Ä¡ ¿ÀÇÁ¼Â")]
+    [Tooltip("í”Œë ˆì´ì–´ ê¸°ì¤€ ë¡œì»¬ ìœ„ì¹˜ ì˜¤í”„ì…‹")]
     public Vector3 visualOffset = Vector3.zero;
+
+    [Header("Spine Visual")]
+    [Tooltip("ì¹´ë¼ë©œ íë¸Œì—ì„œ ì¬ìƒí•  Spine ì• ë‹ˆë©”ì´ì…˜ ì´ë¦„")]
+    public string spineAnimationName = "animation";   // ìŠ¤íŒŒì¸ì—ì„œ ì„¤ì •í•œ ì´ë¦„ìœ¼ë¡œ ë³€ê²½
+
+    [Tooltip("ì• ë‹ˆë©”ì´ì…˜ ë£¨í”„ ì—¬ë¶€")]
+    public bool spineLoop = true;
+
+    [Tooltip("ìŠ¤íŒŒì¸ ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ ë°°ì†")]
+    public float spineTimeScale = 1f;
 
     private bool isActive = false;
     private float originalFireRate;
+    private GameObject activeVisual;          // í˜„ì¬ ì‚´ì•„ ìˆëŠ” ì¹´ë¼ë©œ íë¸Œ ë¹„ì£¼ì–¼
 
     void Start()
     {
@@ -30,7 +50,7 @@ public class CaramelCubeSkill : MonoBehaviour
 
     void Update()
     {
-        // Ä«¶ó¸áÅ¥ºê ¾ÆÀÌÅÛÀÌ È°¼ºÈ­µÇ¾î ÀÖ°í, ¾ÆÁ÷ ÄÚ·çÆ¾ÀÌ µ¹°í ÀÖÁö ¾Ê´Ù¸é ½ÇÇà
+        // ì¹´ë¼ë©œíë¸Œ ì•„ì´í…œì´ í™œì„±í™”ë˜ì–´ ìˆê³ , ì•„ì§ ì½”ë£¨í‹´ì´ ëŒê³  ìˆì§€ ì•Šë‹¤ë©´ ì‹¤í–‰
         if (player != null && player.hasCaramelCube && !isActive)
         {
             StartCoroutine(CaramelCubeRoutine());
@@ -41,29 +61,66 @@ public class CaramelCubeSkill : MonoBehaviour
     {
         isActive = true;
 
-        // ºñÁÖ¾ó »ı¼º
+        // ë¹„ì£¼ì–¼ ìƒì„± (Spine í”„ë¦¬íŒ¹)
         if (caramelCubePrefab != null)
         {
-            GameObject visual = Instantiate(caramelCubePrefab, transform.position, Quaternion.identity, transform);
-            visual.transform.localPosition = visualOffset;
-            AudioManager.instance.PlaySfx(AudioManager.Sfx.CaramelCube_SFX);
+            activeVisual = Instantiate(
+                caramelCubePrefab,
+                transform.position,
+                Quaternion.identity,
+                transform   // í”Œë ˆì´ì–´ ë°‘ìœ¼ë¡œ ë¶™ì´ê¸°
+            );
 
-            // È¿°ú°¡ ¹ß»ıÇÏ±â ½ÃÀÛÇÒ ¶§ »ç¿îµå°¡ ³­´Ù°í ÇØ¼­ ÇÁ¸®ÆÕ »ı±â°í ¼Ò¸® ³ª´Â°Ô °¡Àå ÀÚ¿¬½º·¯¿ï °Å °°¾Æ¼­ ¿©±â!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // í”Œë ˆì´ì–´ ê¸°ì¤€ ìœ„ì¹˜ ì˜¤í”„ì…‹
+            activeVisual.transform.localPosition = visualOffset;
+
+            // ğŸ”¹ ìŠ¤íŒŒì¸ ì• ë‹ˆë©”ì´ì…˜ ì„¸íŒ…
+            var skeleton = activeVisual.GetComponent<SkeletonAnimation>();
+            if (skeleton != null)
+            {
+                skeleton.Initialize(true);
+                skeleton.timeScale = spineTimeScale;
+
+                if (!string.IsNullOrEmpty(spineAnimationName))
+                {
+                    skeleton.AnimationState.SetAnimation(0, spineAnimationName, spineLoop);
+                }
+            }
+
+            // ì´í™íŠ¸ ë“±ì¥ ì‚¬ìš´ë“œ
+            if (AudioManager.instance != null)
+            {
+                AudioManager.instance.PlaySfx(AudioManager.Sfx.CaramelCube_SFX);
+            }
         }
 
-        // °ø°İ ¼Óµµ Áõ°¡
-        shooting.fireRate = originalFireRate / speedMultiplier;
-        Debug.Log("Ä«¶ó¸á Å¥ºê ¹ßµ¿! °ø°İ ¼Óµµ 2¹è!");
+        // ê³µê²© ì†ë„ ì¦ê°€
+        if (shooting != null && speedMultiplier > 0f)
+        {
+            shooting.fireRate = originalFireRate / speedMultiplier;
+        }
+        Debug.Log("ì¹´ë¼ë©œ íë¸Œ ë°œë™! ê³µê²© ì†ë„ " + speedMultiplier + "ë°°!");
 
+        // ë²„í”„ ì§€ì† ì‹œê°„
         yield return new WaitForSeconds(duration);
 
-        // ±âº» ¼Óµµ·Î º¹±Í
-        shooting.fireRate = originalFireRate;
-        Debug.Log("Ä«¶ó¸á Å¥ºê Á¾·á. ±âº» °ø°İ ¼Óµµ·Î º¹±Í.");
+        // ê¸°ë³¸ ì†ë„ë¡œ ë³µê·€
+        if (shooting != null)
+        {
+            shooting.fireRate = originalFireRate;
+        }
+        Debug.Log("ì¹´ë¼ë©œ íë¸Œ ì¢…ë£Œ. ê¸°ë³¸ ê³µê²© ì†ë„ë¡œ ë³µê·€.");
 
-        // 3ÄğÅ¸ÀÓ ´ë±â
+        // ë¹„ì£¼ì–¼ ì‚­ì œ
+        if (activeVisual != null)
+        {
+            Destroy(activeVisual);
+            activeVisual = null;
+        }
+
+        // ì¿¨íƒ€ì„ ëŒ€ê¸°
         yield return new WaitForSeconds(cooldown);
 
-        isActive = false; // ´ÙÀ½ »çÀÌÅ¬ ÁØºñ
+        isActive = false; // ë‹¤ìŒ ì‚¬ì´í´ ì¤€ë¹„
     }
 }

@@ -15253,7 +15253,7 @@ MonoBehaviour:
   hasHoneySpin: 0
   hasSnowflakeCandy: 0
   hasCaramelCube: 0
-  hasSugarShield: 0
+  hasSugarShield: 1
   hasSugarPorridge: 0
   hasHyperCandyRushActive: 0
   hasSugarBombParty: 0
@@ -15305,11 +15305,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ee534aa0108fa040ac0e4432fea5fec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  caramelCubePrefab: {fileID: 6455817573866816834, guid: add6967beb92a1c41ae9d24f094ea1ff, type: 3}
+  caramelCubePrefab: {fileID: 4528557728185322431, guid: add6967beb92a1c41ae9d24f094ea1ff, type: 3}
   duration: 5
-  cooldown: 20
+  cooldown: 15
   speedMultiplier: 2
   visualOffset: {x: -0.05, y: -0.4, z: 0}
+  spineAnimationName: animation
+  spineLoop: 1
+  spineTimeScale: 1
 --- !u!114 &1429503047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21099,7 +21102,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1429503044}
-  syrupTornadoPrefab: {fileID: 2310070060321691167, guid: a82ec8fadc6d17947bd2ede781fe6b10, type: 3}
+  syrupTornadoPrefab: {fileID: 8102849079330743706, guid: a82ec8fadc6d17947bd2ede781fe6b10, type: 3}
   poppingColliderRadius: 0.3
   poppingRange: 5
   poppingShardSpeed: 15
