@@ -106,7 +106,7 @@ public class AudioManager : MonoBehaviour
     }
 
 
-    public void PlaySfx(Sfx sfx)
+    public void PlaySfx(Sfx sfx, float volume = 0.7f)
     {
         for (int i = 0; i < sfxPlayers.Length; i++)
         {
@@ -123,13 +123,14 @@ public class AudioManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"SFX Missing: {sfx} 인덱스가 sfxClips 배열보다 큽니다!");
+                Debug.LogError($"SFX Missing: {sfx} 인덱스가 sfxClips 배열보다 큽니다");
                 return;
             }
 
             channelIndex = loopIndex;
             sfxPlayers[loopIndex].clip = sfxClips[clipIndex];
             sfxPlayers[loopIndex].outputAudioMixerGroup = sfxMixerGroup;
+            sfxPlayers[loopIndex].volume = sfxVolume * volume;
             sfxPlayers[loopIndex].Play();
             break;
         }
