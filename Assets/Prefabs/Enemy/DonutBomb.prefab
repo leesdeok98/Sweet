@@ -227,7 +227,7 @@ Rigidbody2D:
   m_GameObject: {fileID: 4844216729306248592}
   m_BodyType: 1
   m_Simulated: 1
-  m_UseFullKinematicContacts: 0
+  m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
@@ -310,9 +310,18 @@ MonoBehaviour:
   runAnimName: move
   deadAnimName: dead
   shadowRenderer: {fileID: 7573148291496957726}
-  separateRadius: 0.3
+  separateRadius: 0.9
   separateForce: 1.5
   enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  playerPushRadius: 0.4
+  playerPushForce: 1.5
+  bodyCollider: {fileID: 0}
+  blockingMask:
     serializedVersion: 2
     m_Bits: 0
   speed: 0

@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using Spine.Unity;  
 using UnityEngine.UI;
 using System.Collections;
@@ -7,34 +7,39 @@ public class Player : MonoBehaviour
 {
     public Vector2 inputVec;
     public float speed = 5f;
-    private float initialSpeed; // ÃÊ±â ¼Óµµ ÀúÀå (ÇÏÀÌÆÛÄµµğ ·¯½¬¿¡¼­ »ç¿ë)
+    private float initialSpeed; // ì´ˆê¸° ì†ë„ ì €ì¥ (í•˜ì´í¼ìº”ë”” ëŸ¬ì‰¬ì—ì„œ ì‚¬ìš©)
 
     private Rigidbody2D rigid;
     
     [SerializeField] private LayerMask enemyLayerMask;
 
-   
+
+    [Header("Kinematic Move")]
+    [SerializeField] private Collider2D bodyCollider;      // í”Œë ˆì´ì–´ ëª¸í†µ ì½œë¼ì´ë”
+    [SerializeField] private LayerMask blockingMask;       // ì´ë™ì„ ë§‰ëŠ” ë ˆì´ì–´(ë²½, ì—ë„ˆë¯¸ ë“±)
+
+
     [SerializeField] private GameObject diepanel;
     [SerializeField] private DeathScreenCapture deathScreenCapture; 
     public StrawberryPopCoreSkill popCoreSkill;
     public SugarShieldSkill sugarShieldSkill;
 
-    //  Spine °ü·Ã ÇÊµå
+    //  Spine ê´€ë ¨ í•„ë“œ
     [Header("Spine")]
-    [SerializeField] private SkeletonAnimation skeletonAnim;   // ÇÃ·¹ÀÌ¾î Spine ÄÄÆ÷³ÍÆ® (Á÷Á¢ ÇÒ´ç or ÀÚ½Ä¿¡¼­ ÀÚµ¿ Å½»ö)
-    [SpineAnimation] public string idleAnimationName = "idle";  // °¡¸¸È÷ ÀÖÀ» ¶§
-    [SpineAnimation] public string walkAnimationName = "walk";  // ÀÌµ¿ ½Ã
-    [SpineAnimation] public string deadAnimationName = "dead";  // »ç¸Á ½Ã
+    [SerializeField] private SkeletonAnimation skeletonAnim;   // í”Œë ˆì´ì–´ Spine ì»´í¬ë„ŒíŠ¸ (ì§ì ‘ í• ë‹¹ or ìì‹ì—ì„œ ìë™ íƒìƒ‰)
+    [SpineAnimation] public string idleAnimationName = "idle";  // ê°€ë§Œíˆ ìˆì„ ë•Œ
+    [SpineAnimation] public string walkAnimationName = "walk";  // ì´ë™ ì‹œ
+    [SpineAnimation] public string deadAnimationName = "dead";  // ì‚¬ë§ ì‹œ
 
-    private string currentAnimationName = ""; //  ÇöÀç Àç»ı ÁßÀÎ ¾Ö´Ï¸ŞÀÌ¼Ç ÀÌ¸§
-    private float spineInitialScaleX = 1f;    //  ÁÂ¿ì ¹İÀüÀ» À§ÇÑ ±âº» ½ºÄÉÀÏ
+    private string currentAnimationName = ""; //  í˜„ì¬ ì¬ìƒ ì¤‘ì¸ ì• ë‹ˆë©”ì´ì…˜ ì´ë¦„
+    private float spineInitialScaleX = 1f;    //  ì¢Œìš° ë°˜ì „ì„ ìœ„í•œ ê¸°ë³¸ ìŠ¤ì¼€ì¼
 
     [Header("HP")]
     public float maxHealth = 100f;
     public float health = 100f;
     private bool isLive = true;
 
-    // ½ºÅ³ º¸À¯ »óÅÂ (ÀÎ½ºÆåÅÍ¿¡¼­ Ã¼Å©)
+    // ìŠ¤í‚¬ ë³´ìœ  ìƒíƒœ (ì¸ìŠ¤í™í„°ì—ì„œ ì²´í¬)
     [Header("has skill")]
     public bool hasIcedJellySkill = false;
     public bool hasDarkChip = false;
@@ -48,17 +53,17 @@ public class Player : MonoBehaviour
     public bool hasCaramelCube = false;
     public bool hasSugarShield = false;
     public bool hasSugarPorridge = false;
-    //ÀÎ½ºÆåÅÍ¿¡¼­ Ã¼Å©µÈ ½ºÅ³µéÀ» ÇÑ ¹ø¸¸ Àû¿ëÇÏ±â À§ÇÑ ÇÃ·¡±×
+    //ì¸ìŠ¤í™í„°ì—ì„œ ì²´í¬ëœ ìŠ¤í‚¬ë“¤ì„ í•œ ë²ˆë§Œ ì ìš©í•˜ê¸° ìœ„í•œ í”Œë˜ê·¸
     private bool startingSkillsApplied = false;
 
-    //¼¼Æ®È¿°ú È®ÀÎ¿ë
+    //ì„¸íŠ¸íš¨ê³¼ í™•ì¸ìš©
     [Header("has SetSkill")]
-    public bool hasHyperCandyRushActive = false; // HyperCandyRush »óÅÂ
-    public bool hasSugarBombParty = false; // SugarBombParty »óÅÂ
+    public bool hasHyperCandyRushActive = false; // HyperCandyRush ìƒíƒœ
+    public bool hasSugarBombParty = false; // SugarBombParty ìƒíƒœ
 
     [Header("Clear UI")]
     [SerializeField] private GameObject clearPanel;
-    private bool bossWasSpawned = false;             // º¸½º¸¦ ÇÑ ¹øÀÌ¶óµµ º» Àû ÀÖ´ÂÁö
+    private bool bossWasSpawned = false;             // ë³´ìŠ¤ë¥¼ í•œ ë²ˆì´ë¼ë„ ë³¸ ì  ìˆëŠ”ì§€
     private bool stageCleared = false;
 
 
@@ -66,43 +71,186 @@ public class Player : MonoBehaviour
     {
         rigid = GetComponent<Rigidbody2D>();
 
+        if (bodyCollider == null)
+            bodyCollider = GetComponent<Collider2D>();
 
-        //  Spine SkeletonAnimation ÀÚµ¿/¼öµ¿ ÇÒ´ç
+        //  Spine SkeletonAnimation ìë™/ìˆ˜ë™ í• ë‹¹
         if (skeletonAnim == null)
             skeletonAnim = GetComponentInChildren<SkeletonAnimation>();
 
         if (skeletonAnim != null)
         {
             spineInitialScaleX = skeletonAnim.transform.localScale.x;
-            // ½ÃÀÛ ½Ã idle ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı
+            // ì‹œì‘ ì‹œ idle ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ
             PlaySpineAnimation(idleAnimationName, true);
         }
         else
         {
-            Debug.LogWarning("[Player] SkeletonAnimationÀÌ ÇÒ´çµÇÁö ¾Ê¾Ò½À´Ï´Ù. Spine ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ Àç»ıµÇÁö ¾Ê½À´Ï´Ù.");
+            Debug.LogWarning("[Player] SkeletonAnimationì´ í• ë‹¹ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. Spine ì• ë‹ˆë©”ì´ì…˜ì´ ì¬ìƒë˜ì§€ ì•ŠìŠµë‹ˆë‹¤.");
         }
 
         popCoreSkill = GetComponent<StrawberryPopCoreSkill>();
 
-        // Ç×»ó Ç®ÇÇ·Î ½ÃÀÛ
+        // í•­ìƒ í’€í”¼ë¡œ ì‹œì‘
         health = maxHealth;
         isLive = true;
 
         if (diepanel) diepanel.SetActive(false);
 
-        initialSpeed = speed; // ÃÊ±â ¼Óµµ ÀúÀå (ÀÌ°Å Áö¿ì½Ã¸é ¾ÈµÅ¿ä ÀÌ°Å Áö¿ì½Ã¸é ÇÏÀÌÆÛÄµµğ ·¯½¬ È¿°ú ½ÇÇàµÆÀ» ¶§ Ä³¸¯ÅÍ ¾È ¿òÁ÷¿©¿äÀÌÀ¯¤Ğ)
+        initialSpeed = speed; // ì´ˆê¸° ì†ë„ ì €ì¥ (ì´ê±° ì§€ìš°ì‹œë©´ ì•ˆë¼ìš” ì´ê±° ì§€ìš°ì‹œë©´ í•˜ì´í¼ìº”ë”” ëŸ¬ì‰¬ íš¨ê³¼ ì‹¤í–‰ëì„ ë•Œ ìºë¦­í„° ì•ˆ ì›€ì§ì—¬ìš”ì´ìœ ã… )
     }
+
+    // â˜… í‚¤ë„¤ë§ˆí‹±ìš© ì´ë™ í•¨ìˆ˜: ì•ì— ë§‰íŒ ê²Œ ìˆìœ¼ë©´ ê±°ê¸°ê¹Œì§€ë§Œ ì´ë™
+    // â˜… í‚¤ë„¤ë§ˆí‹±ìš© ì´ë™ í•¨ìˆ˜: ì•ì— ë§‰íŒ ê²Œ ìˆìœ¼ë©´ ê±°ê¸°ê¹Œì§€ë§Œ ì´ë™
+    // â˜… í‚¤ë„¤ë§ˆí‹±ìš© ì´ë™ í•¨ìˆ˜: ì•ì— ë§‰íŒ ê²Œ ìˆìœ¼ë©´ ê±°ê¸°ê¹Œì§€ë§Œ ì´ë™
+    // â˜… í‚¤ë„¤ë§ˆí‹±ìš© ì´ë™ í•¨ìˆ˜: ì•ì— ë§‰íŒ ê²Œ ìˆìœ¼ë©´ ê±°ê¸°ê¹Œì§€ë§Œ ì´ë™
+    private void KinematicMove(Vector2 delta)
+    {
+        if (rigid == null) return;
+        if (delta.sqrMagnitude <= 0f) return;
+
+        // ì½œë¼ì´ë”ê°€ ì—†ìœ¼ë©´ ê·¸ëƒ¥ ì´ë™
+        if (bodyCollider == null)
+        {
+            rigid.MovePosition(rigid.position + delta);
+            return;
+        }
+
+        Bounds bounds = bodyCollider.bounds;
+
+        // ìºìŠ¤íŠ¸ ê¸°ë³¸ í¬ê¸° / ì„¤ì •ê°’
+        Vector2 baseSize = bounds.size;
+        const float sideShrinkRatio = 0.8f;
+        const float skin = 0.02f;
+
+        // ğŸ”¸ ë‚´ë¶€ì—ì„œ ì“°ëŠ” ê³µí†µ í•¨ìˆ˜: ì£¼ì–´ì§„ ë°©í–¥/ê±°ë¦¬ë¡œ ì´ë™ ê°€ëŠ¥ ê±°ë¦¬ ê³„ì‚°
+        float ComputeAllowed(Vector2 moveDir, float moveDistance, out bool blocked)
+        {
+            blocked = false;
+            if (moveDistance <= 0f || moveDir.sqrMagnitude <= 0f)
+                return 0f;
+
+            moveDir = moveDir.normalized;
+
+            // ì´ë™ ë°©í–¥ì— ë”°ë¼ ìºìŠ¤íŠ¸ ë°•ìŠ¤ ì˜†ë©´ì„ ì‚´ì§ ì¤„ì—¬ ìŠ¬ë¼ì´ë”© í—ˆìš©
+            Vector2 castSize = baseSize;
+            if (Mathf.Abs(moveDir.x) > Mathf.Abs(moveDir.y))
+                castSize.y *= sideShrinkRatio;
+            else
+                castSize.x *= sideShrinkRatio;
+
+            RaycastHit2D[] hits = Physics2D.BoxCastAll(
+                bounds.center,
+                castSize,
+                0f,
+                moveDir,
+                moveDistance + skin,
+                blockingMask
+            );
+
+            float maxMove = moveDistance;
+
+            foreach (var hit in hits)
+            {
+                if (hit.collider == null) continue;
+                if (hit.collider.isTrigger) continue;
+
+                // ìê¸° ìì‹ ì€ ë¬´ì‹œ
+                if (hit.collider.attachedRigidbody == rigid)
+                    continue;
+
+                // ë„ˆë¬´ ê°€ê¹Œìš´ íˆíŠ¸ëŠ” ë°©í–¥ íŒë³„ì´ ì• ë§¤í•˜ë‹ˆ ìŠ¤í‚µ
+                Vector2 toHit = hit.point - (Vector2)bounds.center;
+                if (toHit.sqrMagnitude < 0.0001f)
+                    continue;
+
+                // ì´ë™ ë°©í–¥ê³¼ "íˆíŠ¸ê¹Œì§€ì˜ ë°©í–¥"ì´ ì–¼ë§ˆë‚˜ ì •ë©´ì— ê°€ê¹Œìš´ì§€
+                float alignment = Vector2.Dot(moveDir, toHit.normalized);
+
+                // alignmentê°€ ì‘ìœ¼ë©´(â‰ˆ0) ì˜†ì— ìˆëŠ” ì¥ì• ë¬¼ â†’ ì •ë©´ì´ ì•„ë‹ˆë¼ê³  íŒë‹¨í•˜ê³  ë¬´ì‹œ
+                // 0.5 ì´í•˜ë©´ ì˜†/ëŒ€ê°ì„  ì •ë„ë¡œ ë³´ê³  í†µê³¼ í—ˆìš©
+                if (alignment < 0.5f)
+                    continue;
+
+                blocked = true;
+                float allowed = hit.distance - skin;
+                if (allowed < maxMove)
+                    maxMove = allowed;
+            }
+
+            if (!blocked)
+                return moveDistance;
+
+            return Mathf.Max(0f, maxMove);
+        }
+
+        // ğŸ”¹ 1) ì›ë˜ ì˜ë„í•œ ë°©í–¥ìœ¼ë¡œ ë¨¼ì € ì‹œë„
+        float distance = delta.magnitude;
+        Vector2 dir = delta.normalized;
+
+        bool mainBlocked;
+        float mainAllowed = ComputeAllowed(dir, distance, out mainBlocked);
+
+        if (!mainBlocked)
+        {
+            // ì •ë©´ì— ë§‰íŒ ê²Œ ì—†ë‹¤ â†’ ì›ë˜ëŒ€ë¡œ ì „ì²´ ì´ë™
+            rigid.MovePosition(rigid.position + delta);
+            return;
+        }
+
+        if (mainAllowed > 0f)
+        {
+            // ì¡°ê¸ˆì´ë¼ë„ ì•ìœ¼ë¡œ ê°ˆ ìˆ˜ ìˆìœ¼ë©´, ê·¸ë§Œí¼ë§Œ ì´ë™
+            rigid.MovePosition(rigid.position + dir * mainAllowed);
+            return;
+        }
+
+        // ğŸ”¹ 2) ëŒ€ê°ì„ ì´ ë§‰í˜”ìœ¼ë©´, X / Y ì¶•ìœ¼ë¡œ ë‚˜ëˆ ì„œ ìŠ¬ë¼ì´ë”© ì‹œë„
+
+        // (1) Xì¶•ë§Œ ì´ë™ ì‹œë„
+        Vector2 slideDirX = new Vector2(dir.x, 0f);
+        if (Mathf.Abs(slideDirX.x) > 0.001f)
+        {
+            bool blockedX;
+            float allowedX = ComputeAllowed(slideDirX, distance, out blockedX);
+
+            if (!blockedX || allowedX > 0.001f)
+            {
+                rigid.MovePosition(rigid.position + slideDirX.normalized * allowedX);
+                return;
+            }
+        }
+
+        // (2) Yì¶•ë§Œ ì´ë™ ì‹œë„
+        Vector2 slideDirY = new Vector2(0f, dir.y);
+        if (Mathf.Abs(slideDirY.y) > 0.001f)
+        {
+            bool blockedY;
+            float allowedY = ComputeAllowed(slideDirY, distance, out blockedY);
+
+            if (!blockedY || allowedY > 0.001f)
+            {
+                rigid.MovePosition(rigid.position + slideDirY.normalized * allowedY);
+                return;
+            }
+        }
+
+        // ğŸ”¹ 3) ì—¬ê¸°ê¹Œì§€ ì™”ëŠ”ë°ë„ ë‹¤ ë§‰í˜”ë‹¤ë©´, ì´ë²ˆ í”„ë ˆì„ì€ ê·¸ëƒ¥ ì œìë¦¬
+    }
+
+
+
 
     void OnEnable()
     {
-        // ¾À ÃÊ±âÈ­ ½Ã ÀÌµ¿
+        // ì”¬ ì´ˆê¸°í™” ì‹œ ì´ë™
         isLive = true;
         if (rigid) rigid.velocity = Vector2.zero;
 
-        // ¾À ÃÊ±âÈ­ ½Ã ½ºÅ³ ÃÊ±âÈ­
+        // ì”¬ ì´ˆê¸°í™” ì‹œ ìŠ¤í‚¬ ì´ˆê¸°í™”
         startingSkillsApplied = false;
 
-        //  ´Ù½Ã È°¼ºÈ­µÉ ¶§ idle »óÅÂ·Î ÃÊ±âÈ­
+        //  ë‹¤ì‹œ í™œì„±í™”ë  ë•Œ idle ìƒíƒœë¡œ ì´ˆê¸°í™”
         PlaySpineAnimation(idleAnimationName, true);
     }
 
@@ -112,14 +260,14 @@ public class Player : MonoBehaviour
 
         CheckBossStatus();
 
-        // ÀÌµ¿ ÀÔ·Â
+        // ì´ë™ ì…ë ¥
         inputVec.x = Input.GetAxisRaw("Horizontal");
         inputVec.y = Input.GetAxisRaw("Vertical");
 
-        // ÀÌµ¿·®¿¡ µû¶ó idle / walk ¾Ö´Ï¸ŞÀÌ¼Ç ÀüÈ¯
+        // ì´ë™ëŸ‰ì— ë”°ë¼ idle / walk ì• ë‹ˆë©”ì´ì…˜ ì „í™˜
         UpdateSpineAnimationByMove();
 
-        //ÀÎ½ºÆåÅÍ¿¡¼­ Ã¼Å©µÈ ½ºÅ³µéÀ» º¸°í ½ºÅ³À» ÇÑ ¹ø¸¸ Àû¿ë
+        //ì¸ìŠ¤í™í„°ì—ì„œ ì²´í¬ëœ ìŠ¤í‚¬ë“¤ì„ ë³´ê³  ìŠ¤í‚¬ì„ í•œ ë²ˆë§Œ ì ìš©
         TryApplyStartingSkills();
     }
 
@@ -128,8 +276,9 @@ public class Player : MonoBehaviour
         if (!isLive) return;
 
         Vector2 nextVec = inputVec.normalized * speed * Time.fixedDeltaTime;
-        rigid.MovePosition(rigid.position + nextVec);
+        KinematicMove(nextVec);
     }
+
 
     void LateUpdate()
     {
@@ -137,7 +286,7 @@ public class Player : MonoBehaviour
 
         if (inputVec.x != 0)
         {
-            // ÁÂ¿ì ÀÌµ¿ ¹æÇâ¿¡ µû¶ó Spine Ä³¸¯ÅÍ ÁÂ¿ì ¹İÀü
+            // ì¢Œìš° ì´ë™ ë°©í–¥ì— ë”°ë¼ Spine ìºë¦­í„° ì¢Œìš° ë°˜ì „
             if (skeletonAnim != null)
             {
                 Transform t = skeletonAnim.transform;
@@ -149,18 +298,18 @@ public class Player : MonoBehaviour
         }
     }
 
-    /// °ÔÀÓ ½ÃÀÛ/ºÎÈ° ÈÄ, ÀÎ½ºÆåÅÍ¿¡¼­ Ã¼Å©µÈ ½ºÅ³µéÀ» SkillManager¿¡ ÇÑ ¹ø¸¸ Àü´Ş
+    /// ê²Œì„ ì‹œì‘/ë¶€í™œ í›„, ì¸ìŠ¤í™í„°ì—ì„œ ì²´í¬ëœ ìŠ¤í‚¬ë“¤ì„ SkillManagerì— í•œ ë²ˆë§Œ ì „ë‹¬
     void TryApplyStartingSkills()
     {
-        // ÀÌ¹Ì ÇÑ ¹ø Ã³¸®ÇßÀ¸¸é ´Ù½Ã ¾È ÇÔ
+        // ì´ë¯¸ í•œ ë²ˆ ì²˜ë¦¬í–ˆìœ¼ë©´ ë‹¤ì‹œ ì•ˆ í•¨
         if (startingSkillsApplied) return;
 
-        // SkillManager°¡ ¾ÆÁ÷ ÁØºñ ¾È µÆÀ¸¸é, ´ÙÀ½ ÇÁ·¹ÀÓ¿¡ ´Ù½Ã ½Ãµµ
+        // SkillManagerê°€ ì•„ì§ ì¤€ë¹„ ì•ˆ ëìœ¼ë©´, ë‹¤ìŒ í”„ë ˆì„ì— ë‹¤ì‹œ ì‹œë„
         if (SkillManager.Instance == null) return;
 
         var sm = SkillManager.Instance;
 
-        // ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡ ÀÎ½ºÆåÅÍ bool ¡æ SkillManager.ActivateSkill ¸ÅÇÎ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+        // â”€â”€â”€â”€â”€â”€â”€â”€â”€ ì¸ìŠ¤í™í„° bool â†’ SkillManager.ActivateSkill ë§¤í•‘ â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (hasIcedJellySkill) sm.ActivateSkill(ItemData.ItemType.IcedJelly);
         if (hasSugarShield) sm.ActivateSkill(ItemData.ItemType.SugarShield);
         if (hasRollingChocolateBar) sm.ActivateSkill(ItemData.ItemType.RollingChocolateBar);
@@ -169,15 +318,15 @@ public class Player : MonoBehaviour
         if (hasStrawberryPopCore) sm.ActivateSkill(ItemData.ItemType.StrawberryPopCore);
         if (hasCaramelCube) sm.ActivateSkill(ItemData.ItemType.CaramelCube);
 
-        // ? ¿©±â ¼¼ °³°¡ ¡°¾È µÇ´ø ¾Öµé¡± ¡æ ÀÌÁ¦ ½ÃÀÛ ½Ã¿¡µµ °­Á¦·Î ½ÇÇà
+        // ? ì—¬ê¸° ì„¸ ê°œê°€ â€œì•ˆ ë˜ë˜ ì• ë“¤â€ â†’ ì´ì œ ì‹œì‘ ì‹œì—ë„ ê°•ì œë¡œ ì‹¤í–‰
         if (hasHoneySpin) sm.ActivateSkill(ItemData.ItemType.HoneySpin);
         if (hasSyrupTornado) sm.ActivateSkill(ItemData.ItemType.SyrupTornado);
         if (hasDarkChip) sm.ActivateSkill(ItemData.ItemType.DarkChip);
 
-        // ¡Ú Ãß°¡: ´«²É»çÅÁ ÀÚµ¿ Àû¿ë
+        // â˜… ì¶”ê°€: ëˆˆê½ƒì‚¬íƒ• ìë™ ì ìš©
         if (hasSnowflakeCandy) sm.ActivateSkill(ItemData.ItemType.SnowflakeCandy);
 
-        // ÇÑ ¹ø Àû¿ë ¿Ï·á
+        // í•œ ë²ˆ ì ìš© ì™„ë£Œ
         startingSkillsApplied = true;
     }
 
@@ -185,17 +334,17 @@ public class Player : MonoBehaviour
     {
         if (!isLive) return;
 
-        // ½´°¡ ½Çµå Ã¼Å© ¹× µ¥¹ÌÁö Èí¼ö (º»Ã¼ Ãæµ¹)
-        if (hasSugarShield && sugarShieldSkill != null && sugarShieldSkill.CurrentShieldCount > 0)   // ¸ó½ºÅÍ³ª ÃÑ¾ËÀÌ ÇÃ·¹ÀÌ¾î º»Ã¼¿¡ Á÷Á¢ ´ê¾ÒÀ» ¶§
+        // ìŠˆê°€ ì‹¤ë“œ ì²´í¬ ë° ë°ë¯¸ì§€ í¡ìˆ˜ (ë³¸ì²´ ì¶©ëŒ)
+        if (hasSugarShield && sugarShieldSkill != null && sugarShieldSkill.CurrentShieldCount > 0)   // ëª¬ìŠ¤í„°ë‚˜ ì´ì•Œì´ í”Œë ˆì´ì–´ ë³¸ì²´ì— ì§ì ‘ ë‹¿ì•˜ì„ ë•Œ
         {
-            // ½Çµå°¡ ÀÖÀ¸¸é ½Çµå 1°³ ¼Ò¸ğ (ConsumeShieldByVisualÀÌ ¾Æ´Ñ ConsumeShield È£Ãâ)
+            // ì‹¤ë“œê°€ ìˆìœ¼ë©´ ì‹¤ë“œ 1ê°œ ì†Œëª¨ (ConsumeShieldByVisualì´ ì•„ë‹Œ ConsumeShield í˜¸ì¶œ)
             bool shieldConsumed = sugarShieldSkill.ConsumeShield();
 
             if (shieldConsumed)
             {
-                Debug.Log($"½´°¡ ½Çµå°¡ µ¥¹ÌÁö({damage:0.##})¸¦ ¸·¾Ò½À´Ï´Ù. (º»Ã¼ Ãæµ¹)");
+                Debug.Log($"ìŠˆê°€ ì‹¤ë“œê°€ ë°ë¯¸ì§€({damage:0.##})ë¥¼ ë§‰ì•˜ìŠµë‹ˆë‹¤. (ë³¸ì²´ ì¶©ëŒ)");
 
-                // Health UI °­Á¦ ¾÷µ¥ÀÌÆ®
+                // Health UI ê°•ì œ ì—…ë°ì´íŠ¸
                 Health healthComponent = GetComponentInChildren<Health>();
                 if (healthComponent != null) healthComponent.ForceRefresh();
 
@@ -203,38 +352,38 @@ public class Player : MonoBehaviour
             }
         }
 
-        // ½Çµå°¡ ¾ø°Å³ª Èí¼ö¿¡ ½ÇÆĞÇßÀ» ¶§¸¸ ÇÃ·¹ÀÌ¾î HP °¨¼Ò (±âÁ¸¿¡ ÀÕ´ø ÄÚµå)
+        // ì‹¤ë“œê°€ ì—†ê±°ë‚˜ í¡ìˆ˜ì— ì‹¤íŒ¨í–ˆì„ ë•Œë§Œ í”Œë ˆì´ì–´ HP ê°ì†Œ (ê¸°ì¡´ì— ì‡ë˜ ì½”ë“œ)
 
         health -= damage;
 
-        // Health UI ¾÷µ¥ÀÌÆ® 
+        // Health UI ì—…ë°ì´íŠ¸ 
         Health healthComp = GetComponentInChildren<Health>();
         if (healthComp != null) healthComp.ForceRefresh();
 
-        Debug.Log($"[Player] ÇÇÇØ: {damage:0.##}, HP: {Mathf.Max(health, 0):0.##}/{maxHealth}");
+        Debug.Log($"[Player] í”¼í•´: {damage:0.##}, HP: {Mathf.Max(health, 0):0.##}/{maxHealth}");
 
         if (health <= 0f)
             Die();
     }
 
-    // ¹°¸® Ãæµ¹(Non-Trigger)·Î Àû°ú ´ê¾Æ ÀÖ´Â µ¿¾È Áö¼Ó ÇÇÇØ
+    // ë¬¼ë¦¬ ì¶©ëŒ(Non-Trigger)ë¡œ ì ê³¼ ë‹¿ì•„ ìˆëŠ” ë™ì•ˆ ì§€ì† í”¼í•´
 void OnCollisionStay2D(Collision2D collision)
 {
     if (!isLive) return;
 
-    // 1) Ãæµ¹ÇÑ ¿ÀºêÁ§Æ®ÀÇ ·¹ÀÌ¾î °¡Á®¿À±â
+    // 1) ì¶©ëŒí•œ ì˜¤ë¸Œì íŠ¸ì˜ ë ˆì´ì–´ ê°€ì ¸ì˜¤ê¸°
     int otherLayer = collision.collider.gameObject.layer;
 
-    // 2) enemyLayerMask ¾È¿¡ ÀÌ ·¹ÀÌ¾î°¡ Æ÷ÇÔµÇ¾î ÀÖÁö ¾ÊÀ¸¸é ¹Ù·Î ¸®ÅÏ
-    //    (enemyLayerMask.value ½áµµ µÇ°í, ±×³É enemyLayerMask ½áµµ µÊ)
+    // 2) enemyLayerMask ì•ˆì— ì´ ë ˆì´ì–´ê°€ í¬í•¨ë˜ì–´ ìˆì§€ ì•Šìœ¼ë©´ ë°”ë¡œ ë¦¬í„´
+    //    (enemyLayerMask.value ì¨ë„ ë˜ê³ , ê·¸ëƒ¥ enemyLayerMask ì¨ë„ ë¨)
     if ((enemyLayerMask & (1 << otherLayer)) == 0)
         return;
 
-    // 3) Enemy ÄÄÆ÷³ÍÆ® Ã£±â
+    // 3) Enemy ì»´í¬ë„ŒíŠ¸ ì°¾ê¸°
     Enemy enemy = collision.collider.GetComponent<Enemy>();
     if (enemy == null) return;
 
-    // 4) dps(ÃÊ´ç µ¥¹ÌÁö) ¡¿ fixedDeltaTime = ÀÌ¹ø ¹°¸®ÇÁ·¹ÀÓ¿¡¼­ ¹Ş¾Æ¾ß ÇÒ µ¥¹ÌÁö
+    // 4) dps(ì´ˆë‹¹ ë°ë¯¸ì§€) Ã— fixedDeltaTime = ì´ë²ˆ ë¬¼ë¦¬í”„ë ˆì„ì—ì„œ ë°›ì•„ì•¼ í•  ë°ë¯¸ì§€
     float dmg = enemy.dps * Time.fixedDeltaTime;
 
     if (dmg > 0f)
@@ -249,7 +398,7 @@ void OnCollisionStay2D(Collision2D collision)
     {
         if (!isLive) return;
         health = Mathf.Clamp(health + amount, 0f, maxHealth);
-        Debug.Log($"[Player] È¸º¹: {amount:0.##}, HP: {health:0.##}");
+        Debug.Log($"[Player] íšŒë³µ: {amount:0.##}, HP: {health:0.##}");
     }
 
     void Die()
@@ -259,49 +408,49 @@ void OnCollisionStay2D(Collision2D collision)
         isLive = false;
         if (rigid != null) rigid.velocity = Vector2.zero;
 
-        //  ÄÚ·çÆ¾À¸·Î »ç¸Á ¿¬Ãâ Ã³¸®
+        //  ì½”ë£¨í‹´ìœ¼ë¡œ ì‚¬ë§ ì—°ì¶œ ì²˜ë¦¬
         StartCoroutine(DieRoutine());
     }
 
-    //  Á×À½ ¾Ö´Ï¸ŞÀÌ¼Ç ¡æ ´ë±â ¡æ ÆĞ³Î ¡æ °ÔÀÓ Á¤Áö
+    //  ì£½ìŒ ì• ë‹ˆë©”ì´ì…˜ â†’ ëŒ€ê¸° â†’ íŒ¨ë„ â†’ ê²Œì„ ì •ì§€
     private IEnumerator DieRoutine()
     {
-        // 1) »ç¸Á ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı
+        // 1) ì‚¬ë§ ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ
         PlaySpineAnimation(deadAnimationName, false);
 
-        // 2) ¾Ö´Ï¸ŞÀÌ¼Ç ±æÀÌ¸¸Å­ ±â´Ù¸®±â
-        float waitTime = 10f; // ±âº»°ª(È¤½Ã ¸ø Ã£À» ¶§ ´ëºñ)
+        // 2) ì• ë‹ˆë©”ì´ì…˜ ê¸¸ì´ë§Œí¼ ê¸°ë‹¤ë¦¬ê¸°
+        float waitTime = 10f; // ê¸°ë³¸ê°’(í˜¹ì‹œ ëª» ì°¾ì„ ë•Œ ëŒ€ë¹„)
         if (skeletonAnim != null && !string.IsNullOrEmpty(deadAnimationName))
         {
             var anim = skeletonAnim.Skeleton.Data.FindAnimation(deadAnimationName);
             if (anim != null)
             {
-                waitTime = anim.Duration; // ½ºÆÄÀÎ ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÁ¦ ±æÀÌ
+                waitTime = anim.Duration; // ìŠ¤íŒŒì¸ ì• ë‹ˆë©”ì´ì…˜ ì‹¤ì œ ê¸¸ì´
             }
         }
 
-        // ÇÊ¿äÇÏ¸é »ìÂ¦ ¿©À¯¸¦ ´õ ÁÙ ¼öµµ ÀÖÀ½ (ex: +0.2f)
+        // í•„ìš”í•˜ë©´ ì‚´ì§ ì—¬ìœ ë¥¼ ë” ì¤„ ìˆ˜ë„ ìˆìŒ (ex: +0.2f)
         yield return new WaitForSeconds(waitTime);
 
-        // 3) È­¸é Ä¸ÃÄ + »ç¸Á ÆĞ³Î ¶ç¿ì±â
+        // 3) í™”ë©´ ìº¡ì³ + ì‚¬ë§ íŒ¨ë„ ë„ìš°ê¸°
         if (deathScreenCapture != null)
         {
             deathScreenCapture.ShowDeathScreen();
         }
         else
         {
-            Debug.LogWarning("[Player] DeathScreenCapture ÂüÁ¶°¡ ºñ¾ú½À´Ï´Ù.");
+            Debug.LogWarning("[Player] DeathScreenCapture ì°¸ì¡°ê°€ ë¹„ì—ˆìŠµë‹ˆë‹¤.");
             if (diepanel)
                 diepanel.SetActive(true);
         }
 
-        // 4) GameOver Ã³¸®
+        // 4) GameOver ì²˜ë¦¬
         if (GameManager.instance != null)
             GameManager.instance.GameOver();
         else
-            Debug.LogError("[Player] GameManager.instance°¡ nullÀÔ´Ï´Ù.");
+            Debug.LogError("[Player] GameManager.instanceê°€ nullì…ë‹ˆë‹¤.");
 
-        // 5) ¸¶Áö¸·¿¡ °ÔÀÓ ÀÏ½ÃÁ¤Áö
+        // 5) ë§ˆì§€ë§‰ì— ê²Œì„ ì¼ì‹œì •ì§€
         Time.timeScale = 0f;
     }
 
@@ -310,7 +459,7 @@ void OnCollisionStay2D(Collision2D collision)
     
    
 
-    // Àç½ÃÀÛ/ºÎÈ° ½Ã È£ÃâÇÏ¸é Ã¼·Â/»óÅÂ ÃÊ±âÈ­(¾À ¸®·Îµå ¾øÀÌµµ »ç¿ë °¡´É)
+    // ì¬ì‹œì‘/ë¶€í™œ ì‹œ í˜¸ì¶œí•˜ë©´ ì²´ë ¥/ìƒíƒœ ì´ˆê¸°í™”(ì”¬ ë¦¬ë¡œë“œ ì—†ì´ë„ ì‚¬ìš© ê°€ëŠ¥)
     public void ResetForRetry()
     {
         health = maxHealth;
@@ -321,16 +470,16 @@ void OnCollisionStay2D(Collision2D collision)
 
         startingSkillsApplied = false;
 
-        // ºÎÈ° ½Ã idle ¾Ö´Ï¸ŞÀÌ¼ÇÀ¸·Î µ¹¾Æ°¡±â
+        // ë¶€í™œ ì‹œ idle ì• ë‹ˆë©”ì´ì…˜ìœ¼ë¡œ ëŒì•„ê°€ê¸°
         PlaySpineAnimation(idleAnimationName, true);
     }
 
-    // ¾ÀÀÌ ¹Ù²ğ ¶§ »õ »ç¸Á ÆĞ³ÎÀ» ´Ù½Ã ¿¬°áÇÏ±â À§ÇÑ ¼¼ÅÍ
+    // ì”¬ì´ ë°”ë€” ë•Œ ìƒˆ ì‚¬ë§ íŒ¨ë„ì„ ë‹¤ì‹œ ì—°ê²°í•˜ê¸° ìœ„í•œ ì„¸í„°
     public void SetDiePanel(GameObject panel)
     {
         diepanel = panel;
         if (diepanel != null)
-            diepanel.SetActive(false);  // ±âº»Àº ²¨Áø »óÅÂ
+            diepanel.SetActive(false);  // ê¸°ë³¸ì€ êº¼ì§„ ìƒíƒœ
     }
 
 
@@ -338,7 +487,7 @@ void OnCollisionStay2D(Collision2D collision)
     {
         if (skeletonAnim == null) return;
 
-        // Á×¾úÀ¸¸é ¿©±â¼­´Â »óÅÂ¸¦ °Çµå¸®Áö ¾Ê°í Die()¿¡¼­ dead¸¦ Àç»ı
+        // ì£½ì—ˆìœ¼ë©´ ì—¬ê¸°ì„œëŠ” ìƒíƒœë¥¼ ê±´ë“œë¦¬ì§€ ì•Šê³  Die()ì—ì„œ deadë¥¼ ì¬ìƒ
         if (!isLive) return;
 
         string nextAnim;
@@ -348,7 +497,7 @@ void OnCollisionStay2D(Collision2D collision)
         else
             nextAnim = idleAnimationName;
 
-        if (currentAnimationName == nextAnim) return; // ¾Ö´Ï Áßº¹ ¹æÁö
+        if (currentAnimationName == nextAnim) return; // ì• ë‹ˆ ì¤‘ë³µ ë°©ì§€
 
         bool loop = nextAnim != deadAnimationName;
         PlaySpineAnimation(nextAnim, loop);
@@ -356,14 +505,14 @@ void OnCollisionStay2D(Collision2D collision)
 
     public void ActivateHyperCandyRush(bool activate)
     {
-        if (hasHyperCandyRushActive == activate) return; // »óÅÂ º¯È­ ¾øÀ» ½Ã Áß´Ü
+        if (hasHyperCandyRushActive == activate) return; // ìƒíƒœ ë³€í™” ì—†ì„ ì‹œ ì¤‘ë‹¨
 
         hasHyperCandyRushActive = activate;
 
-        // ÀÌµ¿ ¼Óµµ 30% Áõ°¡ Àû¿ë/º¹¿ø
+        // ì´ë™ ì†ë„ 30% ì¦ê°€ ì ìš©/ë³µì›
         speed = activate ? (initialSpeed * 1.30f) : initialSpeed;
 
-        Debug.Log($"[HyperCandyRush] È°¼ºÈ­: ÀÌµ¿ ¼Óµµ {initialSpeed:0.##} -> {speed:0.##}");
+        Debug.Log($"[HyperCandyRush] í™œì„±í™”: ì´ë™ ì†ë„ {initialSpeed:0.##} -> {speed:0.##}");
 
         PlayerShooting shooting = GetComponent<PlayerShooting>();
         if (shooting != null)
@@ -387,7 +536,7 @@ void OnCollisionStay2D(Collision2D collision)
 
     public void StartSugarBombPartyActivation(SugarBombParty sbpComponent)
     {
-        // ÀÌ¹Ì Á×¾ú°Å³ª ÄÄÆ÷³ÍÆ®°¡ ÇÒ´çµÇ¾îÀÕÁö ¾ÊÀ¸¸é ½ÇÇà X
+        // ì´ë¯¸ ì£½ì—ˆê±°ë‚˜ ì»´í¬ë„ŒíŠ¸ê°€ í• ë‹¹ë˜ì–´ì‡ì§€ ì•Šìœ¼ë©´ ì‹¤í–‰ X
         if (!isLive || sbpComponent == null) return;
         
         StartCoroutine(ActivateSugarBombPartyNextFrame(sbpComponent));
@@ -395,17 +544,17 @@ void OnCollisionStay2D(Collision2D collision)
 
     private IEnumerator ActivateSugarBombPartyNextFrame(SugarBombParty sbp)
     {
-        // 1 ÇÁ·¹ÀÓ ´ë±â (Spine ¾Ö´Ï¸ŞÀÌ¼Ç ¹× ÃÊ±âÈ­ Ãæµ¹ ¹æÁö)
+        // 1 í”„ë ˆì„ ëŒ€ê¸° (Spine ì• ë‹ˆë©”ì´ì…˜ ë° ì´ˆê¸°í™” ì¶©ëŒ ë°©ì§€)
         yield return null;
 
         if (sbp != null)
         {
-            // SugarBombParty.csÀÇ ActivateSetEffect È£Ãâ
+            // SugarBombParty.csì˜ ActivateSetEffect í˜¸ì¶œ
             sbp.ActivateSetEffect();
         }
     }
 
-    /// Spine ¾Ö´Ï¸ŞÀÌ¼ÇÀ» Àç»ıÇÏ´Â °øÅë ÇÔ¼ö.
+    /// Spine ì• ë‹ˆë©”ì´ì…˜ì„ ì¬ìƒí•˜ëŠ” ê³µí†µ í•¨ìˆ˜.
 
     void PlaySpineAnimation(string animName, bool loop)
     {
@@ -416,21 +565,21 @@ void OnCollisionStay2D(Collision2D collision)
         skeletonAnim.AnimationState.SetAnimation(0, animName, loop);
     }
 
-    //º¸½º Ã¼Å© ÈÄ Ã³¸® ½Ã Å¬¸®¾î ÄÚ·çÆ¾ ½ÇÇà
+    //ë³´ìŠ¤ ì²´í¬ í›„ ì²˜ë¦¬ ì‹œ í´ë¦¬ì–´ ì½”ë£¨í‹´ ì‹¤í–‰
     private void CheckBossStatus()
     {
-        if (stageCleared) return;   // ÀÌ¹Ì Å¬¸®¾î Ã³¸®ÇßÀ¸¸é ´õ ÀÌ»ó Ã¼Å© ¾È ÇÔ
+        if (stageCleared) return;   // ì´ë¯¸ í´ë¦¬ì–´ ì²˜ë¦¬í–ˆìœ¼ë©´ ë” ì´ìƒ ì²´í¬ ì•ˆ í•¨
 
         GameObject boss = GameObject.FindGameObjectWithTag("Boss");
 
-        // 1) º¸½º¸¦ Ã³À½ ¹ß°ßÇÑ °æ¿ì
+        // 1) ë³´ìŠ¤ë¥¼ ì²˜ìŒ ë°œê²¬í•œ ê²½ìš°
         if (boss != null && boss.activeInHierarchy)
         {
             bossWasSpawned = true;
             return;
         }
 
-        // 2) º¸½º¸¦ º» ÀûÀÌ ÀÖ°í, ÀÌÁ¦´Â º¸½º°¡ ¾À¿¡ ¾ø°Å³ª ºñÈ°¼ºÈ­µÈ °æ¿ì
+        // 2) ë³´ìŠ¤ë¥¼ ë³¸ ì ì´ ìˆê³ , ì´ì œëŠ” ë³´ìŠ¤ê°€ ì”¬ì— ì—†ê±°ë‚˜ ë¹„í™œì„±í™”ëœ ê²½ìš°
         if (bossWasSpawned && (boss == null || !boss.activeInHierarchy))
         {
             stageCleared = true;
@@ -438,10 +587,10 @@ void OnCollisionStay2D(Collision2D collision)
         }
     }
 
-    //  ½ÇÁ¦·Î Å¬¸®¾î ÆĞ³ÎÀ» ¿©´Â ÄÚ·çÆ¾
+    //  ì‹¤ì œë¡œ í´ë¦¬ì–´ íŒ¨ë„ì„ ì—¬ëŠ” ì½”ë£¨í‹´
     private System.Collections.IEnumerator ShowClearPanelAfterDelay()
     {
-        //º¸½º°¡ DIE ¸Å¼­µå ½ÇÇà ÈÄ 3ÃÊ ÈÄ¿¡ Å¬¸®¾î ÆĞ³Î ¿­±â
+        //ë³´ìŠ¤ê°€ DIE ë§¤ì„œë“œ ì‹¤í–‰ í›„ 3ì´ˆ í›„ì— í´ë¦¬ì–´ íŒ¨ë„ ì—´ê¸°
         yield return new WaitForSeconds(2f);
 
         if (clearPanel != null)
@@ -450,10 +599,10 @@ void OnCollisionStay2D(Collision2D collision)
         }
         else
         {
-            Debug.LogWarning("[Player] ClearPanelÀÌ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.LogWarning("[Player] ClearPanelì´ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
         }
 
-        // ½ºÅ×ÀÌÁö Å¬¸®¾î ½Ã¿¡µµ °ÔÀÓ Á¤Áö
+        // ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´ ì‹œì—ë„ ê²Œì„ ì •ì§€
         Time.timeScale = 0f;
     }
 

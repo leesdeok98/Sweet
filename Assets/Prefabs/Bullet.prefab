@@ -128,7 +128,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifeTime: 3
-  baseDamage: 5
+  baseDamage: 0
   icedJellySpinePrefab: {fileID: 3063704607308313011, guid: 31c6a6892256833419bac4d0c47158ef, type: 3}
   icedJellyChance: 0.3
   bittermeltChaosDps: 2

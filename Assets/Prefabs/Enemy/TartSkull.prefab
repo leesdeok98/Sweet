@@ -270,9 +270,9 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3992737701259309621}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
-  m_UseFullKinematicContacts: 0
+  m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
@@ -310,6 +310,15 @@ MonoBehaviour:
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 256
+  playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  playerPushRadius: 0.9
+  playerPushForce: 1.5
+  bodyCollider: {fileID: 2520477695205531146}
+  blockingMask:
+    serializedVersion: 2
+    m_Bits: 0
   speed: 2
   health: 0
   maxHealth: 0

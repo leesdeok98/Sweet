@@ -249,7 +249,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0.6773186, y: -6.933446}
   serializedVersion: 2
-  m_Radius: 5.3639
+  m_Radius: 3.7204063
 --- !u!50 &6146267261565876781
 Rigidbody2D:
   serializedVersion: 4
@@ -260,9 +260,9 @@ Rigidbody2D:
   m_GameObject: {fileID: 8645179148039481334}
   m_BodyType: 1
   m_Simulated: 1
-  m_UseFullKinematicContacts: 0
+  m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 50
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -293,15 +293,24 @@ MonoBehaviour:
   runAnimName: move
   deadAnimName: dead
   shadowRenderer: {fileID: 5639369850791707469}
-  separateRadius: 0.5
-  separateForce: 0.5
+  separateRadius: 0.3
+  separateForce: 0.3
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 256
+  playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  playerPushRadius: 0.9
+  playerPushForce: 2
+  bodyCollider: {fileID: 1780446500764224244}
+  blockingMask:
+    serializedVersion: 2
+    m_Bits: 384
   speed: 0
   health: 0
   maxHealth: 0
-  dps: 0
+  dps: 5
   target: {fileID: 0}
   isSlowed: 0
   knockbackDuration: 0.1

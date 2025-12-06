@@ -8848,107 +8848,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1001 &776706197
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 630079333229565891, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: dps
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 630079333229565891, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: health
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 630079333229565891, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: maxHealth
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 630079333229565891, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: chargeDamage
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 630079333229565891, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: separateForce
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 630079333229565891, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: chargeDuration
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 630079333229565891, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: separateRadius
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2311517150612470122, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_BodyType
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2520477695205531146, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_IsTrigger
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3992737701259309621, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_Name
-      value: TartSkull
-      objectReference: {fileID: 0}
-    - target: {fileID: 3992737701259309621, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6798279225318856779, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 8764449073829779550, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 7.958794
-      objectReference: {fileID: 0}
-    - target: {fileID: 8764449073829779550, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -1.1622152
-      objectReference: {fileID: 0}
-    - target: {fileID: 8764449073829779550, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8764449073829779550, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8764449073829779550, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8764449073829779550, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8764449073829779550, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8764449073829779550, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8764449073829779550, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8764449073829779550, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 4f1e717df7dbde546a85477fa73ea548, type: 3}
 --- !u!1 &782192856
 GameObject:
   m_ObjectHideFlags: 0
@@ -15112,9 +15011,9 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1429503034}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
-  m_UseFullKinematicContacts: 0
+  m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
@@ -15232,7 +15131,11 @@ MonoBehaviour:
   speed: 5
   enemyLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
+  bodyCollider: {fileID: 1429503045}
+  blockingMask:
+    serializedVersion: 2
+    m_Bits: 256
   diepanel: {fileID: 91834491}
   deathScreenCapture: {fileID: 575644667}
   popCoreSkill: {fileID: 0}
@@ -15253,7 +15156,7 @@ MonoBehaviour:
   hasHoneySpin: 0
   hasSnowflakeCandy: 0
   hasCaramelCube: 0
-  hasSugarShield: 1
+  hasSugarShield: 0
   hasSugarPorridge: 0
   hasHyperCandyRushActive: 0
   hasSugarBombParty: 0
@@ -22423,4 +22326,3 @@ SceneRoots:
   - {fileID: 723920944}
   - {fileID: 867951064137957530}
   - {fileID: 575644668}
-  - {fileID: 776706197}
