@@ -13,7 +13,7 @@ public class Spawner : MonoBehaviour
 
         foreach (var rule in spawnRules)
         {
-            rule.lastSpawnTimer = 0f;
+            rule.lastSpawnTimer = rule.spawnInterval;
             rule.hasSpawned = false;
         }
     }

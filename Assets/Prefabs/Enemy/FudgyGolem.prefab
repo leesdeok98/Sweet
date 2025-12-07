@@ -322,7 +322,7 @@ MonoBehaviour:
   dps: 0
   target: {fileID: 0}
   isSlowed: 0
-  knockbackDuration: 0.1
+  knockbackDuration: 0
   isKnockback: 0
   isStunned: 0
   isFrozen: 0

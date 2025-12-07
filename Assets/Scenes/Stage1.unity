@@ -16073,19 +16073,7 @@ MonoBehaviour:
     dps: 5
     hasSpawned: 0
     lastSpawnTimer: 0
-  - description: "\uBE44\uC2A4\uD0B7 \uBC84\uADF8 1"
-    prefabIndex: 5
-    startTime: 40
-    endTime: 40.1
-    spawnCount: 10
-    spawnInterval: 0.1
-    spriteType: 0
-    health: 16
-    speed: 2.5
-    dps: 2
-    hasSpawned: 0
-    lastSpawnTimer: 0
-  - description: "\uBE44\uC2A4\uD0B7 \uBC84\uADF8 2"
+  - description: "\uBE44\uC2A4\uD0B7 \uBC84\uADF8"
     prefabIndex: 5
     startTime: 40
     endTime: 300

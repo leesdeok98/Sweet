@@ -56,7 +56,7 @@ public class PoppingCandyShard : MonoBehaviour
             sr = GetComponent<SpriteRenderer>();
         }
 
-        AudioManager.instance.PlaySfx(AudioManager.Sfx.PoppingCandy_SFX, 0.1f);
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.PoppingCandy_SFX, 0.2f);
     }
 
     void Start()
