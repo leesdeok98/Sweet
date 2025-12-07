@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using Spine.Unity;  
+using Spine.Unity;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -10,29 +10,23 @@ public class Player : MonoBehaviour
     private float initialSpeed; // 초기 속도 저장 (하이퍼캔디 러쉬에서 사용)
 
     private Rigidbody2D rigid;
-    
+
     [SerializeField] private LayerMask enemyLayerMask;
 
-
-    [Header("Kinematic Move")]
-    [SerializeField] private Collider2D bodyCollider;      // 플레이어 몸통 콜라이더
-    [SerializeField] private LayerMask blockingMask;       // 이동을 막는 레이어(벽, 에너미 등)
-
-
     [SerializeField] private GameObject diepanel;
-    [SerializeField] private DeathScreenCapture deathScreenCapture; 
+    [SerializeField] private DeathScreenCapture deathScreenCapture;
     public StrawberryPopCoreSkill popCoreSkill;
     public SugarShieldSkill sugarShieldSkill;
 
-    //  Spine 관련 필드
+    // Spine 관련 필드
     [Header("Spine")]
     [SerializeField] private SkeletonAnimation skeletonAnim;   // 플레이어 Spine 컴포넌트 (직접 할당 or 자식에서 자동 탐색)
     [SpineAnimation] public string idleAnimationName = "idle";  // 가만히 있을 때
     [SpineAnimation] public string walkAnimationName = "walk";  // 이동 시
     [SpineAnimation] public string deadAnimationName = "dead";  // 사망 시
 
-    private string currentAnimationName = ""; //  현재 재생 중인 애니메이션 이름
-    private float spineInitialScaleX = 1f;    //  좌우 반전을 위한 기본 스케일
+    private string currentAnimationName = ""; // 현재 재생 중인 애니메이션 이름
+    private float spineInitialScaleX = 1f;    // 좌우 반전을 위한 기본 스케일
 
     [Header("HP")]
     public float maxHealth = 100f;
@@ -53,28 +47,28 @@ public class Player : MonoBehaviour
     public bool hasCaramelCube = false;
     public bool hasSugarShield = false;
     public bool hasSugarPorridge = false;
-    //인스펙터에서 체크된 스킬들을 한 번만 적용하기 위한 플래그
+
+    // 인스펙터에서 체크된 스킬들을 한 번만 적용하기 위한 플래그
     private bool startingSkillsApplied = false;
 
-    //세트효과 확인용
+    // 세트효과 확인용
     [Header("has SetSkill")]
     public bool hasHyperCandyRushActive = false; // HyperCandyRush 상태
-    public bool hasSugarBombParty = false; // SugarBombParty 상태
+    public bool hasSugarBombParty = false;       // SugarBombParty 상태
 
     [Header("Clear UI")]
     [SerializeField] private GameObject clearPanel;
-    private bool bossWasSpawned = false;             // 보스를 한 번이라도 본 적 있는지
+    private bool bossWasSpawned = false; // 보스를 한 번이라도 본 적 있는지
     private bool stageCleared = false;
-
 
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
 
-        if (bodyCollider == null)
-            bodyCollider = GetComponent<Collider2D>();
+        if (rigid != null)
+            rigid.bodyType = RigidbodyType2D.Dynamic;
 
-        //  Spine SkeletonAnimation 자동/수동 할당
+        // Spine SkeletonAnimation 자동/수동 할당
         if (skeletonAnim == null)
             skeletonAnim = GetComponentInChildren<SkeletonAnimation>();
 
@@ -95,151 +89,11 @@ public class Player : MonoBehaviour
         health = maxHealth;
         isLive = true;
 
-        if (diepanel) diepanel.SetActive(false);
+        if (diepanel)
+            diepanel.SetActive(false);
 
         initialSpeed = speed; // 초기 속도 저장 (이거 지우시면 안돼요 이거 지우시면 하이퍼캔디 러쉬 효과 실행됐을 때 캐릭터 안 움직여요이유ㅠ)
     }
-
-    // ★ 키네마틱용 이동 함수: 앞에 막힌 게 있으면 거기까지만 이동
-    // ★ 키네마틱용 이동 함수: 앞에 막힌 게 있으면 거기까지만 이동
-    // ★ 키네마틱용 이동 함수: 앞에 막힌 게 있으면 거기까지만 이동
-    // ★ 키네마틱용 이동 함수: 앞에 막힌 게 있으면 거기까지만 이동
-    private void KinematicMove(Vector2 delta)
-    {
-        if (rigid == null) return;
-        if (delta.sqrMagnitude <= 0f) return;
-
-        // 콜라이더가 없으면 그냥 이동
-        if (bodyCollider == null)
-        {
-            rigid.MovePosition(rigid.position + delta);
-            return;
-        }
-
-        Bounds bounds = bodyCollider.bounds;
-
-        // 캐스트 기본 크기 / 설정값
-        Vector2 baseSize = bounds.size;
-        const float sideShrinkRatio = 0.8f;
-        const float skin = 0.02f;
-
-        // 🔸 내부에서 쓰는 공통 함수: 주어진 방향/거리로 이동 가능 거리 계산
-        float ComputeAllowed(Vector2 moveDir, float moveDistance, out bool blocked)
-        {
-            blocked = false;
-            if (moveDistance <= 0f || moveDir.sqrMagnitude <= 0f)
-                return 0f;
-
-            moveDir = moveDir.normalized;
-
-            // 이동 방향에 따라 캐스트 박스 옆면을 살짝 줄여 슬라이딩 허용
-            Vector2 castSize = baseSize;
-            if (Mathf.Abs(moveDir.x) > Mathf.Abs(moveDir.y))
-                castSize.y *= sideShrinkRatio;
-            else
-                castSize.x *= sideShrinkRatio;
-
-            RaycastHit2D[] hits = Physics2D.BoxCastAll(
-                bounds.center,
-                castSize,
-                0f,
-                moveDir,
-                moveDistance + skin,
-                blockingMask
-            );
-
-            float maxMove = moveDistance;
-
-            foreach (var hit in hits)
-            {
-                if (hit.collider == null) continue;
-                if (hit.collider.isTrigger) continue;
-
-                // 자기 자신은 무시
-                if (hit.collider.attachedRigidbody == rigid)
-                    continue;
-
-                // 너무 가까운 히트는 방향 판별이 애매하니 스킵
-                Vector2 toHit = hit.point - (Vector2)bounds.center;
-                if (toHit.sqrMagnitude < 0.0001f)
-                    continue;
-
-                // 이동 방향과 "히트까지의 방향"이 얼마나 정면에 가까운지
-                float alignment = Vector2.Dot(moveDir, toHit.normalized);
-
-                // alignment가 작으면(≈0) 옆에 있는 장애물 → 정면이 아니라고 판단하고 무시
-                // 0.5 이하면 옆/대각선 정도로 보고 통과 허용
-                if (alignment < 0.5f)
-                    continue;
-
-                blocked = true;
-                float allowed = hit.distance - skin;
-                if (allowed < maxMove)
-                    maxMove = allowed;
-            }
-
-            if (!blocked)
-                return moveDistance;
-
-            return Mathf.Max(0f, maxMove);
-        }
-
-        // 🔹 1) 원래 의도한 방향으로 먼저 시도
-        float distance = delta.magnitude;
-        Vector2 dir = delta.normalized;
-
-        bool mainBlocked;
-        float mainAllowed = ComputeAllowed(dir, distance, out mainBlocked);
-
-        if (!mainBlocked)
-        {
-            // 정면에 막힌 게 없다 → 원래대로 전체 이동
-            rigid.MovePosition(rigid.position + delta);
-            return;
-        }
-
-        if (mainAllowed > 0f)
-        {
-            // 조금이라도 앞으로 갈 수 있으면, 그만큼만 이동
-            rigid.MovePosition(rigid.position + dir * mainAllowed);
-            return;
-        }
-
-        // 🔹 2) 대각선이 막혔으면, X / Y 축으로 나눠서 슬라이딩 시도
-
-        // (1) X축만 이동 시도
-        Vector2 slideDirX = new Vector2(dir.x, 0f);
-        if (Mathf.Abs(slideDirX.x) > 0.001f)
-        {
-            bool blockedX;
-            float allowedX = ComputeAllowed(slideDirX, distance, out blockedX);
-
-            if (!blockedX || allowedX > 0.001f)
-            {
-                rigid.MovePosition(rigid.position + slideDirX.normalized * allowedX);
-                return;
-            }
-        }
-
-        // (2) Y축만 이동 시도
-        Vector2 slideDirY = new Vector2(0f, dir.y);
-        if (Mathf.Abs(slideDirY.y) > 0.001f)
-        {
-            bool blockedY;
-            float allowedY = ComputeAllowed(slideDirY, distance, out blockedY);
-
-            if (!blockedY || allowedY > 0.001f)
-            {
-                rigid.MovePosition(rigid.position + slideDirY.normalized * allowedY);
-                return;
-            }
-        }
-
-        // 🔹 3) 여기까지 왔는데도 다 막혔다면, 이번 프레임은 그냥 제자리
-    }
-
-
-
 
     void OnEnable()
     {
@@ -250,7 +104,7 @@ public class Player : MonoBehaviour
         // 씬 초기화 시 스킬 초기화
         startingSkillsApplied = false;
 
-        //  다시 활성화될 때 idle 상태로 초기화
+        // 다시 활성화될 때 idle 상태로 초기화
         PlaySpineAnimation(idleAnimationName, true);
     }
 
@@ -267,8 +121,11 @@ public class Player : MonoBehaviour
         // 이동량에 따라 idle / walk 애니메이션 전환
         UpdateSpineAnimationByMove();
 
-        //인스펙터에서 체크된 스킬들을 보고 스킬을 한 번만 적용
+        // 인스펙터에서 체크된 스킬들을 보고 스킬을 한 번만 적용
         TryApplyStartingSkills();
+
+        // 이동 여부에 따라 Rigidbody2D BodyType 전환
+        UpdateRigidbodyBodyType();
     }
 
     void FixedUpdate()
@@ -276,9 +133,8 @@ public class Player : MonoBehaviour
         if (!isLive) return;
 
         Vector2 nextVec = inputVec.normalized * speed * Time.fixedDeltaTime;
-        KinematicMove(nextVec);
+        rigid.MovePosition(rigid.position + nextVec);
     }
-
 
     void LateUpdate()
     {
@@ -293,8 +149,6 @@ public class Player : MonoBehaviour
                 float sign = (inputVec.x < 0) ? -1f : 1f;
                 t.localScale = new Vector3(Mathf.Abs(spineInitialScaleX) * sign, t.localScale.y, t.localScale.z);
             }
-
-
         }
     }
 
@@ -330,6 +184,33 @@ public class Player : MonoBehaviour
         startingSkillsApplied = true;
     }
 
+    void UpdateRigidbodyBodyType()
+    {
+        if (rigid == null) return;
+
+        if (!isLive)
+        {
+            if (rigid.bodyType != RigidbodyType2D.Dynamic)
+                rigid.bodyType = RigidbodyType2D.Dynamic;
+            return;
+        }
+
+        bool isMoving = inputVec.sqrMagnitude > 0.01f;
+
+        if (isMoving)
+        {
+            if (rigid.bodyType != RigidbodyType2D.Dynamic)
+                rigid.bodyType = RigidbodyType2D.Dynamic;
+        }
+        else
+        {
+            if (rigid.bodyType != RigidbodyType2D.Kinematic)
+                rigid.bodyType = RigidbodyType2D.Kinematic;
+
+            rigid.velocity = Vector2.zero;
+        }
+    }
+
     public void TakeDamage(float damage)
     {
         if (!isLive) return;
@@ -348,15 +229,14 @@ public class Player : MonoBehaviour
                 Health healthComponent = GetComponentInChildren<Health>();
                 if (healthComponent != null) healthComponent.ForceRefresh();
 
-                return; 
+                return;
             }
         }
 
         // 실드가 없거나 흡수에 실패했을 때만 플레이어 HP 감소 (기존에 잇던 코드)
-
         health -= damage;
 
-        // Health UI 업데이트 
+        // Health UI 업데이트
         Health healthComp = GetComponentInChildren<Health>();
         if (healthComp != null) healthComp.ForceRefresh();
 
@@ -367,32 +247,30 @@ public class Player : MonoBehaviour
     }
 
     // 물리 충돌(Non-Trigger)로 적과 닿아 있는 동안 지속 피해
-void OnCollisionStay2D(Collision2D collision)
-{
-    if (!isLive) return;
-
-    // 1) 충돌한 오브젝트의 레이어 가져오기
-    int otherLayer = collision.collider.gameObject.layer;
-
-    // 2) enemyLayerMask 안에 이 레이어가 포함되어 있지 않으면 바로 리턴
-    //    (enemyLayerMask.value 써도 되고, 그냥 enemyLayerMask 써도 됨)
-    if ((enemyLayerMask & (1 << otherLayer)) == 0)
-        return;
-
-    // 3) Enemy 컴포넌트 찾기
-    Enemy enemy = collision.collider.GetComponent<Enemy>();
-    if (enemy == null) return;
-
-    // 4) dps(초당 데미지) × fixedDeltaTime = 이번 물리프레임에서 받아야 할 데미지
-    float dmg = enemy.dps * Time.fixedDeltaTime;
-
-    if (dmg > 0f)
+    void OnCollisionStay2D(Collision2D collision)
     {
-        TakeDamage(dmg);
+        if (!isLive) return;
+
+        // 1) 충돌한 오브젝트의 레이어 가져오기
+        int otherLayer = collision.collider.gameObject.layer;
+
+        // 2) enemyLayerMask 안에 이 레이어가 포함되어 있지 않으면 바로 리턴
+        //    (enemyLayerMask.value 써도 되고, 그냥 enemyLayerMask 써도 됨)
+        if ((enemyLayerMask & (1 << otherLayer)) == 0)
+            return;
+
+        // 3) Enemy 컴포넌트 찾기
+        Enemy enemy = collision.collider.GetComponent<Enemy>();
+        if (enemy == null) return;
+
+        // 4) dps(초당 데미지) × fixedDeltaTime = 이번 물리프레임에서 받아야 할 데미지
+        float dmg = enemy.dps * Time.fixedDeltaTime;
+
+        if (dmg > 0f)
+        {
+            TakeDamage(dmg);
+        }
     }
-}
-
-
 
     public void Heal(float amount)
     {
@@ -408,11 +286,11 @@ void OnCollisionStay2D(Collision2D collision)
         isLive = false;
         if (rigid != null) rigid.velocity = Vector2.zero;
 
-        //  코루틴으로 사망 연출 처리
+        // 코루틴으로 사망 연출 처리
         StartCoroutine(DieRoutine());
     }
 
-    //  죽음 애니메이션 → 대기 → 패널 → 게임 정지
+    // 죽음 애니메이션 → 대기 → 패널 → 게임 정지
     private IEnumerator DieRoutine()
     {
         // 1) 사망 애니메이션 재생
@@ -454,11 +332,6 @@ void OnCollisionStay2D(Collision2D collision)
         Time.timeScale = 0f;
     }
 
-
-
-    
-   
-
     // 재시작/부활 시 호출하면 체력/상태 초기화(씬 리로드 없이도 사용 가능)
     public void ResetForRetry()
     {
@@ -481,7 +354,6 @@ void OnCollisionStay2D(Collision2D collision)
         if (diepanel != null)
             diepanel.SetActive(false);  // 기본은 꺼진 상태
     }
-
 
     void UpdateSpineAnimationByMove()
     {
@@ -538,7 +410,7 @@ void OnCollisionStay2D(Collision2D collision)
     {
         // 이미 죽었거나 컴포넌트가 할당되어잇지 않으면 실행 X
         if (!isLive || sbpComponent == null) return;
-        
+
         StartCoroutine(ActivateSugarBombPartyNextFrame(sbpComponent));
     }
 
@@ -555,7 +427,6 @@ void OnCollisionStay2D(Collision2D collision)
     }
 
     /// Spine 애니메이션을 재생하는 공통 함수.
-
     void PlaySpineAnimation(string animName, bool loop)
     {
         if (skeletonAnim == null) return;
@@ -587,7 +458,7 @@ void OnCollisionStay2D(Collision2D collision)
         }
     }
 
-    //  실제로 클리어 패널을 여는 코루틴
+    // 실제로 클리어 패널을 여는 코루틴
     private System.Collections.IEnumerator ShowClearPanelAfterDelay()
     {
         //보스가 DIE 매서드 실행 후 3초 후에 클리어 패널 열기
@@ -605,6 +476,4 @@ void OnCollisionStay2D(Collision2D collision)
         // 스테이지 클리어 시에도 게임 정지
         Time.timeScale = 0f;
     }
-
 }
-

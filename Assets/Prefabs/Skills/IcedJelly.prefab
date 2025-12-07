@@ -127,7 +127,7 @@ MonoBehaviour:
   physicsMovementRelativeTo: {fileID: 0}
   updateTiming: 1
   unscaledTime: 0
-  _animationName: 
+  _animationName: animation
   loop: 1
   timeScale: 1
 --- !u!114 &3623053284239531092
@@ -143,7 +143,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseOrder: 8
-  scale: 100
+  scale: 10
   sortingLayerName: Effect
 --- !u!114 &6715040596975680373
 MonoBehaviour:

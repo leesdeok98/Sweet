@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: -6761210494384181904}
   m_Layer: 8
   m_Name: FudgyGolem
-  m_TagString: Enemy
+  m_TagString: Golem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -267,12 +267,12 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6209733559883107525}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
+  m_Mass: 5
+  m_LinearDrag: 500
   m_AngularDrag: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 0}
@@ -307,22 +307,13 @@ MonoBehaviour:
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 256
-  playerLayerMask:
-    serializedVersion: 2
-    m_Bits: 128
-  playerPushRadius: 0.9
-  playerPushForce: 1.5
-  bodyCollider: {fileID: 0}
-  blockingMask:
-    serializedVersion: 2
-    m_Bits: 0
   speed: 0
   health: 0
   maxHealth: 0
   dps: 0
   target: {fileID: 0}
   isSlowed: 0
-  knockbackDuration: 0
+  knockbackDuration: 0.1
   isKnockback: 0
   isStunned: 0
   isFrozen: 0

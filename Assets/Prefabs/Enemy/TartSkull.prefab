@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: -8092732007463287505}
   m_Layer: 8
   m_Name: TartSkull
-  m_TagString: Boss
+  m_TagString: Golem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -270,12 +270,12 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3992737701259309621}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
+  m_Mass: 5
+  m_LinearDrag: 500
   m_AngularDrag: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
@@ -310,27 +310,18 @@ MonoBehaviour:
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 256
-  playerLayerMask:
-    serializedVersion: 2
-    m_Bits: 128
-  playerPushRadius: 0.9
-  playerPushForce: 1.5
-  bodyCollider: {fileID: 2520477695205531146}
-  blockingMask:
-    serializedVersion: 2
-    m_Bits: 0
   speed: 2
-  health: 0
-  maxHealth: 0
-  dps: 0
+  health: 100
+  maxHealth: 100
+  dps: 1
   target: {fileID: 0}
   isSlowed: 0
-  knockbackDuration: 0
+  knockbackDuration: 0.1
   isKnockback: 0
   isStunned: 0
   isFrozen: 0
   vec2: {x: 0, y: 0}
-  hitFlashDuration: 0.05
+  hitFlashDuration: 0.01
   hitFlashCooldown: 0.5
   followDuration: 4
   chargeSpeed: 15

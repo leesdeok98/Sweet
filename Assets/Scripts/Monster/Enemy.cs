@@ -22,15 +22,6 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float separateForce = 1.5f;    // 얼마나 세게 밀어낼지
     [SerializeField] private LayerMask enemyLayerMask;      // Enemy가 있는 레이어
 
-    [Header("Player Push")]
-    [SerializeField] private LayerMask playerLayerMask;     // 플레이어가 있는 레이어
-    [SerializeField] private float playerPushRadius = 0.4f; // 플레이어와 너무 겹쳤다고 보는 거리
-    [SerializeField] private float playerPushForce = 1.5f;  // 한 프레임당 밀어내는 힘
-
-    [Header("Kinematic Move")]
-    [SerializeField] private Collider2D bodyCollider;       // 에너미 몸통 콜라이더
-    [SerializeField] private LayerMask blockingMask;
-
     private Coroutine knockbackRoutine;
 
     // 🔸 전역 이벤트: 어떤 적이든 죽으면 한 번만 방송
@@ -89,9 +80,6 @@ public class Enemy : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         originalSpeed = speed; // 인스펙터의 초기 speed 저장 
 
-        if (bodyCollider == null)
-            bodyCollider = GetComponent<Collider2D>();
-
         // 스파인 초기 스케일 저장(좌우 반전용)
         if (skeletonAnimation != null)
             spineInitialScaleX = skeletonAnimation.transform.localScale.x;
@@ -109,14 +97,12 @@ public class Enemy : MonoBehaviour
         if (shadowRenderer != null)
             shadowOriginalColor = shadowRenderer.color;
 
-            if (skeletonAnimation != null && skeletonAnimation.Skeleton != null)
-            {
-                var s = skeletonAnimation.Skeleton;
-                hitOriginalColor = new Color(s.R, s.G, s.B, s.A);
-            }
-
+        if (skeletonAnimation != null && skeletonAnimation.Skeleton != null)
+        {
+            var s = skeletonAnimation.Skeleton;
+            hitOriginalColor = new Color(s.R, s.G, s.B, s.A);
+        }
     }
-
 
     void Start()
     {
@@ -162,7 +148,6 @@ public class Enemy : MonoBehaviour
             return;
         }
 
-        
         if (!isLive || target == null) return;
 
         // 플레이어를 향해 이동
@@ -170,7 +155,7 @@ public class Enemy : MonoBehaviour
         Vector2 nextVec = dir.normalized * speed * Time.fixedDeltaTime;
 
         vec2 = dir.normalized; //이동 방향 기록 x 값으로 좌우 판별
-        KinematicMove(nextVec);
+        rb.MovePosition(rb.position + nextVec);
 
         // 물리 잔여속도 제거
         rb.velocity = Vector2.zero;
@@ -195,92 +180,10 @@ public class Enemy : MonoBehaviour
                 t.localScale.z
             );
         }
+
         //겹침 방지
         SeparateFromOthers();
-        SeparateFromPlayer();   // ★ 플레이어와도 살짝 떨어지기
-
     }
-    // ★ 키네마틱용 이동 함수
-    // ★ 키네마틱용 이동 함수
-    // ★ 키네마틱용 이동 함수
-    private void KinematicMove(Vector2 delta)
-    {
-        if (rb == null) return;
-        if (delta.sqrMagnitude <= 0f) return;
-
-        if (bodyCollider == null)
-        {
-            rb.MovePosition(rb.position + delta);
-            return;
-        }
-
-        float distance = delta.magnitude;
-        Vector2 dir = delta.normalized;
-
-        Bounds bounds = bodyCollider.bounds;
-
-        Vector2 castSize = bounds.size;
-        const float sideShrinkRatio = 0.8f;
-
-        if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
-        {
-            castSize.y *= sideShrinkRatio;
-        }
-        else
-        {
-            castSize.x *= sideShrinkRatio;
-        }
-
-        const float skin = 0.02f;
-
-        RaycastHit2D[] hits = Physics2D.BoxCastAll(
-            bounds.center,
-            castSize,
-            0f,
-            dir,
-            distance + skin,
-            blockingMask
-        );
-
-        float maxMove = distance;
-        bool blocked = false;
-
-        foreach (var hit in hits)
-        {
-            if (hit.collider == null) continue;
-            if (hit.collider.isTrigger) continue;
-
-            if (hit.collider.attachedRigidbody == rb)
-                continue;
-
-            Vector2 toHit = hit.point - (Vector2)bounds.center;
-            if (toHit.sqrMagnitude < 0.0001f)
-                continue;
-
-            float alignment = Vector2.Dot(dir, toHit.normalized);
-
-            if (alignment < 0.5f)
-                continue;
-
-            blocked = true;
-            float allowed = hit.distance - skin;
-            if (allowed < maxMove)
-                maxMove = allowed;
-        }
-
-        if (!blocked)
-        {
-            rb.MovePosition(rb.position + delta);
-        }
-        else
-        {
-            maxMove = Mathf.Max(0f, maxMove);
-            rb.MovePosition(rb.position + dir * maxMove);
-        }
-    }
-
-
-
 
     protected virtual void OnEnable()
     {
@@ -376,7 +279,6 @@ public class Enemy : MonoBehaviour
         }
     }
 
-
     /// <summary>
     /// 스폰 시 외부에서 스탯 일괄 설정 (스폰러가 호출)
     /// </summary>
@@ -441,8 +343,6 @@ public class Enemy : MonoBehaviour
     {
         if (!isLive) return;
 
-        
-
         health -= damage;
         if (health <= 0f)
             Die();
@@ -475,61 +375,6 @@ public class Enemy : MonoBehaviour
 
         hitFlashRoutine = null;
     }
-
-    void SeparateFromPlayer()
-    {
-        if (rb == null) return;
-        if (!isLive) return;
-
-        //// 넉백/빙결/스턴 중에는 강제로 밀지 않음 (원하면 이 줄들은 빼도 됨)
-        //if (isKnockback || isFrozen || isStunned)
-        //    return;
-
-        // 플레이어 레이어에 해당하는 콜라이더가 내 주변에 있는지 확인
-        Collider2D[] hits = Physics2D.OverlapCircleAll(
-            rb.position,
-            playerPushRadius,
-            playerLayerMask
-        );
-
-        if (hits == null || hits.Length == 0)
-            return;
-
-        // 가장 가까운 플레이어 기준으로 살짝 반대 방향으로 밀기
-        Collider2D closest = null;
-        float closestDist = float.MaxValue;
-
-        foreach (var hit in hits)
-        {
-            if (hit == null) continue;
-            if (hit.attachedRigidbody == rb) continue; // 자기 자신이면 무시
-
-            float dist = Vector2.SqrMagnitude(rb.position - hit.attachedRigidbody.position);
-            if (dist < closestDist)
-            {
-                closestDist = dist;
-                closest = hit;
-            }
-        }
-
-        if (closest == null) return;
-
-        Vector2 playerPos = closest.attachedRigidbody != null
-            ? closest.attachedRigidbody.position
-            : (Vector2)closest.transform.position;
-
-        Vector2 diff = rb.position - playerPos;
-        if (diff.sqrMagnitude < 0.0001f) return;
-
-        Vector2 pushDir = diff.normalized;
-
-        // 한 프레임당 살짝만 밀어냄
-        float step = playerPushForce * Time.deltaTime;
-        rb.MovePosition(rb.position + pushDir * step);
-    }
-
-
-
 
     /// <summary>
     /// 사망 처리 (애니메이션 트리거 + 처치 이벤트 + 비활성)
@@ -597,6 +442,7 @@ public class Enemy : MonoBehaviour
         // 죽음 애니메이션이 끝난 뒤 살짝 여유 주고 비활성화
         StartCoroutine(DeactivateAfterDelay(deactivateDelay + 0.1f));
     }
+
     //그림자 코루틴
     IEnumerator FadeShadowOut(float duration)
     {
@@ -634,9 +480,6 @@ public class Enemy : MonoBehaviour
         shadowFadeRoutine = null;
     }
 
-
-
-
     IEnumerator DeactivateAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -645,7 +488,6 @@ public class Enemy : MonoBehaviour
 
     public virtual void OnCollisionStay2D(Collision2D collision)
     {
-        //플레이어에 이미 데미지 코드가 있음
         //if (isLive && collision.gameObject.CompareTag("Player"))
         //{
         //    collision.gameObject.GetComponent<Player>().TakeDamage(dps * Time.deltaTime);
@@ -706,24 +548,17 @@ public class Enemy : MonoBehaviour
         {
             elapsed += Time.fixedDeltaTime;
 
-            if (rb != null)
-            {
-                float step = force * Time.fixedDeltaTime;
-                rb.MovePosition(rb.position + knockDir * step);
-            }
+            // velocity로 직접 밀기
+            rb.velocity = knockDir * force;
 
             yield return new WaitForFixedUpdate();
         }
 
         // 넉백 종료
-        if (rb != null)
-            rb.velocity = Vector2.zero;
-
+        rb.velocity = Vector2.zero;
         isKnockback = false;
         knockbackRoutine = null;
     }
-
-
 
     public void ApplyStun(float duration)
     {
@@ -771,7 +606,6 @@ public class Enemy : MonoBehaviour
             if (skeletonAnimation != null)
                 skeletonAnimation.timeScale = 0f; // 시간 0 = 멈춤
 
-            
             if (rb != null) rb.velocity = Vector2.zero;
         }
         else
@@ -788,6 +622,5 @@ public class Enemy : MonoBehaviour
 
         if (skeletonAnimation != null)
             skeletonAnimation.timeScale = 1f;
-        
     }
 }

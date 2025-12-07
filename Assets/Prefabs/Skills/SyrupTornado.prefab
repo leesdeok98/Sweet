@@ -214,4 +214,4 @@ MonoBehaviour:
   timeScale: 1
   useFixedTick: 0
   tickInterval: 0.2
-  imageOffset: {x: 0, y: 1}
+  imageOffset: {x: 0, y: -0.4}

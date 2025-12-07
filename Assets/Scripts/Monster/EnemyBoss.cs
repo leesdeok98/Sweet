@@ -28,6 +28,12 @@ public class EnemyBoss : Enemy
 
     private bool isActing = false;   // 패턴 동작 중인지(추적 off)
 
+    // ★ 추가: 돌진 관통/데미지용
+    private bool isCharging = false;
+    private Collider2D[] bossColliders;
+
+    // ★ 추가: 발사 패턴 시 원래 Rigidbody2D 상태 저장용
+    private RigidbodyType2D originalBodyType;
 
     void Start()
     {
@@ -41,6 +47,10 @@ public class EnemyBoss : Enemy
         rb = GetComponent<Rigidbody2D>();
         if (skeletonAnimation == null)
             skeletonAnimation = GetComponent<SkeletonAnimation>();
+
+        // ★ 추가: 시작 시 원래 Rigidbody2D 타입 저장 (보통 Dynamic일 것)
+        if (rb != null)
+            originalBodyType = rb.bodyType;
 
         // GameManager에서 플레이어 가져오기
         if (GameManager.instance != null && GameManager.instance.player != null)
@@ -62,6 +72,9 @@ public class EnemyBoss : Enemy
         // 기본 추적 애니메이션
         if (skeletonAnimation != null && !string.IsNullOrEmpty(runAnimName))
             skeletonAnimation.AnimationState.SetAnimation(0, runAnimName, true);
+
+        // ★ 추가: 보스 자신의 콜라이더들 캐싱
+        bossColliders = GetComponentsInChildren<Collider2D>();
 
         StartCoroutine(BossPatternRoutine());
     }
@@ -144,6 +157,19 @@ public class EnemyBoss : Enemy
         float originalDps = dps;
         dps = chargeDamage; // 돌진 중 데미지 강화
 
+        // ★ 관통 시작: 모든 콜라이더를 Trigger로 전환
+        isCharging = true;
+        bool[] prevIsTrigger = null;
+        if (bossColliders != null && bossColliders.Length > 0)
+        {
+            prevIsTrigger = new bool[bossColliders.Length];
+            for (int i = 0; i < bossColliders.Length; i++)
+            {
+                prevIsTrigger[i] = bossColliders[i].isTrigger;
+                bossColliders[i].isTrigger = true;
+            }
+        }
+
         // 1) 돌진 방향(플레이어 기준)
         Vector2 dir;
         if (target != null)
@@ -211,15 +237,29 @@ public class EnemyBoss : Enemy
         if (rb != null)
             rb.velocity = Vector2.zero;
 
+        // ★ 관통 종료: 콜라이더 Trigger 상태 복구
+        if (bossColliders != null && prevIsTrigger != null)
+        {
+            for (int i = 0; i < bossColliders.Length && i < prevIsTrigger.Length; i++)
+            {
+                if (bossColliders[i] != null)
+                    bossColliders[i].isTrigger = prevIsTrigger[i];
+            }
+        }
+
+        isCharging = false;
         dps = originalDps; // dps 원래대로 복구
     }
-
 
     //  패턴 2: 탄 발사
     IEnumerator ShootPattern()
     {
+        // ★ 발사 패턴 동안에는 자리 고정 + 키네마틱으로 변경
         if (rb != null)
+        {
             rb.velocity = Vector2.zero;
+            rb.bodyType = RigidbodyType2D.Kinematic;
+        }
 
         // 공격 애니메이션 재생
         float waitTime = 0.5f;
@@ -253,6 +293,13 @@ public class EnemyBoss : Enemy
 
         // 애니메이션 길이만큼 대기
         yield return new WaitForSeconds(waitTime);
+
+        // ★ 발사 패턴 종료 후, 다시 원래 바디 타입(Dynamic)으로 복구
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.bodyType = originalBodyType;
+        }
     }
 
     void OnDisable()
@@ -260,5 +307,36 @@ public class EnemyBoss : Enemy
         StopAllCoroutines();
         if (rb != null)
             rb.velocity = Vector2.zero;
+
+        // ★ 비활성화 시에도 안전하게 상태 원복
+        isCharging = false;
+        if (bossColliders != null)
+        {
+            foreach (var col in bossColliders)
+            {
+                if (col != null)
+                    col.isTrigger = false;
+            }
+        }
+
+        // ★ 추가: 혹시 발사 중 비활성화되면 바디 타입도 원복
+        if (rb != null)
+            rb.bodyType = originalBodyType;
+    }
+
+    // ★ 추가: 돌진 중 플레이어 관통 순간에 chargeDamage 한 번 데미지
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!isLive) return;
+        if (!isCharging) return;
+        if (!other.CompareTag("Player")) return;
+
+        Player player = other.GetComponent<Player>();
+        if (player == null) return;
+
+        if (chargeDamage > 0f)
+        {
+            player.TakeDamage(chargeDamage);
+        }
     }
 }

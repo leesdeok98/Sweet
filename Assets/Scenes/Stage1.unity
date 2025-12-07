@@ -15011,12 +15011,12 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1429503034}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
+  m_Mass: 2
+  m_LinearDrag: 500
   m_AngularDrag: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
@@ -15043,7 +15043,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 4765972778447892138, guid: 84717f3c43c75ab40b0fcc16571fee1f, type: 3}
-  popChancePer: 0.3
+  popChancePer: 0.15
   extraBulletCount: 8
   bulletSpeed: 5
 --- !u!114 &1429503040
@@ -15132,10 +15132,6 @@ MonoBehaviour:
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 256
-  bodyCollider: {fileID: 1429503045}
-  blockingMask:
-    serializedVersion: 2
-    m_Bits: 256
   diepanel: {fileID: 91834491}
   deathScreenCapture: {fileID: 575644667}
   popCoreSkill: {fileID: 0}
@@ -15148,7 +15144,7 @@ MonoBehaviour:
   health: 70
   hasIcedJellySkill: 0
   hasDarkChip: 0
-  hasRollingChocolateBar: 0
+  hasRollingChocolateBar: 1
   hasPoppingCandy: 0
   hasSyrupTornado: 0
   hasCocoaPowder: 0
@@ -21008,7 +21004,7 @@ MonoBehaviour:
   - {fileID: 602878481925108109, guid: 1198467f65cf3704c8a9daf0b4e78122, type: 3}
   - {fileID: 8337420281652448825, guid: 430edfe8e42fa114dbe322adb7506925, type: 3}
   - {fileID: 2573533215926175062, guid: 51da079ab9b4a214aaf8fd33d696401b, type: 3}
-  poppingChance: 0.2
+  poppingChance: 0.1
   darkChipPercent: 0.3
   darkChipSpinePrefab: {fileID: 8358102944823119088, guid: 3bce94651fab6a442b4539f11bd7c52e, type: 3}
   darkChipAnimName: animation
