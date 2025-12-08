@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 6240411473588414844}
   - component: {fileID: 7203625422419158752}
   - component: {fileID: 4162799710119241086}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: SugarShield2
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

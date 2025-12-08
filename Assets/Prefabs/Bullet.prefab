@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 6188430291500693671}
   - component: {fileID: 8925112846880800324}
   - component: {fileID: 7239264720877347162}
-  - component: {fileID: 1271012493434481261}
   - component: {fileID: -1186312517586220965}
   m_Layer: 0
   m_Name: Bullet
@@ -135,22 +134,6 @@ MonoBehaviour:
   bittermeltChaosDuration: 5
   bittermeltChaosHpBuffMultiplier: 1.3
   knockbackForce: 0.5
---- !u!114 &1271012493434481261
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4765972778447892138}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8115acb7b8c772488cd82392ef7cbec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 4765972778447892138}
-  popChancePer: 0.15
-  extraBulletCount: 8
-  bulletSpeed: 5
 --- !u!58 &-1186312517586220965
 CircleCollider2D:
   m_ObjectHideFlags: 0
