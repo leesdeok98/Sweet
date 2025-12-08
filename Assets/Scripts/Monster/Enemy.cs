@@ -54,6 +54,9 @@ public class Enemy : MonoBehaviour
     public bool isStunned = false;
     public bool isFrozen = false;
 
+    // ★ 추가: 넉백 무시용 플래그 (보스 발사 패턴 등에서 사용)
+    public bool ignoreKnockback = false;
+
     private Coroutine removeSlowRoutine;
 
     // 🔸 처치수 중복 집계 방지용
@@ -210,6 +213,7 @@ public class Enemy : MonoBehaviour
         freezeRemain = 0f;         // 남은 빙결 시간 초기화
         isStunned = false;         // 스턴 상태 해제
         isKnockback = false;       // 넉백 상태 해제
+        ignoreKnockback = false;   // 넉백 무시 플래그도 리셋
 
         if (skeletonAnimation != null)
             skeletonAnimation.timeScale = 1f;
@@ -303,6 +307,7 @@ public class Enemy : MonoBehaviour
         freezeRemain = 0f;         // 남은 빙결 시간 초기화
         isStunned = false;         // 스턴 상태 해제
         isKnockback = false;       // 넉백 상태 해제
+        ignoreKnockback = false;   // 넉백 무시 플래그 리셋
 
         if (skeletonAnimation != null)
         {
@@ -524,6 +529,9 @@ public class Enemy : MonoBehaviour
         if (!isLive) return;
         if (rb == null) return;
         if (!gameObject.activeInHierarchy) return;
+
+        // ★ 추가: 넉백 무시 플래그가 켜져 있으면 바로 리턴
+        if (ignoreKnockback) return;
 
         // 이미 넉백 중이면 이전 코루틴 정지
         if (knockbackRoutine != null)

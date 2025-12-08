@@ -16,18 +16,19 @@ public class CocoaPowderBullet : MonoBehaviour
 
     private readonly Color cocoaColor = new Color(0.55f, 0.3f, 0.1f);
 
-    //  추가: 넉백 제외할 태그 (기본값 Golem)
+    // 🔸 넉백 / 스턴 처리에 사용할 태그들
+    [Header("Knockback / Stun Exclude Tags")]
     [SerializeField] private string golemTag = "Golem";
+    [SerializeField] private string bossTag = "Boss";
 
     void Awake()
     {
-        
         sr = GetComponent<SpriteRenderer>();
         player = GameObject.FindWithTag("Player")?.GetComponent<Player>();
 
-        
         if (sr != null)
             sr.color = cocoaColor;
+
         enemyLayer = LayerMask.NameToLayer("Enemy");
     }
 
@@ -55,18 +56,19 @@ public class CocoaPowderBullet : MonoBehaviour
 
         hitEnemy.TakeDamage(damage);
 
-        
-        //  골렘 태그인 경우에는 넉백만 제외
-        if (!collision.CompareTag(golemTag))
+        // 🔸 골렘도 아니고, 보스도 아닐 때만 넉백 적용
+        if (!collision.CompareTag(golemTag) && !collision.CompareTag(bossTag))
         {
             Vector2 knockDir = (hitEnemy.transform.position - transform.position).normalized;
             hitEnemy.ApplyKnockback(knockDir, knockbackPower);
         }
 
-        // 골렘이든 아니든 스턴은 동일하게 적용
-        hitEnemy.ApplyStun(stunDuration);
+        // 🔸 보스만 스턴 제외 (골렘은 스턴 O)
+        if (!collision.CompareTag(bossTag))
+        {
+            hitEnemy.ApplyStun(stunDuration);
+        }
 
-        
         Deactivate();
     }
 }

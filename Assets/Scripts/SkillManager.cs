@@ -207,9 +207,15 @@ public class SkillManager : MonoBehaviour
             player = FindObjectOfType<Player>();
 
         // 슈가 실드
-        sugarShieldSkill = GetComponent<SugarShieldSkill>(); // 변경된 타입으로 컴포넌트 가져오기
-        //if (sugarShieldSkill == null) Debug.LogError("SugarShieldSkill is missing on Player!");
+
+        // 실제 슈가쉴드 컴포넌트는 플레이어에서 가져오도록 수정
+        if (player != null)
+        {
+            sugarShieldSkill = player.GetComponent<SugarShieldSkill>();
+        }
+        
     }
+
 
     void Start()
     {
@@ -238,6 +244,9 @@ public class SkillManager : MonoBehaviour
     /// <summary>
     /// 모든 스킬 플래그와 중첩 스택을 0으로 초기화합니다.
     /// </summary>
+    /// <summary>
+    /// 모든 스킬 플래그와 중첩 스택을 0으로 초기화합니다.
+    /// </summary>
     public void ResetAllSkills()
     {
         if (player == null) return;
@@ -255,15 +264,52 @@ public class SkillManager : MonoBehaviour
         player.hasSnowflakeCandy = false;
         player.hasCaramelCube = false;
         player.hasSugarPorridge = false;
+        player.hasSugarShield = false; // 중복이지만 문제는 없음
+
+        // ★ 슈가실드 정리: 코루틴 정지 + 기존 쉴드 제거
+        //  (SugarShieldSkill 쪽에 StopSugarShieldGeneration(bool clearExistingShields) 메서드가 있어야 함)
+        var shieldManager = player.GetComponent<SugarShieldSkill>();
+        if (shieldManager != null)
+        {
+            shieldManager.StopSugarShieldGeneration(true);
+        }
 
         // 스탯 및 중첩 횟수 초기화
         darkChipLevel = 0;
         Bullet.damageMultiplier = 1f;
 
         // 세트 효과 리셋
-        bittermeltChaosActive = false;
-        DeactivateIcebreakerSet(); // 아이스브레이커 세트 효과도 해제
-        twistOrTreatActive = false; // 트오트 세트 해제
+        bittermeltChaosActive = false;   // 비터멜트 카오스
+        DeactivateIcebreakerSet();       // 아이스브레이커 세트 효과도 해제 (슬로우 / 속도 원복)
+        twistOrTreatActive = false;      // 트오트 세트 해제
+        hasHyperCandyRushActive = false; // 하이퍼 캔디 러쉬
+        hasSweetarmorComboActive = false; // 스윗아머 콤보
+        isSugarBombPartyActive = false;   // 슈가밤 파티
+
+        // ★ 하이퍼 캔디 러쉬 효과 OFF (이동속도/공속 원복)
+        player.ActivateHyperCandyRush(false);
+
+        // ★ 스위트아머 콤보 컴포넌트 제거
+        if (sweetarmorComboComponent != null)
+        {
+            Destroy(sweetarmorComboComponent);
+            sweetarmorComboComponent = null;
+        }
+
+        // ★ 슈가밤 파티 비주얼/로직 정리
+        if (player.hasSugarBombParty)
+            player.hasSugarBombParty = false;
+
+        if (sugarBombPartyComponent != null)
+        {
+            Destroy(sugarBombPartyComponent);
+            sugarBombPartyComponent = null;
+        }
+
+        // ★ 세트 FX 재생 여부 리셋 (다시 세트 발동 시 FX 다시 나오게)
+        icebreakerFxPlayed = false;
+        bittermeltChaosFxPlayed = false;
+        twistOrTreatFxPlayed = false;
 
         // 지속형 오브젝트 파괴
         if (syrupTornadoInstance != null)
@@ -278,8 +324,10 @@ public class SkillManager : MonoBehaviour
             darkChipSpineInstance = null;
         }
 
+        // 허니스핀 오브젝트 제거
         ClearHoneySpinInstances();
     }
+
 
     /// <summary>
     /// 특정 스킬 '하나'를 활성화합니다. (InventoryManager가 호출)

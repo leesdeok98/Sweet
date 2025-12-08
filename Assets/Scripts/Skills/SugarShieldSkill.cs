@@ -151,4 +151,35 @@ public class SugarShieldSkill : MonoBehaviour
         Debug.Log("업그레이드 실드: S1과 S2 동시 생성 완료!");
 
     }
+
+    // ★ 슈가 쉴드 생성 중지 + 기존 쉴드 정리
+    public void StopSugarShieldGeneration(bool clearExistingShields)
+    {
+        // 더 이상 자동 생성 안 함
+        isGenerating = false;
+
+        // 코루틴 돌고 있으면 중지
+        if (generationCoroutine != null)
+        {
+            StopCoroutine(generationCoroutine);
+            generationCoroutine = null;
+        }
+
+        // 필요하면 현재 떠 있는 쉴드도 같이 제거
+        if (clearExistingShields)
+        {
+            if (activeShield1 != null)
+            {
+                Destroy(activeShield1);
+                activeShield1 = null;
+            }
+
+            if (activeShield2 != null)
+            {
+                Destroy(activeShield2);
+                activeShield2 = null;
+            }
+        }
+    }
+
 }

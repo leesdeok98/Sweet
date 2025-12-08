@@ -27,6 +27,8 @@ public class SweetarmorCombo : MonoBehaviour
     public string ShieldAnimation = "animation";
     public float spineTimeScale = 1.0f;
 
+    // ★ 세트 효과가 이미 한 번 발동되었는지 여부 (중복 발동/이펙트 방지)
+    private bool comboActivatedOnce = false;
 
     void Start()
     {
@@ -51,6 +53,14 @@ public class SweetarmorCombo : MonoBehaviour
     {
         Debug.Log("[1] ActivateComboEffect 시작");
 
+        // ★ 이미 한 번 발동했다면 다시 실행하지 않음
+        if (comboActivatedOnce)
+        {
+            Debug.Log("[SweetarmorCombo] 이미 세트 효과가 발동된 상태입니다. 다시 실행하지 않습니다.");
+            return;
+        }
+        comboActivatedOnce = true;
+
         // 비주얼 생성
         if (comboVisualPrefab != null)
         {
@@ -67,7 +77,7 @@ public class SweetarmorCombo : MonoBehaviour
         }
 
         // Spine 애니메이션 재생 (딱 한 번만 재생)
-        if (skeleton != null)  
+        if (skeleton != null)
         {
             Debug.Log("[3] 스파인 애니메이션 재생 명령");
             skeleton.timeScale = spineTimeScale;

@@ -32,9 +32,6 @@ public class EnemyBoss : Enemy
     private bool isCharging = false;
     private Collider2D[] bossColliders;
 
-    // ★ 추가: 발사 패턴 시 원래 Rigidbody2D 상태 저장용
-    private RigidbodyType2D originalBodyType;
-
     void Start()
     {
         // BGM 재생
@@ -47,10 +44,6 @@ public class EnemyBoss : Enemy
         rb = GetComponent<Rigidbody2D>();
         if (skeletonAnimation == null)
             skeletonAnimation = GetComponent<SkeletonAnimation>();
-
-        // ★ 추가: 시작 시 원래 Rigidbody2D 타입 저장 (보통 Dynamic일 것)
-        if (rb != null)
-            originalBodyType = rb.bodyType;
 
         // GameManager에서 플레이어 가져오기
         if (GameManager.instance != null && GameManager.instance.player != null)
@@ -254,12 +247,11 @@ public class EnemyBoss : Enemy
     //  패턴 2: 탄 발사
     IEnumerator ShootPattern()
     {
-        // ★ 발사 패턴 동안에는 자리 고정 + 키네마틱으로 변경
+        // ★ 발사 패턴 동안에는 제자리에서 캐스팅 + 넉백 무시
         if (rb != null)
-        {
             rb.velocity = Vector2.zero;
-            rb.bodyType = RigidbodyType2D.Kinematic;
-        }
+
+        ignoreKnockback = true;   // ★ Enemy 쪽에서 넉백 무시
 
         // 공격 애니메이션 재생
         float waitTime = 0.5f;
@@ -294,12 +286,11 @@ public class EnemyBoss : Enemy
         // 애니메이션 길이만큼 대기
         yield return new WaitForSeconds(waitTime);
 
-        // ★ 발사 패턴 종료 후, 다시 원래 바디 타입(Dynamic)으로 복구
+        // ★ 발사 패턴 종료: 넉백 다시 허용
         if (rb != null)
-        {
             rb.velocity = Vector2.zero;
-            rb.bodyType = originalBodyType;
-        }
+
+        ignoreKnockback = false;
     }
 
     void OnDisable()
@@ -319,9 +310,8 @@ public class EnemyBoss : Enemy
             }
         }
 
-        // ★ 추가: 혹시 발사 중 비활성화되면 바디 타입도 원복
-        if (rb != null)
-            rb.bodyType = originalBodyType;
+        // ★ 넉백 무시 플래그도 초기화
+        ignoreKnockback = false;
     }
 
     // ★ 추가: 돌진 중 플레이어 관통 순간에 chargeDamage 한 번 데미지

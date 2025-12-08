@@ -100,7 +100,6 @@ GameObject:
   - component: {fileID: 8868313887707168508}
   - component: {fileID: 6700478800256728882}
   - component: {fileID: 650588385912655895}
-  - component: {fileID: 8772064846758416921}
   m_Layer: 8
   m_Name: DonutBomb
   m_TagString: Enemy
@@ -329,25 +328,11 @@ MonoBehaviour:
   vec2: {x: 0, y: 0}
   hitFlashDuration: 0.05
   hitFlashCooldown: 0.5
-  explosionRadius: 0.92
+  explosionRadius: 1.5
   explosionDamage: 10
   explosionDelay: 0.1
   explosionAnimName: bomb
+  explosionScaleMultiplier: 1.5
   Player:
     serializedVersion: 2
     m_Bits: 128
---- !u!114 &8772064846758416921
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4844216729306248592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7883c8fbe6626ad41bcda8d3f54e816a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  baseOrder: 10
-  scale: 9
-  sortingLayerName: 

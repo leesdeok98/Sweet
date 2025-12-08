@@ -21,6 +21,8 @@ public class HyperCandyRush : MonoBehaviour
     private const float MAX_MOVING_INCREASE = 0.30f;
     private const float INCREASE_PER_SECOND = 0.03f;
 
+    // ★ 세트 효과가 이미 한 번 발동되었는지 여부 (중복 발동/이펙트 방지)
+    private bool hasPlayedOnce = false;
 
     void Start()
     {
@@ -39,6 +41,14 @@ public class HyperCandyRush : MonoBehaviour
 
     public void ActivateSetEffect()
     {
+        // ★ 이미 세트 효과가 발동된 상태라면 다시 실행하지 않음 (FX 1회만 표시)
+        if (hasPlayedOnce)
+        {
+            Debug.Log("[HyperCandyRush] 이미 세트 효과가 발동된 상태입니다. 다시 실행하지 않습니다.");
+            return;
+        }
+        hasPlayedOnce = true;
+
         // 비주얼 생성
         if (comboVisualPrefab != null)
         {
@@ -53,10 +63,10 @@ public class HyperCandyRush : MonoBehaviour
         }
 
         // Spine 애니메이션 재생
-        if (skeleton != null)  
+        if (skeleton != null)
         {
             skeleton.timeScale = spineTimeScale;
-            skeleton.AnimationState.SetAnimation(0, RushAnimation, false);   
+            skeleton.AnimationState.SetAnimation(0, RushAnimation, false);
             AudioManager.instance.PlaySfx(AudioManager.Sfx.HyperCandyRush_SFX);
         }
 
@@ -117,7 +127,7 @@ public class HyperCandyRush : MonoBehaviour
         StopMovementCheck();
     }
 
-    
+
     void OnDestroy()
     {
         StopMovementCheck();

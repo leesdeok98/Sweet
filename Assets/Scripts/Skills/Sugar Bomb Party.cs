@@ -16,6 +16,8 @@ public class SugarBombParty : MonoBehaviour
     private Player player;
     private PlayerShooting shooting;
 
+    //  세트 효과를 이미 한 번 발동했는지 여부 (중복 이펙트 방지용)
+    private bool hasPlayedOnce = false;
 
     void Start()
     {
@@ -33,6 +35,14 @@ public class SugarBombParty : MonoBehaviour
 
     public void ActivateSetEffect()
     {
+        //  이미 한 번 발동했다면 다시 실행하지 않음 (세트 이펙트 1회만 표시)
+        if (hasPlayedOnce)
+        {
+            Debug.Log("[SugarBombParty] 이미 세트 효과가 발동된 상태입니다. 다시 실행하지 않습니다.");
+            return;
+        }
+        hasPlayedOnce = true;
+
         // 비주얼 생성 및 Spine 애니메이션 재생 (다른 세트 효과와 동일)
         if (comboVisualPrefab != null)
         {
