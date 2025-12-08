@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;   // ★ 추가
 using UnityEngine;
 
 public class RollingChocolateBarAttack : MonoBehaviour
@@ -16,6 +17,12 @@ public class RollingChocolateBarAttack : MonoBehaviour
 
     //  Enemy 레이어 번호 저장용
     private int enemyLayer;
+
+    // ★ 추가: 적별 피격 쿨타임(초) – 인스펙터에서 조절 가능
+    [SerializeField] private float damageCooldown = 0.5f;
+
+    // ★ 추가: 적별 마지막 피격 시간 기록
+    private Dictionary<Enemy, float> lastHitTime = new Dictionary<Enemy, float>();
 
     void Awake()
     {
@@ -86,11 +93,23 @@ public class RollingChocolateBarAttack : MonoBehaviour
         if (collision.gameObject.layer != enemyLayer) return;
 
         var hitEnemy = collision.GetComponent<Enemy>();
-        if (hitEnemy != null)
+        if (hitEnemy == null) return;
+
+        // ★ 적별 쿨타임 체크
+        float now = Time.time;
+        float lastTime;
+        if (lastHitTime.TryGetValue(hitEnemy, out lastTime))
         {
-            hitEnemy.TakeDamage(damage);
-            Vector2 dir = (hitEnemy.transform.position - transform.position).normalized;
-            hitEnemy.ApplyKnockback(dir, knockbackForce);
+            // 마지막 피격 후 damageCooldown초가 안 지났으면 데미지/넉백 무시
+            if (now - lastTime < damageCooldown)
+                return;
         }
+
+        // 이번 타이밍을 마지막 피격 시간으로 기록
+        lastHitTime[hitEnemy] = now;
+
+        hitEnemy.TakeDamage(damage);
+        Vector2 dir = (hitEnemy.transform.position - transform.position).normalized;
+        hitEnemy.ApplyKnockback(dir, knockbackForce);
     }
 }
