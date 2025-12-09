@@ -11,9 +11,9 @@ bounds:655,2,1046,954
 offsets:1,2,1048,957
 
 skeleton_2.png
-size:1102,1096
+size:1126,1120
 filter:Linear,Linear
 pma:true
 도넛밤
-bounds:2,2,1098,1092
-offsets:433,264,1949,1614
+bounds:2,2,1122,1116
+offsets:421,252,1949,1614

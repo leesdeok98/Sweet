@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 62ea60756cc791545ade935a1da982d1
+guid: 83bf11b4591e2c841b480fa3008a30cc
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -93,39 +93,26 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\uC274\uB4DC 4_0"
+      name: "\uC2AC\uB77C\uC784_0"
       rect:
         serializedVersion: 2
-        x: 66
-        y: 344
-        width: 1335
-        height: 1057
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 455
+        y: 429
+        width: 1046
+        height: 874
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 89d124050b101514689417232d01b43e
-      internalID: 239572420
+      spriteID: 6be13fb021be3af43a8e622d0fe55f18
+      internalID: 1776544611
       vertices: []
       indices: 
       edges: []
@@ -141,7 +128,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      "\uC274\uB4DC 4_0": 239572420
+      "\uC2AC\uB77C\uC784_0": 1776544611
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

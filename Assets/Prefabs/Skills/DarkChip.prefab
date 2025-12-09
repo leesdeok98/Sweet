@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 1105140119886556679}
   - component: {fileID: 709667380107046082}
   m_Layer: 9
-  m_Name: Darkchip
+  m_Name: DarkChip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -157,8 +157,8 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1233970845
-  m_SortingLayer: 7
+  m_SortingLayerID: -1342202699
+  m_SortingLayer: 2
   m_SortingOrder: 11
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &1105140119886556679

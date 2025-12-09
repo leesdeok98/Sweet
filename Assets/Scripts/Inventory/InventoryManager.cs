@@ -33,10 +33,10 @@ public class InventoryManager : MonoBehaviour
 
     private InventoryItemData[,] tetrisGrid; 
     
-    // ★★★ [기능] 칸 잠금 상태 배열 (true=잠김, false=해제) ★★★
+    //  [기능] 칸 잠금 상태 배열 (true=잠김, false=해제) 
     private bool[,] cellLocked; 
 
-    // ★★★ [최적화] 스킬 깜빡임 방지용 목록 ★★★
+    //  [최적화] 스킬 깜빡임 방지용 목록 
     private HashSet<ItemData.ItemType> currentActiveSkills = new HashSet<ItemData.ItemType>();
 
     // 변경 사항 감지 플래그
@@ -56,9 +56,9 @@ public class InventoryManager : MonoBehaviour
         InitializeLocks(); // 게임 시작 시 테두리 잠금 실행
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // ★★★ [기능 1] 자동 회전 배치 기능이 추가된 AddItem ★★★
-    // ─────────────────────────────────────────────────────────────
+    
+    //   자동 회전 배치 기능
+    
     public bool AddItem(InventoryItemData itemData)
     {
         // 0도, 90도, 180도, 270도 순서로 회전하며 시도
@@ -102,7 +102,7 @@ public class InventoryManager : MonoBehaviour
         return false;
     }
 
-    // [내부 함수] 모양 배열을 회전시켜 반환 (AddItem용)
+    // [내부 함수] 모양 배열을 회전시켜 반환
     private void GetRotatedShape(bool[] originalShape, int originalW, int originalH, int angle, out bool[] rotatedShape, out int rotatedW, out int rotatedH)
     {
         int turns = (angle % 360) / 90;
@@ -136,9 +136,9 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // ★★★ [기능 2] 잠금 시스템 (초기화 & 해금) ★★★
-    // ─────────────────────────────────────────────────────────────
+    
+    //  잠금 시스템 (초기화 & 해금) 
+    
     private void InitializeLocks()
     {
         for (int y = 0; y < gridHeight; y++)
@@ -265,33 +265,50 @@ public class InventoryManager : MonoBehaviour
     }
 
     public void UpdateActiveSkills()
-    {
-        if (SkillManager.Instance == null) return;
-        
-        HashSet<ItemData.ItemType> newActiveSkills = new HashSet<ItemData.ItemType>();
-        for (int y = activeZoneStartY; y < gridHeight; y++) {
-            for (int x = 0; x < gridWidth; x++) {
-                InventoryItemData item = tetrisGrid[x, y];
-                if (item != null && item.skillType != ItemData.ItemType.None) {
-                    newActiveSkills.Add(item.skillType);
-                }
+{
+    if (SkillManager.Instance == null) return;
+    
+    HashSet<ItemData.ItemType> newActiveSkills = new HashSet<ItemData.ItemType>();
+    for (int y = activeZoneStartY; y < gridHeight; y++) {
+        for (int x = 0; x < gridWidth; x++) {
+            InventoryItemData item = tetrisGrid[x, y];
+            if (item != null && item.skillType != ItemData.ItemType.None) {
+                newActiveSkills.Add(item.skillType);
             }
         }
+    }
 
-        if (newActiveSkills.SetEquals(currentActiveSkills)) {
-            isDirty = false;
-            return;
-        }
+    // 활성 구역에 들어있는 스킬 종류가 이전과 완전히 같다면,
+    // 굳이 다시 리셋/재적용/세트 체크를 할 필요가 없음.
+    if (newActiveSkills.SetEquals(currentActiveSkills)) {
+        isDirty = false;
+        return;
+    }
+
+    // 기존 스킬/세트 상태 올클리어
+    SkillManager.Instance.ResetAllSkills();
+
+    // 활성 구역에 들어있는 스킬만 다시 켜기
+    foreach (var skillType in newActiveSkills) {
+        SkillManager.Instance.ActivateSkill(skillType);
+    }
 
         SkillManager.Instance.ResetAllSkills();
-        foreach (var skillType in newActiveSkills) {
-            SkillManager.Instance.ActivateSkill(skillType);
-        }
 
-        currentActiveSkills = newActiveSkills;
-        isDirty = false;
-        Debug.Log("[InventoryManager] 스킬 갱신 완료");
+    foreach (var skillType in newActiveSkills)
+    {
+        SkillManager.Instance.ActivateSkill(skillType);
     }
+
+    // 여기 추가: 모든 스킬이 켜진 뒤, 세트 효과 한 번만 갱신
+    SkillManager.Instance.CheckAllSetEffects();
+
+    currentActiveSkills = newActiveSkills;
+    isDirty = false;
+    Debug.Log("[InventoryManager] 스킬 갱신 완료");
+
+    }
+
 
     public void ApplySkillsWithDelay(float delay)
     {

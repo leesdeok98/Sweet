@@ -41,23 +41,43 @@ public class PoolManager : MonoBehaviour
         return select;
     }
 
+   // PoolManager.cs
+
     public void ClearAllEnemies()
     {
-        Debug.Log("ȣ��Ǿ���^^");
-        foreach (List<GameObject> pool in pools)
-        {
-            foreach (GameObject item in pool)
-            {
-                if (item.activeSelf)
-                {
-                    Debug.Log($"Ȱ��ȭ�� ����: {item.name}, �±�: {item.tag}");
-                }
+    Debug.Log("호출됨^^");
 
-                if (item.activeSelf && !item.CompareTag("Boss"))
-                {
-                    item.SetActive(false);
-                }
+    // pools 안의 각 풀을 순회
+    for (int poolIndex = 0; poolIndex < pools.Length; poolIndex++)
+    {
+        List<GameObject> pool = pools[poolIndex];
+
+        // 리스트를 뒤에서부터 도는 이유: RemoveAt 해도 인덱스 안 꼬이게
+        for (int i = pool.Count - 1; i >= 0; i--)
+        {
+            GameObject item = pool[i];
+
+            // 1) 이미 Destroy()된 오브젝트면 리스트에서 제거하고 패스
+            if (item == null)
+            {
+                pool.RemoveAt(i);
+                continue;
+            }
+
+            // 2) 비활성화된 애면 그냥 넘어감
+            if (!item.activeSelf)
+                continue;
+
+            // 3) 활성화된 애만 로그 찍기
+            Debug.Log($"활성화된 오브젝트: {item.name}, 태그: {item.tag}");
+
+            // 4) 보스가 아니면 비활성화
+            if (!item.CompareTag("Boss"))
+            {
+                item.SetActive(false);
             }
         }
     }
+}
+
 }

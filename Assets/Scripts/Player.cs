@@ -180,6 +180,8 @@ public class Player : MonoBehaviour
         // ★ 추가: 눈꽃사탕 자동 적용
         if (hasSnowflakeCandy) sm.ActivateSkill(ItemData.ItemType.SnowflakeCandy);
 
+        sm.CheckAllSetEffects();
+
         // 한 번 적용 완료
         startingSkillsApplied = true;
     }
