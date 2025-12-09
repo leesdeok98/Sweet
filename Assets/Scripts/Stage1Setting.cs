@@ -73,6 +73,8 @@ public class Stage1Setting : MonoBehaviour
             else
             {
                 TogglePause();
+                ItemDragHandler.CancelAllDragsAndRestore();
+
             }
         }
     }

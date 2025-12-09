@@ -27,8 +27,11 @@ public class SweetarmorCombo : MonoBehaviour
     public string ShieldAnimation = "animation";
     public float spineTimeScale = 1.0f;
 
-    // ★ 세트 효과가 이미 한 번 발동되었는지 여부 (중복 발동/이펙트 방지)
+    //  세트 효과가 이미 한 번 발동되었는지 여부 (중복 발동/이펙트 방지)
     private bool comboActivatedOnce = false;
+
+    //  타임스케일 0일 때 FX/사운드를 나중에 재생하기 위한 플래그
+    private bool fxPending = false;
 
     void Start()
     {
@@ -46,7 +49,6 @@ public class SweetarmorCombo : MonoBehaviour
         {
             Debug.LogWarning("SweetarmorCombo: SugarShieldSkill 컴포넌트가 없어 실드 자동 발동 기능이 작동하지 않습니다.");
         }
-
     }
 
     public void ActivateComboEffect()
@@ -76,21 +78,37 @@ public class SweetarmorCombo : MonoBehaviour
             Debug.LogError("SweetarmorCombo: 비주얼 프리팹이 할당되지 않았습니다. 애니메이션이 실행되지 않습니다.");
         }
 
-        // Spine 애니메이션 재생 (딱 한 번만 재생)
+        // Spine 레퍼런스만 세팅 (실제 애니/사운드는 타임스케일에 맞춰 따로 처리)
+        if (skeleton != null)
+        {
+            skeleton.timeScale = spineTimeScale;
+        }
+
+        // ★ 타임스케일이 0이면 FX/사운드는 나중에 재생
+        if (Time.timeScale == 0f)
+        {
+            fxPending = true;
+        }
+        else
+        {
+            PlayComboFx();
+        }
+
+        // 5초마다 체력 회복 코루틴 시작 (기존 기능 유지)
+        StartCoroutine(HealRoutine());
+    }
+
+    //  실제 Spine 애니 + 사운드 재생 함수
+    private void PlayComboFx()
+    {
         if (skeleton != null)
         {
             Debug.Log("[3] 스파인 애니메이션 재생 명령");
             skeleton.timeScale = spineTimeScale;
             skeleton.AnimationState.SetAnimation(0, ShieldAnimation, false);
-            AudioManager.instance.PlaySfx(AudioManager.Sfx.SweetArmorCombo_SFX);
-        }
-        else
-        {
-            Debug.LogError("[ERROR] Skeleton State가 null입니다. 데이터 로드 실패 가능성 높음.");
         }
 
-        // 5초마다 체력 회복 코루틴 시작 (기존 기능 유지)
-        StartCoroutine(HealRoutine());
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.SweetArmorCombo_SFX);
     }
 
     void Update()
@@ -99,6 +117,14 @@ public class SweetarmorCombo : MonoBehaviour
         if (!isShieldCooldown && player.health <= HP_THRESHOLD)
         {
             TryAutoCastShield();
+        }
+
+        //  인벤토리(타임스케일 0)에서 세트가 완성된 뒤,
+        //    게임이 다시 진행되면 FX/사운드를 딱 한 번만 재생
+        if (fxPending && Time.timeScale > 0f)
+        {
+            fxPending = false;
+            PlayComboFx();
         }
     }
 
@@ -142,6 +168,4 @@ public class SweetarmorCombo : MonoBehaviour
             Destroy(activeComboVisual); // 비주얼 삭제해주기
         }
     }
-
-
 }

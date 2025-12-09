@@ -21,8 +21,11 @@ public class HyperCandyRush : MonoBehaviour
     private const float MAX_MOVING_INCREASE = 0.30f;
     private const float INCREASE_PER_SECOND = 0.03f;
 
-    // ★ 세트 효과가 이미 한 번 발동되었는지 여부 (중복 발동/이펙트 방지)
+    // 세트 효과가 이미 한 번 발동되었는지 여부 (중복 발동/이펙트 방지)
     private bool hasPlayedOnce = false;
+
+    //  타임스케일 0일 때 FX/사운드를 나중에 재생하기 위한 플래그
+    private bool fxPending = false;
 
     void Start()
     {
@@ -37,7 +40,6 @@ public class HyperCandyRush : MonoBehaviour
             return;
         }
     }
-
 
     public void ActivateSetEffect()
     {
@@ -56,24 +58,42 @@ public class HyperCandyRush : MonoBehaviour
             activeComboVisual.transform.localPosition = Vector3.zero;
 
             skeleton = activeComboVisual.GetComponentInChildren<SkeletonAnimation>(true);
+            if (skeleton != null)
+            {
+                skeleton.timeScale = spineTimeScale;
+            }
         }
         else
         {
             Debug.LogError("HyperCandyRush: 비주얼 프리팹이 할당되지 않아 애니메이션이 실행되지 않습니다.");
         }
 
-        // Spine 애니메이션 재생
+        // HyperCandyRush의 핵심 로직 시작 (이동 기반 공격속도 체크)
+        StartMovementCheck();
+
+        //  타임스케일 0이면 FX/사운드는 나중에 재생
+        if (Time.timeScale == 0f)
+        {
+            fxPending = true;
+        }
+        else
+        {
+            PlayRushFx();
+        }
+
+        Debug.Log("[HyperCandyRush] Set Effect Activated!");
+    }
+
+    // ★ 실제 Spine 애니 + 사운드 재생 함수
+    private void PlayRushFx()
+    {
         if (skeleton != null)
         {
             skeleton.timeScale = spineTimeScale;
             skeleton.AnimationState.SetAnimation(0, RushAnimation, false);
-            AudioManager.instance.PlaySfx(AudioManager.Sfx.HyperCandyRush_SFX);
         }
 
-        // HyperCandyRush의 핵심 로직 시작 (이동 기반 공격속도 체크)
-        StartMovementCheck();
-
-        Debug.Log("[HyperCandyRush] Set Effect Activated!");
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.HyperCandyRush_SFX);
     }
 
     public void StartMovementCheck()    // 루프를 시작하고 공격 속도 증가 효과를 초기화하는 메서드
@@ -127,6 +147,15 @@ public class HyperCandyRush : MonoBehaviour
         StopMovementCheck();
     }
 
+    void Update()
+    {
+        // 인벤토리에서 세트가 완성된 뒤, 게임이 다시 진행되면 FX/사운드를 딱 한 번 재생
+        if (fxPending && Time.timeScale > 0f)
+        {
+            fxPending = false;
+            PlayRushFx();
+        }
+    }
 
     void OnDestroy()
     {

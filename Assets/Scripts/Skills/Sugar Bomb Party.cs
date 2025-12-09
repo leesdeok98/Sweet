@@ -19,6 +19,9 @@ public class SugarBombParty : MonoBehaviour
     //  세트 효과를 이미 한 번 발동했는지 여부 (중복 이펙트 방지용)
     private bool hasPlayedOnce = false;
 
+    // 타임스케일 0일 때 FX/사운드를 나중에 재생하기 위한 플래그
+    private bool fxPending = false;
+
     void Start()
     {
         // 컴포넌트 참조 초기화
@@ -43,24 +46,21 @@ public class SugarBombParty : MonoBehaviour
         }
         hasPlayedOnce = true;
 
-        // 비주얼 생성 및 Spine 애니메이션 재생 (다른 세트 효과와 동일)
+        // 비주얼 생성 및 Spine 참조
         if (comboVisualPrefab != null)
         {
             activeComboVisual = Instantiate(comboVisualPrefab, transform.position, Quaternion.identity, transform);
             activeComboVisual.transform.localPosition = Vector3.zero;
 
             skeleton = activeComboVisual.GetComponentInChildren<SkeletonAnimation>(true);
+            if (skeleton != null)
+            {
+                skeleton.timeScale = spineTimeScale;
+            }
         }
         else
         {
             Debug.LogWarning("SugarBombParty: 비주얼 프리팹이 할당되지 않아 애니메이션이 실행되지 않습니다.");
-        }
-
-        if (skeleton != null)
-        {
-            skeleton.timeScale = spineTimeScale;
-            skeleton.AnimationState.SetAnimation(0, PartyAnimation, false);
-            AudioManager.instance.PlaySfx(AudioManager.Sfx.SugarBombParty_SFX);
         }
 
         // PlayerShooting에 폭발 반경 증가 및 미니 폭죽 발사 활성화 요청
@@ -74,7 +74,39 @@ public class SugarBombParty : MonoBehaviour
             player.hasSugarBombParty = true;
         }
 
+        // ★ 타임스케일 0이면 FX/사운드는 나중에 재생
+        if (Time.timeScale == 0f)
+        {
+            fxPending = true;
+        }
+        else
+        {
+            PlayPartyFx();
+        }
+
         Debug.Log("[SugarBombParty] Set Effect Activated! (Porridge Radius +30%)");
+    }
+
+    //  실제 Spine 애니 + 사운드 재생 함수
+    private void PlayPartyFx()
+    {
+        if (skeleton != null)
+        {
+            skeleton.timeScale = spineTimeScale;
+            skeleton.AnimationState.SetAnimation(0, PartyAnimation, false);
+        }
+
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.SugarBombParty_SFX);
+    }
+
+    void Update()
+    {
+        // 인벤토리에서 세트가 완성된 뒤, 게임이 다시 진행되면 FX/사운드를 딱 한 번 재생
+        if (fxPending && Time.timeScale > 0f)
+        {
+            fxPending = false;
+            PlayPartyFx();
+        }
     }
 
     public void DeactivateSetEffect()
@@ -103,6 +135,10 @@ public class SugarBombParty : MonoBehaviour
     void OnDestroy()
     {
         // 오브젝트 파괴 시에도 해제 로직 호출
-        DeactivateSetEffect();
+        // (Destroy(this)로 인한 중복 호출은 무해하지만, 혹시를 위해 안전하게 호출)
+        if (shooting != null || player != null || activeComboVisual != null)
+        {
+            DeactivateSetEffect();
+        }
     }
 }

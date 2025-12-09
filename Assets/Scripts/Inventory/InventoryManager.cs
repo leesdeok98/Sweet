@@ -246,6 +246,7 @@ public class InventoryManager : MonoBehaviour
         
         isDirty = true; // 변경됨
         SpawnItemUI(itemData, gridX, gridY, rotatedWidth, rotatedHeight, rotatedShape, rotationAngle);
+        //UpdateActiveSkills();
         return true; 
     }
 
@@ -260,54 +261,56 @@ public class InventoryManager : MonoBehaviour
                 }
             }
         }
-        if (removed) isDirty = true; 
+        if (removed) isDirty = true;
+
+        UpdateActiveSkills();
         return removed;
     }
 
     public void UpdateActiveSkills()
-{
-    if (SkillManager.Instance == null) return;
-    
-    HashSet<ItemData.ItemType> newActiveSkills = new HashSet<ItemData.ItemType>();
-    for (int y = activeZoneStartY; y < gridHeight; y++) {
-        for (int x = 0; x < gridWidth; x++) {
-            InventoryItemData item = tetrisGrid[x, y];
-            if (item != null && item.skillType != ItemData.ItemType.None) {
-                newActiveSkills.Add(item.skillType);
+    {
+        if (SkillManager.Instance == null) return;
+
+        // 활성 구역에 들어있는 스킬 타입 수집
+        HashSet<ItemData.ItemType> newActiveSkills = new HashSet<ItemData.ItemType>();
+
+        for (int y = activeZoneStartY; y < gridHeight; y++)
+        {
+            for (int x = 0; x < gridWidth; x++)
+            {
+                InventoryItemData item = tetrisGrid[x, y];
+                if (item != null && item.skillType != ItemData.ItemType.None)
+                {
+                    newActiveSkills.Add(item.skillType);
+                }
             }
         }
-    }
 
-    // 활성 구역에 들어있는 스킬 종류가 이전과 완전히 같다면,
-    // 굳이 다시 리셋/재적용/세트 체크를 할 필요가 없음.
-    if (newActiveSkills.SetEquals(currentActiveSkills)) {
-        isDirty = false;
-        return;
-    }
+        // 이전과 완전히 같고, 인벤토리 변경 플래그도 없으면 그냥 패스
+        if (newActiveSkills.SetEquals(currentActiveSkills) && !isDirty)
+        {
+            return;
+        }
 
-    // 기존 스킬/세트 상태 올클리어
-    SkillManager.Instance.ResetAllSkills();
-
-    // 활성 구역에 들어있는 스킬만 다시 켜기
-    foreach (var skillType in newActiveSkills) {
-        SkillManager.Instance.ActivateSkill(skillType);
-    }
-
+        // 1) 기존 스킬들/세트 효과 전부 초기화
         SkillManager.Instance.ResetAllSkills();
 
-    foreach (var skillType in newActiveSkills)
-    {
-        SkillManager.Instance.ActivateSkill(skillType);
+        // 2) 이번에 활성 구역에서 발견된 스킬 타입들만 다시 켜기
+        foreach (var skillType in newActiveSkills)
+        {
+            SkillManager.Instance.ActivateSkill(skillType);
+        }
+
+        // 3) 세트 효과 갱신
+        SkillManager.Instance.CheckAllSetEffects();
+
+        currentActiveSkills = newActiveSkills;
+        isDirty = false;
+
+        Debug.Log("[InventoryManager] 스킬 갱신 완료. 활성 스킬 개수: " + currentActiveSkills.Count);
     }
 
-    // 여기 추가: 모든 스킬이 켜진 뒤, 세트 효과 한 번만 갱신
-    SkillManager.Instance.CheckAllSetEffects();
 
-    currentActiveSkills = newActiveSkills;
-    isDirty = false;
-    Debug.Log("[InventoryManager] 스킬 갱신 완료");
-
-    }
 
 
     public void ApplySkillsWithDelay(float delay)

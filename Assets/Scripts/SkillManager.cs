@@ -181,6 +181,10 @@ public class SkillManager : MonoBehaviour
     private bool bittermeltChaosFxPlayed = false;
     private bool twistOrTreatFxPlayed = false;
 
+    private bool icebreakerFxPending = false;
+    private bool bittermeltChaosFxPending = false;
+    private bool twistOrTreatFxPending = false;
+
     public bool IsBittermeltChaosActive => bittermeltChaosActive;
     public bool IsIcebreakerActive => icebreakerActive;
     public float IcebreakerBonusDamage => icebreakerBonusDamage;
@@ -239,7 +243,25 @@ public class SkillManager : MonoBehaviour
                 ApplyHoneySpin();
             }
         }
+
+        // ★ 타임스케일이 다시 1 이상으로 돌아온 순간,
+        //    인벤토리에서 세트가 완성된 상태였다면 FX/사운드를 "딱 한 번만" 재생
+        if (Time.timeScale > 0f)
+        {
+            if (bittermeltChaosActive && bittermeltChaosFxPending && !bittermeltChaosFxPlayed)
+            {
+                PlayBittermeltChaosFx();
+            }
+
+            if (twistOrTreatActive && twistOrTreatFxPending && !twistOrTreatFxPlayed)
+            {
+                PlayTwistOrTreatFx();
+            }
+
+            // Icebreaker FX도 나중에 필요하면 같은 패턴으로 추가 가능
+        }
     }
+
 
     /// <summary>
     /// 모든 스킬 플래그와 중첩 스택을 0으로 초기화합니다.
@@ -442,7 +464,7 @@ public class SkillManager : MonoBehaviour
         Debug.Log("[SkillManager] 딸기 팝코어 활성화");
     }
 
-    // ★★★ 허니스핀 구체 생성 함수 ★★★
+    // 허니스핀 구체 생성 함수 
     void ApplyHoneySpin()
     {
         if (player == null)
@@ -563,10 +585,8 @@ public class SkillManager : MonoBehaviour
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
+    
     // 슈가 밤 파티 세트
-    // ─────────────────────────────────────────────────────────────
-
     public void CheckSugarBombParty()
     {
         if (player == null) return;
@@ -588,9 +608,9 @@ public class SkillManager : MonoBehaviour
         prevHasSugarBombPartySet = hasSet;
     }
 
-    /// <summary>
-    /// 슈가밤 파티 세트 효과를 플레이어에게 적용하고 코루틴을 시작합니다.
-    /// </summary>
+
+    /// 슈가밤 파티 세트 효과를 플레이어에게 적용하고 코루틴을 시작
+
     private void ApplySugarBombPartySet()
     {
         if (player.hasSugarBombParty) return;
@@ -644,9 +664,8 @@ public class SkillManager : MonoBehaviour
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
     // 하이퍼 캔디 러쉬 세트
-    // ─────────────────────────────────────────────────────────────
+
 
     void CheckHyperCandyRushSet()
     {
@@ -779,22 +798,19 @@ public class SkillManager : MonoBehaviour
         prevHasBittermeltSet = hasSet;
     }
 
-    void ApplyBittermeltChaosSet() //비터멜트 세트효과 로직
-    {
-        bittermeltChaosActive = true;
-        Debug.Log("[SkillManager] 비터멜트 카오스 세트 효과 발동!");
 
-        // ★ FX는 처음 발동할 때만 재생 (이미 재생했다면 다시 생성하지 않음)
-        if (bittermeltChaosFxPlayed)
-        {
-            return;
-        }
+
+    void PlayBittermeltChaosFx()
+    {
+        if (bittermeltChaosFxPlayed) return;
+
         bittermeltChaosFxPlayed = true;
+        bittermeltChaosFxPending = false;
 
         if (player == null) return;
+
         if (bittermeltChaosSpinePrefab == null)
         {
-            // Spine FX를 아직 안 넣었어도 게임 진행에는 지장 없도록 로그만 남김
             Debug.LogWarning("[SkillManager] bittermeltChaosSpinePrefab 비어 있음 (세트 FX는 나중에 연결 가능)");
             return;
         }
@@ -808,15 +824,39 @@ public class SkillManager : MonoBehaviour
         {
             var state = sa.AnimationState;
             TrackEntry entry = state.SetAnimation(0, bittermeltChaosAnimName, bittermeltChaosAnimLoop);
+
+            // ★ 여기서만 사운드 재생 (= 타임스케일 0일 땐 절대 안 들어옴)
             AudioManager.instance.PlaySfx(AudioManager.Sfx.BitterMeltChaos_SFX);
 
-            // 세트 FX는 1번만 재생하고 끝나야 하므로 loop = false 기준
             if (!bittermeltChaosAnimLoop)
             {
                 StartCoroutine(DestroySpineEffectAfter(sa, entry));
             }
         }
     }
+
+
+    void ApplyBittermeltChaosSet() //비터멜트 세트효과 로직
+    {
+        bittermeltChaosActive = true;
+        Debug.Log("[SkillManager] 비터멜트 카오스 세트 효과 발동!");
+
+        // 이미 FX 한 번 본 세트면 또 FX 만들 필요 없음
+        if (bittermeltChaosFxPlayed)
+            return;
+
+        // ★ 인벤토리/ESC로 Time.timeScale == 0이면
+        //    지금은 FX/사운드 안 틀고 "대기"만 걸어둔다.
+        if (Time.timeScale == 0f)
+        {
+            bittermeltChaosFxPending = true;
+            return;
+        }
+
+        // 타임스케일이 0이 아니라면 바로 FX 재생
+        PlayBittermeltChaosFx();
+    }
+
 
     void DeactivateBittermeltChaosSet()
     {
@@ -825,7 +865,12 @@ public class SkillManager : MonoBehaviour
         Debug.Log("[SkillManager] 비터멜트 카오스 세트 효과 해제!");
         bittermeltChaosActive = false;
         bittermeltChaosFxPlayed = false;   // 다음에 다시 세트 맞추면 FX 재생
-        // 필요 시 비터멜트 관련 추가 버프 롤백 로직을 여기서 처리
+                                           // 필요 시 비터멜트 관련 추가 버프 롤백 로직을 여기서 처리
+
+        if (Time.timeScale > 0f)
+        {
+            bittermeltChaosFxPlayed = false;
+        }
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -868,10 +913,9 @@ public class SkillManager : MonoBehaviour
         }
         icebreakerSlowRoutine = StartCoroutine(ApplyIcebreakerSlowLoop());
 
-        // ─────────────────────────────────────────────
         // 아이스브레이커 세트 발동 시 Spine FX 1회 재생
         //  (이미 한 번 재생된 상태라면 FX는 다시 나오지 않음)
-        // ─────────────────────────────────────────────
+  
         if (icebreakerFxPlayed) return;  // ★ FX는 한 번만
         icebreakerFxPlayed = true;
 
@@ -973,46 +1017,59 @@ public class SkillManager : MonoBehaviour
     //세트 플래그를 키면 각 3개의 스킬 효과 버프 적용
     void ApplyTwistOrTreatSet() // 트위스트 오어 트릿 세트 효과 로직
     {
-        // 세트 발동 플래그 ON
         twistOrTreatActive = true;
         Debug.Log("[SkillManager] 트위스트 오어 트릿 세트 효과 발동!");
 
-        // 버프 적용
+        // 버프(범위/개수 증가)는 바로 적용
         ApplyTwistOrTreatBuffOnly();
 
-        //  Spine 세트 이펙트 한 번만 재생 후 Destroy
-        // ★ FX는 처음 발동할 때만 재생 (이미 재생했다면 아래 FX 로직 스킵)
+        // 이미 FX를 한 번 재생했다면 다시 만들지 않음
         if (twistOrTreatFxPlayed)
+            return;
+
+        // 타임스케일 0이면 FX/사운드는 나중으로 미룸
+        if (Time.timeScale == 0f)
         {
+            twistOrTreatFxPending = true;
             return;
         }
+
+        // 바로 FX 재생
+        PlayTwistOrTreatFx();
+    }
+
+    void PlayTwistOrTreatFx()
+    {
+        if (twistOrTreatFxPlayed) return;
+
         twistOrTreatFxPlayed = true;
+        twistOrTreatFxPending = false;
 
         if (player == null) return;
 
         if (twistOrTreatSpinePrefab == null)
         {
-            // FX 프리팹이 비어 있어도 게임이 터지진 않게 경고만 출력
             Debug.LogWarning("[SkillManager] twistOrTreatSpinePrefab 비어 있음 (세트 FX는 나중에 연결 가능)");
             return;
         }
 
-        // 플레이어를 부모로 해서 FX 생성 (플레이어를 따라다니게)
         GameObject fx = Instantiate(twistOrTreatSpinePrefab, player.transform);
         fx.name = "TwistOrTreat_SetFX";
-        fx.transform.localPosition = twistOrTreatLocalOffset; // 인스펙터에서 준 오프셋만큼 위치 조정
+        fx.transform.localPosition = twistOrTreatLocalOffset;
 
-        // SkeletonAnimation 가져와서 애니메이션 1회 재생
         SkeletonAnimation sa = fx.GetComponent<SkeletonAnimation>();
         if (sa != null)
         {
             var state = sa.AnimationState;
 
-            const string animName = "animation"; // Spine 안에 있는 애니메이션 이름
-            const bool loop = false;             // 세트 FX는 항상 한 번만 재생
+            // 원래 코드처럼 Spine 안의 "animation" 클립을 1회 재생
+            const string animName = "animation";
+            const bool loop = false;
 
             TrackEntry entry = state.SetAnimation(0, animName, loop);
-            Invoke("TwistorTreatSound", 1f); // 인보크 = 매서드 지연 시키는 함수 (매서드이름,지연시킬시간) 
+
+            // ★ 사운드는 FX 시작 후 1초 뒤 (타임스케일 0일 땐 아예 여기까지 안 옴)
+            Invoke(nameof(TwistorTreatSound), 1f);
 
             if (!loop)
             {
@@ -1021,25 +1078,31 @@ public class SkillManager : MonoBehaviour
         }
     }
 
+
+
     void DeactivateTwistOrTreatSet()
     {
         if (!twistOrTreatActive && !prevHasTwistOrTreatSet) return;
 
         Debug.Log("[SkillManager] 트위스트 오어 트릿 세트 효과 해제!");
         twistOrTreatActive = false;
-        twistOrTreatFxPlayed = false;   // 세트 다시 맞추면 FX 재생될 수 있도록
+        twistOrTreatFxPending = false;
 
-        // 허니스핀 세트 버프 해제: 세트용 허니스핀 제거 후 기본 허니스핀 다시 생성
+        // 게임이 실제로 돌아가는 동안 세트가 깨졌을 때만
+        // FX 재생 가능 상태로 초기화
+        if (Time.timeScale > 0f)
+        {
+            twistOrTreatFxPlayed = false;
+        }
+
+        // 허니스핀은 세트용으로 재구성된 상태라서, 해제 시 기본 버전으로 복구
         ClearHoneySpinInstances();
         if (player != null && player.hasHoneySpin)
         {
             ApplyHoneySpin();
         }
-
-        // SyrupTornado / RollingChocolateBar 는 IsTwistOrTreatActive 플래그를 보고
-        // 새로 생성되는 것부터 일반 모드로 동작하도록 설계되어 있다면
-        // 여기서는 플래그만 내려줘도 충분함.
     }
+
 
     void UpgradeHoneySpinForTwistOrTreat()
     {
