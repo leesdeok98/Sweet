@@ -85,7 +85,7 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1342202699
   m_SortingLayer: 2
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &4258213676927876498
 MonoBehaviour:
@@ -214,4 +214,4 @@ MonoBehaviour:
   timeScale: 1
   useFixedTick: 0
   tickInterval: 0.2
-  imageOffset: {x: 0, y: -0.4}
+  imageOffset: {x: 0, y: -0.5}

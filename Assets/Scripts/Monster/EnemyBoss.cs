@@ -66,7 +66,12 @@ public class EnemyBoss : Enemy
         if (skeletonAnimation != null && !string.IsNullOrEmpty(runAnimName))
             skeletonAnimation.AnimationState.SetAnimation(0, runAnimName, true);
 
-        // ★ 추가: 보스 자신의 콜라이더들 캐싱
+         if (BossHealthUI.Instance != null)
+        {
+        BossHealthUI.Instance.RegisterBoss(this);
+        }    
+
+        //  추가: 보스 자신의 콜라이더들 캐싱
         bossColliders = GetComponentsInChildren<Collider2D>();
 
         StartCoroutine(BossPatternRoutine());

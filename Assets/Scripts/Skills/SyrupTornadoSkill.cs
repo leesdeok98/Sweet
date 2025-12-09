@@ -14,7 +14,7 @@ public class SyrupTornadoSkill : MonoBehaviour
     public float damagePerSecond = 2f;          // ← 요구 3
 
     [Header("Area")]
-    [Tooltip("원형 트리거 반경(미터)")]
+    [Tooltip("원형 트리거 반경(미터) - 이 값이 콜라이더 Radius에 그대로 적용됨")]
     public float radius = 1.5f;                 // ← 요구 2
 
     [Tooltip("원형 콜라이더 중심 오프셋 (로컬 좌표)")]
@@ -63,7 +63,10 @@ public class SyrupTornadoSkill : MonoBehaviour
         if (circle != null)
         {
             circle.isTrigger = true;
-            circle.radius = Mathf.Max(0.01f, radius);
+
+            // 🔹 기준은 항상 인스펙터의 radius 값
+            radius = Mathf.Max(0.01f, radius);
+            circle.radius = radius;
             circle.offset = colliderOffset;
         }
 
@@ -91,9 +94,13 @@ public class SyrupTornadoSkill : MonoBehaviour
         if (circle == null)
             circle = GetComponent<CircleCollider2D>();
 
+        // 🔹 radius를 먼저 보정하고, 이 값을 콜라이더에 밀어넣는다.
+        radius = Mathf.Max(0.01f, radius);
+
         if (circle != null)
         {
-            circle.radius = Mathf.Max(0.01f, radius);
+            circle.isTrigger = true;
+            circle.radius = radius;
             circle.offset = colliderOffset;   //  오프셋도 함께 반영
         }
     }
@@ -221,6 +228,4 @@ public class SyrupTornadoSkill : MonoBehaviour
             }
         }
     }
-
-
 }

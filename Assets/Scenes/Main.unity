@@ -1909,6 +1909,10 @@ PrefabInstance:
       propertyPath: sfxMixerGroup
       value: 
       objectReference: {fileID: -314378072922290241, guid: 78275b0215edee64c83508171b63084e, type: 2}
+    - target: {fileID: 2630458871440393961, guid: b67002425585bc94780a22e660ca6254, type: 3}
+      propertyPath: bgmClips.Array.data[0]
+      value: 
+      objectReference: {fileID: 8300000, guid: 6c96435f4c81dcc42beb52a67da743c0, type: 3}
     - target: {fileID: 6836816898946239996, guid: b67002425585bc94780a22e660ca6254, type: 3}
       propertyPath: m_Name
       value: AudioManager

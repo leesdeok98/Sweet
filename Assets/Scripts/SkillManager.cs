@@ -117,7 +117,8 @@ public class SkillManager : MonoBehaviour
 
     //  트위스트 오어 트릿 세트 발동 여부
     private bool twistOrTreatActive = false;
-    //트오트 설정
+
+    //트오트 FX 설정
     [Header("Twist Or Treat Set FX")]
     [Tooltip("트위스트 오어 트릿 발동 시 재생할 Spine 프리팹")]
     [SerializeField] private GameObject twistOrTreatSpinePrefab;
@@ -157,6 +158,7 @@ public class SkillManager : MonoBehaviour
     // 슈가실드
     private SugarShieldSkill sugarShieldSkill;
 
+
     //아이스 브레이커 세트 효과
     //눈꽃사탕+아이스 젤리+팝핑 캔디
     //모든 적 이동속도 10%감소, 눈꽃사탕,아이스 젤리 데미지 5 증가
@@ -186,6 +188,20 @@ public class SkillManager : MonoBehaviour
     private readonly Dictionary<Enemy, float> icebreakerOriginalSpeed = new Dictionary<Enemy, float>();
     private Coroutine icebreakerSlowRoutine;
 
+    // ─────────────────────────────────────────────
+    // 세트 조건 변화 감지용 (이전 상태 저장)
+    // ─────────────────────────────────────────────
+    private bool prevHasBittermeltSet = false;
+    private bool prevHasIcebreakerSet = false;
+    private bool prevHasTwistOrTreatSet = false;
+    private bool prevHasHyperCandyRushSet = false;
+    private bool prevHasSweetarmorComboSet = false;
+    private bool prevHasSugarBombPartySet = false;
+
+    // ResetAllSkills 후 한 번만 세트 버프 재구성할지 여부 (트위스트 오어 트릿용)
+    private bool needRebuildSetEffects = false;
+
+
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -194,14 +210,11 @@ public class SkillManager : MonoBehaviour
         if (player == null)
             player = FindObjectOfType<Player>();
 
-        // 슈가 실드
-
         // 실제 슈가쉴드 컴포넌트는 플레이어에서 가져오도록 수정
         if (player != null)
         {
             sugarShieldSkill = player.GetComponent<SugarShieldSkill>();
         }
-
     }
 
     void Start()
@@ -231,26 +244,12 @@ public class SkillManager : MonoBehaviour
     /// <summary>
     /// 모든 스킬 플래그와 중첩 스택을 0으로 초기화합니다.
     /// </summary>
-    /// <summary>
-    /// 모든 스킬 플래그와 중첩 스택을 0으로 초기화합니다.
-    /// </summary>
     public void ResetAllSkills()
     {
         if (player == null) return;
 
-        // ★★★ 세트 효과 / 코루틴 / FX 먼저 초기화 ★★★
-        DeactivateIcebreakerSet();   // 아이스브레이커 슬로우 코루틴 & 속도 원복
-
-        bittermeltChaosActive = false;
-        icebreakerActive = false;
-        hasHyperCandyRushActive = false;
-        hasSweetarmorComboActive = false;
-        isSugarBombPartyActive = false;
-        twistOrTreatActive = false;
-
-        bittermeltChaosFxPlayed = false;
-        icebreakerFxPlayed = false;
-        twistOrTreatFxPlayed = false;
+        // 인벤토리 재계산 후 세트 버프(특히 트위스트 오어 트릿)를 다시 깔 수 있게 플래그
+        needRebuildSetEffects = true;
 
         player.hasIcedJellySkill = false;
         player.hasSugarShield = false;
@@ -272,19 +271,8 @@ public class SkillManager : MonoBehaviour
         darkChipLevel = 0;
         Bullet.damageMultiplier = 1f;
 
-        player.ActivateHyperCandyRush(false);
-
-        if (sweetarmorComboComponent != null)
-        {
-            Destroy(sweetarmorComboComponent);
-            sweetarmorComboComponent = null;
-        }
-
-        if (sugarBombPartyComponent != null)
-        {
-            Destroy(sugarBombPartyComponent);
-            sugarBombPartyComponent = null;
-        }
+        // 개별 세트/콤보 컴포넌트는 "세트가 실제로 깨질 때" DeactivateXXXSet 에서 정리
+        // 여기선 순수 스킬 오브젝트만 정리
 
         if (syrupTornadoInstance != null)
         {
@@ -360,14 +348,6 @@ public class SkillManager : MonoBehaviour
                 Debug.Log($"[SkillManager] '{type}' 처리 미구현 아이템입니다.");
                 break;
         }
-        //세트 효과 체크
-
-        // CheckBittermeltChaosSet(); //DarkChip + CocoaPowder + RollingChocolateBar
-        // CheckIcebreakerSet(); // SnowflakeCandy + IcedJelly + PoppingCandy 세트 체크
-        // CheckTwistOrTreatSet(); //SyrupTornado + HoneySpin + RollingChocolateBar 세트 체크
-        // CheckHyperCandyRushSet(); // HoneySpin + StrawberryPopCore + SugarPorridge 세트 체크
-        // CheckSweetarmorCombo(); // SugarShield + CaramelCube + CocoaPowder 세트 체크
-        // CheckSugarBombParty(); //PoppingCandy + StrawberryPopCore + SugarPorridge 세트 체크
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -522,26 +502,26 @@ public class SkillManager : MonoBehaviour
         Debug.Log("[SkillManager] 허니스핀 활성화: 구체 " + honeySpinOrbCount + "개 생성");
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // 스위트아머 콤보
+    // ─────────────────────────────────────────────────────────────
+
     private void CheckSweetarmorCombo()
     {
         if (player == null) return;
 
         bool hasSet = player.hasSugarShield && player.hasCaramelCube && player.hasCocoaPowder;
 
-        if (hasSet)
+        if (hasSet && !prevHasSweetarmorComboSet)
         {
-            if (!hasSweetarmorComboActive)
-            {
-                ApplySweetarmorCombo();
-            }
+            ApplySweetarmorCombo();
         }
-        else
+        else if (!hasSet && prevHasSweetarmorComboSet)
         {
-            if (hasSweetarmorComboActive)
-            {
-                DeactivateSweetarmorCombo();
-            }
+            DeactivateSweetarmorCombo();
         }
+
+        prevHasSweetarmorComboSet = hasSet;
     }
 
     private void ApplySweetarmorCombo()
@@ -571,6 +551,8 @@ public class SkillManager : MonoBehaviour
 
     void DeactivateSweetarmorCombo()
     {
+        if (!hasSweetarmorComboActive) return;
+
         Debug.Log("SweetarmorCombo 해제!");
         hasSweetarmorComboActive = false;
 
@@ -581,17 +563,29 @@ public class SkillManager : MonoBehaviour
         }
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // 슈가 밤 파티 세트
+    // ─────────────────────────────────────────────────────────────
+
     public void CheckSugarBombParty()
     {
         if (player == null) return;
 
-        if (player.hasPoppingCandy && player.hasStrawberryPopCore && player.hasSugarPorridge)
+        bool hasSet =
+            player.hasPoppingCandy &&
+            player.hasStrawberryPopCore &&
+            player.hasSugarPorridge;
+
+        if (hasSet && !prevHasSugarBombPartySet)
         {
-            if (!isSugarBombPartyActive) // 아직 활성화되지 않았을 때만
-            {
-                ApplySugarBombPartySet();
-            }
+            ApplySugarBombPartySet();
         }
+        else if (!hasSet && prevHasSugarBombPartySet)
+        {
+            DeactivateSugarBombPartySet();
+        }
+
+        prevHasSugarBombPartySet = hasSet;
     }
 
     /// <summary>
@@ -601,7 +595,7 @@ public class SkillManager : MonoBehaviour
     {
         if (player.hasSugarBombParty) return;
 
-        isSugarBombPartyActive = true;  // 세트 활성화 플래그
+        isSugarBombPartyActive = true;
         player.hasSugarBombParty = true;
 
         // 플레이어 오브젝트에 SugarBombParty 스크립트 추가
@@ -631,28 +625,48 @@ public class SkillManager : MonoBehaviour
         Debug.Log("[SugarBombParty] 컴포넌트 추가 및 활성화 예약됨.");
     }
 
+    void DeactivateSugarBombPartySet()
+    {
+        if (!isSugarBombPartyActive) return;
+
+        Debug.Log("[SkillManager] 슈가밤 파티 세트 효과 해제!");
+        isSugarBombPartyActive = false;
+
+        if (player != null)
+        {
+            player.hasSugarBombParty = false;
+        }
+
+        if (sugarBombPartyComponent != null)
+        {
+            Destroy(sugarBombPartyComponent);
+            sugarBombPartyComponent = null;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 하이퍼 캔디 러쉬 세트
+    // ─────────────────────────────────────────────────────────────
+
     void CheckHyperCandyRushSet()
     {
         if (player == null) return;
 
-        bool hasSet = player.hasHoneySpin &&
-                      player.hasStrawberryPopCore &&
-                      player.hasSugarPorridge;
+        bool hasSet =
+            player.hasHoneySpin &&
+            player.hasStrawberryPopCore &&
+            player.hasSugarPorridge;
 
-        if (hasSet)
+        if (hasSet && !prevHasHyperCandyRushSet)
         {
-            if (!hasHyperCandyRushActive) // 아직 활성화되지 않았을 때만
-            {
-                ApplyHyperCandyRushSet();
-            }
+            ApplyHyperCandyRushSet();
         }
-        else
+        else if (!hasSet && prevHasHyperCandyRushSet)
         {
-            if (hasHyperCandyRushActive)
-            {
-                DeactivateHyperCandyRushSet();
-            }
+            DeactivateHyperCandyRushSet();
         }
+
+        prevHasHyperCandyRushSet = hasSet;
     }
 
     void ApplyHyperCandyRushSet()
@@ -700,19 +714,26 @@ public class SkillManager : MonoBehaviour
                 {
                     StartCoroutine(DestroySpineEffectAfter(sa, entry));
                 }
-
             }
         }
     }
 
     void DeactivateHyperCandyRushSet()
     {
+        if (!hasHyperCandyRushActive) return;
+
         Debug.Log("[SkillManager] 하이퍼 캔디 러쉬 세트 효과 해제!");
         hasHyperCandyRushActive = false;
 
         if (player != null)
         {
             player.ActivateHyperCandyRush(false);
+        }
+
+        if (hyperCandyRushComponent != null)
+        {
+            Destroy(hyperCandyRushComponent);
+            hyperCandyRushComponent = null;
         }
     }
 
@@ -731,7 +752,10 @@ public class SkillManager : MonoBehaviour
         honeySpinInstances.Clear();
     }
 
-    /// DarkChip + CocoaPowder + RollingChocolateBar 를 모두 보유했는지 검사하고,
+    // ─────────────────────────────────────────────────────────────
+    // 비터멜트 카오스 세트
+    // ─────────────────────────────────────────────────────────────
+
     void CheckBittermeltChaosSet()
     {
         if (player == null) return;
@@ -741,20 +765,18 @@ public class SkillManager : MonoBehaviour
             player.hasCocoaPowder &&
             player.hasRollingChocolateBar;
 
-        if (hasSet)
+        // 세트가 막 완성된 순간
+        if (hasSet && !prevHasBittermeltSet)
         {
-            if (!bittermeltChaosActive)
-            {
-                ApplyBittermeltChaosSet();
-            }
+            ApplyBittermeltChaosSet();
         }
-        else
+        // 세트가 깨진 순간
+        else if (!hasSet && prevHasBittermeltSet)
         {
-            if (bittermeltChaosActive)
-            {
-                DeactivateBittermeltChaosSet();
-            }
+            DeactivateBittermeltChaosSet();
         }
+
+        prevHasBittermeltSet = hasSet;
     }
 
     void ApplyBittermeltChaosSet() //비터멜트 세트효과 로직
@@ -798,10 +820,17 @@ public class SkillManager : MonoBehaviour
 
     void DeactivateBittermeltChaosSet()
     {
+        if (!bittermeltChaosActive) return;
+
         Debug.Log("[SkillManager] 비터멜트 카오스 세트 효과 해제!");
         bittermeltChaosActive = false;
+        bittermeltChaosFxPlayed = false;   // 다음에 다시 세트 맞추면 FX 재생
         // 필요 시 비터멜트 관련 추가 버프 롤백 로직을 여기서 처리
     }
+
+    // ─────────────────────────────────────────────────────────────
+    // 아이스브레이커 세트
+    // ─────────────────────────────────────────────────────────────
 
     // 아이스브레이커 세트 효과 체크 (SnowflakeCandy + IcedJelly + PoppingCandy)
     void CheckIcebreakerSet()
@@ -813,23 +842,20 @@ public class SkillManager : MonoBehaviour
             player.hasIcedJellySkill &&
             player.hasPoppingCandy;
 
-        if (hasSet)
+        // 세트가 막 완성된 순간
+        if (hasSet && !prevHasIcebreakerSet)
         {
-            if (!icebreakerActive)
-            {
-                ApplyIcebreakerSet();
-            }
+            ApplyIcebreakerSet();
         }
-        else
+        // 세트가 깨진 순간
+        else if (!hasSet && prevHasIcebreakerSet)
         {
-            if (icebreakerActive)
-            {
-                DeactivateIcebreakerSet();
-            }
+            DeactivateIcebreakerSet();
         }
+
+        prevHasIcebreakerSet = hasSet;
     }
 
-    // 아이스브레이커 세트 효과 실제 적용: 플래그 on + 슬로우 코루틴 시작
     // 아이스브레이커 세트 효과 실제 적용: 플래그 on + 슬로우 코루틴 시작
     void ApplyIcebreakerSet()
     {
@@ -865,15 +891,7 @@ public class SkillManager : MonoBehaviour
         {
             var state = sa.AnimationState;
 
-            // ★ 여기 원래 twistOrTreatAnimName / twistOrTreatAnimLoop 쓰고 있었음 (버그)
-            //    Icebreaker 전용 필드로 교체
             TrackEntry entry = state.SetAnimation(0, icebreakerAnimName, icebreakerAnimLoop);
-
-            // Icebreaker 전용 사운드가 생기면 여기서 재생하면 됨
-            // AudioManager.instance.PlaySfx(...);
-            // (지금은 기존 TwistorTreatSound를 그대로 쓰고 싶다면
-            //  아래 줄을 살려서 같이 호출해도 됨)
-            // Invoke(nameof(TwistorTreatSound), 1f);
 
             if (!icebreakerAnimLoop)
             {
@@ -885,6 +903,8 @@ public class SkillManager : MonoBehaviour
     // 아이스브레이커 세트 효과 해제: 적 속도 원복 + 코루틴 정리
     void DeactivateIcebreakerSet()
     {
+        if (!icebreakerActive) return;
+
         icebreakerActive = false;
 
         if (icebreakerSlowRoutine != null)
@@ -904,36 +924,51 @@ public class SkillManager : MonoBehaviour
             }
             icebreakerOriginalSpeed.Clear();
         }
+
+        icebreakerFxPlayed = false;   // 세트 다시 맞추면 FX 재생 가능
     }
+
+    // ─────────────────────────────────────────────────────────────
+    // 트위스트 오어 트릿 세트
+    // ─────────────────────────────────────────────────────────────
 
     void CheckTwistOrTreatSet()
     {
         if (player == null) return; // 플레이어가 null이면 리턴
 
-        //만약 플레이어 스크립트 시럽토네이도,허니스핀,롤링초코바가를 가지고 있다면
         bool hasSet =
             player.hasSyrupTornado &&
             player.hasHoneySpin &&
             player.hasRollingChocolateBar;
 
-        if (hasSet)
+        // 1) 세트가 "막 완성"된 순간 → 버프 + FX
+        if (hasSet && !prevHasTwistOrTreatSet)
         {
-            if (!twistOrTreatActive)
-            {
-                ApplyTwistOrTreatSet(); //세트효과 매서드 실행
-            }
+            ApplyTwistOrTreatSet();
         }
-        else
+        // 2) 세트는 유지 중인데 ResetAllSkills 덕분에 스킬 오브젝트만 날아간 경우
+        else if (hasSet && prevHasTwistOrTreatSet && needRebuildSetEffects)
         {
-            if (twistOrTreatActive)
-            {
-                DeactivateTwistOrTreatSet();
-            }
+            // 버프만 다시 깔고, FX는 재생하지 않음
+            ApplyTwistOrTreatBuffOnly();
         }
+        // 3) 세트가 깨진 순간 → 해제
+        else if (!hasSet && prevHasTwistOrTreatSet)
+        {
+            DeactivateTwistOrTreatSet();
+        }
+
+        prevHasTwistOrTreatSet = hasSet;
     }
 
-    //트위스트 오어 트릿 세트 효과 적용
-    //세트 플래그를 키면 각 3개의 스킬 효과 버프 적용
+    // 트위스트 오어 트릿 버프만 적용 (FX 재생 X)
+    void ApplyTwistOrTreatBuffOnly()
+    {
+        UpgradeHoneySpinForTwistOrTreat();
+        UpgradeSyrupTornadoForTwistOrTreat();
+        UpgradeRollingChocolateBarForTwistOrTreat();
+    }
+
     //트위스트 오어 트릿 세트 효과 적용
     //세트 플래그를 키면 각 3개의 스킬 효과 버프 적용
     void ApplyTwistOrTreatSet() // 트위스트 오어 트릿 세트 효과 로직
@@ -942,10 +977,8 @@ public class SkillManager : MonoBehaviour
         twistOrTreatActive = true;
         Debug.Log("[SkillManager] 트위스트 오어 트릿 세트 효과 발동!");
 
-        //   (시럽토네이도 / 허니스핀 / 롤링초코바 강화 함수 호출 등)
-        UpgradeHoneySpinForTwistOrTreat();
-        UpgradeSyrupTornadoForTwistOrTreat();
-        UpgradeRollingChocolateBarForTwistOrTreat();
+        // 버프 적용
+        ApplyTwistOrTreatBuffOnly();
 
         //  Spine 세트 이펙트 한 번만 재생 후 Destroy
         // ★ FX는 처음 발동할 때만 재생 (이미 재생했다면 아래 FX 로직 스킵)
@@ -975,15 +1008,12 @@ public class SkillManager : MonoBehaviour
         {
             var state = sa.AnimationState;
 
-            //  애니 이름과 루프 여부는 코드 안에서 고정
             const string animName = "animation"; // Spine 안에 있는 애니메이션 이름
             const bool loop = false;             // 세트 FX는 항상 한 번만 재생
 
             TrackEntry entry = state.SetAnimation(0, animName, loop);
-            Invoke("TwistorTreatSound", 1f);
-            // 인보크 = 매서드 지연 시키는 함수 (매서드이름,지연시킬시간) 
+            Invoke("TwistorTreatSound", 1f); // 인보크 = 매서드 지연 시키는 함수 (매서드이름,지연시킬시간) 
 
-            // loop = false 이기 때문에, 끝나면 FX 오브젝트 제거
             if (!loop)
             {
                 StartCoroutine(DestroySpineEffectAfter(sa, entry));
@@ -993,8 +1023,11 @@ public class SkillManager : MonoBehaviour
 
     void DeactivateTwistOrTreatSet()
     {
+        if (!twistOrTreatActive && !prevHasTwistOrTreatSet) return;
+
         Debug.Log("[SkillManager] 트위스트 오어 트릿 세트 효과 해제!");
         twistOrTreatActive = false;
+        twistOrTreatFxPlayed = false;   // 세트 다시 맞추면 FX 재생될 수 있도록
 
         // 허니스핀 세트 버프 해제: 세트용 허니스핀 제거 후 기본 허니스핀 다시 생성
         ClearHoneySpinInstances();
@@ -1014,7 +1047,7 @@ public class SkillManager : MonoBehaviour
         if (!player.hasHoneySpin) return;
         if (honeySpinOrbPrefab == null) return;
 
-        //기존 스킬 제거
+        // 기존 스킬 제거
         ClearHoneySpinInstances();
 
         int targetCount = Mathf.Max(1, honeySpinOrbCount * twistCountMultiplier);
@@ -1083,6 +1116,10 @@ public class SkillManager : MonoBehaviour
         Debug.Log("[SkillManager] 트위스트 오어 트릿: 시럽 토네이도 강화 적용");
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // 아이스브레이커 슬로우 루프
+    // ─────────────────────────────────────────────────────────────
+
     // 세트가 유지되는 동안 주기적으로 모든 Enemy 이동속도 10% 감소 적용
     IEnumerator ApplyIcebreakerSlowLoop()
     {
@@ -1110,7 +1147,7 @@ public class SkillManager : MonoBehaviour
         }
     }
 
-    // Spine 트랙 종료 후 이펙트 제거
+    // Spine 트랙 종료 후 이펙트 제거 (다크칩용)
     IEnumerator DestroyAfter(TrackEntry entry)
     {
         float duration = (entry != null && entry.Animation != null)
@@ -1131,7 +1168,7 @@ public class SkillManager : MonoBehaviour
         }
     }
 
-    /// 비터멜트 카오스 전용 Spine FX 제거용 코루틴
+    /// 세트 FX 제거용 코루틴
     IEnumerator DestroySpineEffectAfter(SkeletonAnimation sa, TrackEntry entry)
     {
         float duration = (entry != null && entry.Animation != null)
@@ -1168,6 +1205,9 @@ public class SkillManager : MonoBehaviour
         CheckHyperCandyRushSet();    // HoneySpin + StrawberryPopCore + SugarPorridge
         CheckSweetarmorCombo();      // SugarShield + CaramelCube + CocoaPowder
         CheckSugarBombParty();       // PoppingCandy + StrawberryPopCore + SugarPorridge
+
+        // ResetAllSkills 이후 한 번만 재빌드하게 플래그 끔
+        needRebuildSetEffects = false;
     }
 
 #if UNITY_EDITOR
