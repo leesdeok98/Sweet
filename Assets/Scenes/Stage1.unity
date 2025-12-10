@@ -15589,7 +15589,7 @@ MonoBehaviour:
   hasHoneySpin: 0
   hasSnowflakeCandy: 0
   hasCaramelCube: 0
-  hasSugarShield: 0
+  hasSugarShield: 1
   hasSugarPorridge: 0
   hasHyperCandyRushActive: 0
   hasSugarBombParty: 0
