@@ -246,7 +246,7 @@ public class InventoryManager : MonoBehaviour
         
         isDirty = true; // 변경됨
         SpawnItemUI(itemData, gridX, gridY, rotatedWidth, rotatedHeight, rotatedShape, rotationAngle);
-        //UpdateActiveSkills();
+        // UpdateActiveSkills();
         return true; 
     }
 
@@ -263,7 +263,7 @@ public class InventoryManager : MonoBehaviour
         }
         if (removed) isDirty = true;
 
-        UpdateActiveSkills();
+        // UpdateActiveSkills();
         return removed;
     }
 
