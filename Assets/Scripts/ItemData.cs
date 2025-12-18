@@ -3,14 +3,14 @@ using UnityEngine;
 [System.Serializable]
 public class ItemData
 {
-    // --- 1. 유저님의 '원래' 변수들 (100% '유지') ---
+    
     public string itemName;
     public string description;
     public Sprite icon;
     public ItemType type; 
     //public float value;
 
-    // --- 2. '테트리스' (5x5) '전용' '추가' 변수들 ---
+    // 테트리스 (5x5) 전용 추가 변수들
     public int width;
     public int height;
     public bool[,] shape; 
@@ -20,7 +20,7 @@ public class ItemData
     {
         None,               // 스킬 없음(지우면안됨)
 
-        // (↓ 사용자님의 '마스터 목록' 12개)
+        
         CaramelCube,        //카라멜 큐브
         SugarShield,        // 슈가 실드
         StrawberryPopCore,  //딸기 팝 코어
@@ -34,9 +34,9 @@ public class ItemData
         HoneySpin,          // 허니 스핀
         SugarPorridge       // 설탕 폭죽
     }
-    // ---
+    
 
-    // (생성자 - 수정 없음)
+    
     public ItemData(ItemData original, int w, int h, bool[,] s)
     {
         this.itemName = original.itemName;
@@ -49,7 +49,7 @@ public class ItemData
         this.shape = s;
     }
 
-    // (ActivateAbility 함수 - 수정 없음)
+    
     public void ActivateAbility()
     {
         Debug.Log(itemName + "의 '능력'이 '발동'되었습니다!");
@@ -65,7 +65,7 @@ public class ItemData
         }
     }
 
-    // (DeactivateAbility 함수 - 수정 없음)
+    
     public void DeactivateAbility()
     {
         Debug.Log(itemName + "의 '능력'이 '비활성'되었습니다.");

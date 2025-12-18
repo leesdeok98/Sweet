@@ -22,7 +22,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField]
     private RectTransform itemLayerRect; 
 
-    // ★★★ [시각 효과] 슬롯 배경 이미지 리스트 (인스펙터 연결 필수) ★★★
+    //[시각 효과] 슬롯 배경 이미지 리스트 (인스펙터 연결 필수)
     [Header("Slot Visuals")]
     public List<Image> slotImages; // 슬롯 40개를 순서대로(좌상단->우하단) 넣어주세요.
     public Color lockedColor = new Color(0.5f, 0.5f, 0.5f, 1f); // 잠금(회색)
@@ -197,9 +197,9 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
+ 
     // 배치 검사 (잠금 확인 포함)
-    // ─────────────────────────────────────────────────────────────
+
     public bool CanPlaceItem(InventoryItemData itemData, int gridX, int gridY, int rotatedWidth, int rotatedHeight, bool[] rotatedShape)
     {
         for (int y = 0; y < rotatedHeight; y++) {
@@ -222,9 +222,8 @@ public class InventoryManager : MonoBehaviour
         return true;
     }
 
-    // ─────────────────────────────────────────────────────────────
+
     // 기본 기능들 (배치, 제거, 스킬, 소리, UI생성)
-    // ─────────────────────────────────────────────────────────────
 
     public void PlayDropSound()
     {

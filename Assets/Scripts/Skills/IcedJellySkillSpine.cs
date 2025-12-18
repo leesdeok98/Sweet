@@ -1,4 +1,4 @@
-﻿// IcedJellySkillSpine.cs (Sorting Controls 제거 버전)
+﻿
 using System.Collections;
 using UnityEngine;
 using Spine.Unity;
@@ -57,12 +57,4 @@ public class IcedJellySkillSpine : MonoBehaviour
 
         Destroy(gameObject);
     }
-
-#if UNITY_EDITOR
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, radius);
-    }
-#endif
 }

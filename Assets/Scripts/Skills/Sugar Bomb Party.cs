@@ -74,7 +74,7 @@ public class SugarBombParty : MonoBehaviour
             player.hasSugarBombParty = true;
         }
 
-        // ★ 타임스케일 0이면 FX/사운드는 나중에 재생
+        //  타임스케일 0이면 FX/사운드는 나중에 재생
         if (Time.timeScale == 0f)
         {
             fxPending = true;
@@ -87,7 +87,7 @@ public class SugarBombParty : MonoBehaviour
         Debug.Log("[SugarBombParty] Set Effect Activated! (Porridge Radius +30%)");
     }
 
-    //  실제 Spine 애니 + 사운드 재생 함수
+  
     private void PlayPartyFx()
     {
         if (skeleton != null)
@@ -101,7 +101,7 @@ public class SugarBombParty : MonoBehaviour
 
     void Update()
     {
-        // 인벤토리에서 세트가 완성된 뒤, 게임이 다시 진행되면 FX/사운드를 딱 한 번 재생
+        
         if (fxPending && Time.timeScale > 0f)
         {
             fxPending = false;

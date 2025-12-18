@@ -7,7 +7,7 @@ public class SugarShieldManager : MonoBehaviour
     private Player player;
     private SugarShieldSkill skillManager;
 
-    //  Enemy 레이어 번호
+    
     private int enemyLayer;
 
     void Start()
@@ -27,24 +27,21 @@ public class SugarShieldManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        // Enemy 레이어
+      
         enemyLayer = LayerMask.NameToLayer("Enemy");
     }
 
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        // 태그 확인 -> 레이어 확인으로 변경
+        
         if (other.gameObject.layer == enemyLayer)
         {
             if (skillManager != null)
             {
                 bool shieldConsumed = skillManager.ConsumeShieldByVisual(gameObject);
 
-                /* if (shieldConsumed && other.CompareTag("EnemyBullet"))
-                {
-                    Destroy(other.gameObject);
-                } */
+            
             }
         }
     }

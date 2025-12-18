@@ -155,10 +155,10 @@ public class Player : MonoBehaviour
     /// 게임 시작/부활 후, 인스펙터에서 체크된 스킬들을 SkillManager에 한 번만 전달
     void TryApplyStartingSkills()
     {
-        // 이미 한 번 처리했으면 다시 안 함
+        
         if (startingSkillsApplied) return;
 
-        // SkillManager가 아직 준비 안 됐으면, 다음 프레임에 다시 시도
+        
         if (SkillManager.Instance == null) return;
 
         var sm = SkillManager.Instance;
@@ -172,12 +172,12 @@ public class Player : MonoBehaviour
         if (hasStrawberryPopCore) sm.ActivateSkill(ItemData.ItemType.StrawberryPopCore);
         if (hasCaramelCube) sm.ActivateSkill(ItemData.ItemType.CaramelCube);
 
-        // ? 여기 세 개가 “안 되던 애들” → 이제 시작 시에도 강제로 실행
+        
         if (hasHoneySpin) sm.ActivateSkill(ItemData.ItemType.HoneySpin);
         if (hasSyrupTornado) sm.ActivateSkill(ItemData.ItemType.SyrupTornado);
         if (hasDarkChip) sm.ActivateSkill(ItemData.ItemType.DarkChip);
 
-        // ★ 추가: 눈꽃사탕 자동 적용
+        //  눈꽃사탕 자동 적용
         if (hasSnowflakeCandy) sm.ActivateSkill(ItemData.ItemType.SnowflakeCandy);
 
         sm.CheckAllSetEffects();
@@ -463,7 +463,7 @@ public class Player : MonoBehaviour
     // 실제로 클리어 패널을 여는 코루틴
     private System.Collections.IEnumerator ShowClearPanelAfterDelay()
     {
-        //보스가 DIE 매서드 실행 후 3초 후에 클리어 패널 열기
+        //보스가 DIE 매서드 실행 후 2초 후에 클리어 패널 열기
         yield return new WaitForSeconds(2f);
 
         if (clearPanel != null)

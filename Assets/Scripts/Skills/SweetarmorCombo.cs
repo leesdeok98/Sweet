@@ -55,7 +55,7 @@ public class SweetarmorCombo : MonoBehaviour
     {
         Debug.Log("[1] ActivateComboEffect 시작");
 
-        // ★ 이미 한 번 발동했다면 다시 실행하지 않음
+        // 이미 한 번 발동했다면 다시 실행하지 않음
         if (comboActivatedOnce)
         {
             Debug.Log("[SweetarmorCombo] 이미 세트 효과가 발동된 상태입니다. 다시 실행하지 않습니다.");
@@ -84,7 +84,7 @@ public class SweetarmorCombo : MonoBehaviour
             skeleton.timeScale = spineTimeScale;
         }
 
-        // ★ 타임스케일이 0이면 FX/사운드는 나중에 재생
+        //  타임스케일이 0이면 FX/사운드는 나중에 재생
         if (Time.timeScale == 0f)
         {
             fxPending = true;
@@ -94,11 +94,11 @@ public class SweetarmorCombo : MonoBehaviour
             PlayComboFx();
         }
 
-        // 5초마다 체력 회복 코루틴 시작 (기존 기능 유지)
+        // 5초마다 체력 회복 코루틴 시작
         StartCoroutine(HealRoutine());
     }
 
-    //  실제 Spine 애니 + 사운드 재생 함수
+   
     private void PlayComboFx()
     {
         if (skeleton != null)

@@ -2,10 +2,7 @@ using UnityEngine;
 using Spine.Unity;
 using System.Collections;
 
-/// <summary>
-/// 설탕 폭죽의 발사체 및 폭발 이펙트 역할을 모두 담당하는 단일 스크립트입니다.
-/// 발사체 충돌 감지용 Radius와 폭발 범위용 Radius를 분리하여 관리합니다.
-/// </summary>
+
 public class PorridgeBulletSkill : MonoBehaviour
 {
     private Rigidbody2D rb;
@@ -65,10 +62,7 @@ public class PorridgeBulletSkill : MonoBehaviour
         if (rb != null) rb.simulated = false;
     }
 
-    /// <summary>
-    /// 폭죽의 능력치, 속도, 수명, 방향을 초기화하고 발사합니다.
-    /// PlayerShooting.cs에서 호출되며, 폭발 범위(explosionRadius)를 별도로 받습니다.
-    /// </summary>
+   
     public void Initialize(float explosionRadius, int damage, float speed, float time, Vector3 direction)
     {
         porridgeRadius = explosionRadius; // 폭발 범위 Radius 저장
@@ -120,9 +114,7 @@ public class PorridgeBulletSkill : MonoBehaviour
         TryExplode();
     }
 
-    /// <summary>
-    /// 발사체의 이동을 멈추고 폭발 애니메이션을 재생하며 데미지를 적용합니다.
-    /// </summary>
+   
     private void TryExplode()
     {
         if (isExploded) return;
@@ -158,9 +150,7 @@ public class PorridgeBulletSkill : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 현재 위치를 중심으로 설정된 폭발 범위(porridgeRadius) 내의 모든 적을 감지하고 피해를 적용합니다.
-    /// </summary>
+ 
     private void ExplodeAndApplyDamage()
     {
         int finalDamage = porridgeDamage;
@@ -181,10 +171,10 @@ public class PorridgeBulletSkill : MonoBehaviour
         }
     }
 
-    // Spine 애니메이션 재생 완료 시 호출되는 콜백
+   
     private void OnExplosionComplete(Spine.TrackEntry trackEntry)
     {
-        // 애니메이션이 끝나면 잠시 후 파괴합니다.
+       
         Destroy(gameObject, destroyDelay);
     }
 }

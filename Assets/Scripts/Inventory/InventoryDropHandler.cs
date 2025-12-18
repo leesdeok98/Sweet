@@ -13,7 +13,7 @@ public class InventoryDropHandler : MonoBehaviour, IDropHandler
         ItemDragHandler dragHandler = draggedObject.GetComponent<ItemDragHandler>();
         if (dragHandler == null) return;
 
-        // ★ (수정) ItemData -> InventoryItemData
+        
         InventoryItemData itemData = dragHandler.GetItemData();
         int rotatedWidth = dragHandler.currentWidth;
         int rotatedHeight = dragHandler.currentHeight;
@@ -33,7 +33,7 @@ public class InventoryDropHandler : MonoBehaviour, IDropHandler
         int targetX = Mathf.FloorToInt(localPoint.x / SLOT_SIZE);
         int targetY = Mathf.FloorToInt(-localPoint.y / SLOT_SIZE);
         
-        // ★ (수정) InventoryManager.instance.PlaceItem 호출
+        //  InventoryManager.instance.PlaceItem 호출
         bool success = InventoryManager.instance.PlaceItem(
             itemData, 
             targetX, 
@@ -46,10 +46,10 @@ public class InventoryDropHandler : MonoBehaviour, IDropHandler
 
         if (success)
         {
-            // ★★★ [수정] 배치 성공 시 플래그만 설정합니다. ★★★
+            //배치 성공 시 플래그만 설정합니다.
             dragHandler.SetDropSuccess(true);
             AudioManager.instance.PlaySfx(AudioManager.Sfx.ItemDrop_SFX);
-            // Destroy(draggedObject); // <--- 이 줄을 제거해야 합니다.
+            
         }
     }
 }

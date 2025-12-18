@@ -13,10 +13,10 @@ public class StrawberryPopCoreSkill : MonoBehaviour
 
     void Awake()
     {
-        player = transform; // 이 스킬은 Player에 붙어 있어야 함
+        player = transform; 
     }
 
-    // Player에서 호출할 함수
+    
     public void UseSkill()
     {
         float roll = Random.value; 

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using Spine;
-using Spine.Unity;   // 🔹 Spine 애니메이션 컨트롤용
+using Spine.Unity;   //  Spine 애니메이션 컨트롤용
 
 public class CaramelCubeSkill : MonoBehaviour
 {
@@ -74,7 +74,7 @@ public class CaramelCubeSkill : MonoBehaviour
             // 플레이어 기준 위치 오프셋
             activeVisual.transform.localPosition = visualOffset;
 
-            // 🔹 스파인 애니메이션 세팅
+            //  스파인 애니메이션 세팅
             var skeleton = activeVisual.GetComponent<SkeletonAnimation>();
             if (skeleton != null)
             {

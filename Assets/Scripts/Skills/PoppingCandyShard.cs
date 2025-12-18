@@ -1,4 +1,4 @@
-﻿// PoppingCandyShard.cs
+﻿
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -38,18 +38,18 @@ public class PoppingCandyShard : MonoBehaviour
     {
         col = GetComponent<CircleCollider2D>();
         col.isTrigger = true;
-        //sr.sortingOrder = 15;
+        
 
-        //  Enemy 레이어 캐싱
+       
         enemyLayer = LayerMask.NameToLayer("Enemy");
 
-        // 프리팹에 SpriteRenderer가 없다면 자동 생성해 원형 시각화
+       
         if (showVisual && GetComponent<SpriteRenderer>() == null)
         {
             sr = gameObject.AddComponent<SpriteRenderer>();
             sr.sortingOrder = 200;
             sr.sprite = GenerateCircleSprite(circlePixels);
-            //sr.color = visualColor;
+            
         }
         else
         {
@@ -77,7 +77,7 @@ public class PoppingCandyShard : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // ★ Enemy 레이어가 아니면 무시
+        
         if (other.gameObject.layer != enemyLayer) return;
 
         var e = other.GetComponent<Enemy>();
@@ -86,8 +86,7 @@ public class PoppingCandyShard : MonoBehaviour
 
         hitSet.Add(e);
         e.TakeDamage(damage);
-        // 한 번만 맞게 하려면 아래 주석 해제:
-        // Destroy(gameObject);
+     
     }
 
     void UpdateVisualScale()
@@ -140,7 +139,7 @@ public class PoppingCandyShard : MonoBehaviour
 #if UNITY_EDITOR
     void OnValidate()
     {
-        //if (sr != null) sr.color = visualColor;
+        
         if (col != null)
         {
             col.isTrigger = true;

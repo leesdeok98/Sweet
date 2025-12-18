@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;   // ★ 추가
+using System.Collections.Generic;   
 using UnityEngine;
 
 public class RollingChocolateBarAttack : MonoBehaviour
@@ -18,10 +18,10 @@ public class RollingChocolateBarAttack : MonoBehaviour
     //  Enemy 레이어 번호 저장용
     private int enemyLayer;
 
-    // ★ 추가: 적별 피격 쿨타임(초) – 인스펙터에서 조절 가능
+    // 적별 피격 쿨타임
     [SerializeField] private float damageCooldown = 0.5f;
 
-    // ★ 추가: 적별 마지막 피격 시간 기록
+    //피격 시간 기록
     private Dictionary<Enemy, float> lastHitTime = new Dictionary<Enemy, float>();
 
     void Awake()
@@ -35,7 +35,7 @@ public class RollingChocolateBarAttack : MonoBehaviour
         knockbackForce = kbForce;
     }
 
-    //  시계침 모드: 막대 피벗이 "한쪽 끝"에 있어야 함 (Sprite Editor에서 설정)
+    
     public void BeginOrbit(Transform center, float duration, float startAngleDeg = 0f, int laps = 1)
     {
         this.center = center;
@@ -49,8 +49,6 @@ public class RollingChocolateBarAttack : MonoBehaviour
         transform.localRotation = Quaternion.Euler(0, 0, startAngle);
 
         //  트위스트 오어 트릿 세트 효과가 발동 중이면, 막대 길이를 범위 배율만큼 키움
-        //   - SkillManager.IsTwistOrTreatActive : 세트 발동 여부
-        //   - SkillManager.twistRangeMultiplier : 예) 1.25f = 25% 증가
         var sm = SkillManager.Instance;
         if (sm != null && sm.IsTwistOrTreatActive && !twistRangeApplied)
         {
@@ -95,7 +93,7 @@ public class RollingChocolateBarAttack : MonoBehaviour
         var hitEnemy = collision.GetComponent<Enemy>();
         if (hitEnemy == null) return;
 
-        // ★ 적별 쿨타임 체크
+        // 쿨타임 체크
         float now = Time.time;
         float lastTime;
         if (lastHitTime.TryGetValue(hitEnemy, out lastTime))

@@ -15,10 +15,10 @@ public class CocoaPowderBullet : MonoBehaviour
     // 코코아 색
     private readonly Color cocoaColor = new Color(0.55f, 0.3f, 0.1f);
 
-    // 🔹 눈꽃사탕 오라용
+    //  눈꽃사탕 오라용
     private SpriteRenderer auraSR;
 
-    // 🔸 넉백 / 스턴 처리에 사용할 태그들
+    //  넉백 / 스턴 처리에 사용할 태그들
     [Header("Knockback / Stun Exclude Tags")]
     [SerializeField] private string golemTag = "Golem";
     [SerializeField] private string bossTag = "Boss";
@@ -53,7 +53,7 @@ public class CocoaPowderBullet : MonoBehaviour
             gameObject.SetActive(false);
     }
 
-    // 🔸 여기 오타 있었음: OnTriggerEnter2D(Collider2D collision) 이게 정답
+  
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.layer != enemyLayer) return;
@@ -90,10 +90,7 @@ public class CocoaPowderBullet : MonoBehaviour
         Deactivate();
     }
 
-    /// <summary>
-    /// 눈꽃사탕을 보유했을 때, 총알 아래에 오라 스프라이트를 붙여준다.
-    /// 이미 붙어 있으면 다시 만들지 않음.
-    /// </summary>
+  
     void TryAttachSnowflakeAura()
     {
         // 이미 오라가 한 번 만들어졌으면 다시 안 만듦

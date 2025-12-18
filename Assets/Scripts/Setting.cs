@@ -32,14 +32,14 @@ public class Setting : MonoBehaviour
 
         Time.timeScale = 1f;
         AudioListener.pause = false;
-        Input.ResetInputAxes();                 // ★ 입력 축 초기화
+        Input.ResetInputAxes();                 
     }
 
     void OnSceneLoaded(Scene s, LoadSceneMode m)
     {
         Time.timeScale = 1f;
         AudioListener.pause = false;
-        Input.ResetInputAxes();                 // ★ 새 씬 로드 직후 한 번 더 초기화
+        Input.ResetInputAxes();                 
 
         if (pausePanel) pausePanel.SetActive(false);
         if (quitPanel) quitPanel.SetActive(false);
@@ -69,13 +69,13 @@ public class Setting : MonoBehaviour
         // 1) 멈춤/사운드/입력 축 초기화
         Time.timeScale = 1f;
         AudioListener.pause = false;
-        Input.ResetInputAxes();                 // ★ 여기서도 초기화
+        Input.ResetInputAxes();             
 
-        // 2) UI 포커스가 키보드를 잡고 있던 경우 해제(선택)
+        // 2) UI 포커스가 키보드를 잡고 있던 경우 해제
         var es = UnityEngine.EventSystems.EventSystem.current;
         if (es) es.SetSelectedGameObject(null);
 
-        // 3) 한 프레임 쉬고 로드 (UI/포커스 정리 후 로드가 더 안정적)
+        // 3) 한 프레임 쉬고 로드 
         yield return null;
 
         var scene = SceneManager.GetActiveScene();
@@ -103,10 +103,10 @@ public class Setting : MonoBehaviour
         if (pausePanel) pausePanel.SetActive(false);
         if (mapSelectionPanel) mapSelectionPanel.SetActive(false);
         Time.timeScale = 1f;
-        Input.ResetInputAxes();                 // ★ 일시정지 해제 시에도 축 초기화
+        Input.ResetInputAxes();                
     }
 
-    // === 종료 ===
+    
     public void Quit()
     {
         if (quitPanel) quitPanel.SetActive(true);
@@ -127,7 +127,7 @@ public class Setting : MonoBehaviour
 #endif
     }
 
-    // === 맵 선택 ===
+    
     public void OnStartButtonClicked()
     {
         if (mapSelectionPanel) mapSelectionPanel.SetActive(true);

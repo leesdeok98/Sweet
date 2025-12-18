@@ -64,7 +64,7 @@ public class SyrupTornadoSkill : MonoBehaviour
         {
             circle.isTrigger = true;
 
-            // 🔹 기준은 항상 인스펙터의 radius 값
+            //  기준은 항상 인스펙터의 radius 값
             radius = Mathf.Max(0.01f, radius);
             circle.radius = radius;
             circle.offset = colliderOffset;
@@ -82,7 +82,7 @@ public class SyrupTornadoSkill : MonoBehaviour
             if (!string.IsNullOrEmpty(loopAnimation))
                 skeleton.AnimationState.SetAnimation(0, loopAnimation, true);
 
-            // 🔹 애니메이션 적용 이후에 항상 위치를 덮어쓰기 위해 이벤트 등록
+            //  애니메이션 적용 이후에 항상 위치를 덮어쓰기 위해 이벤트 등록
             skeleton.UpdateLocal += OnSpineUpdateLocal;
         }
     }
@@ -94,7 +94,7 @@ public class SyrupTornadoSkill : MonoBehaviour
         if (circle == null)
             circle = GetComponent<CircleCollider2D>();
 
-        // 🔹 radius를 먼저 보정하고, 이 값을 콜라이더에 밀어넣는다.
+        //  radius를 먼저 보정하고, 이 값을 콜라이더에 밀어넣는다.
         radius = Mathf.Max(0.01f, radius);
 
         if (circle != null)
@@ -164,10 +164,7 @@ public class SyrupTornadoSkill : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Spine 애니메이션이 뼈대를 업데이트한 직후 호출됨.
-    /// 여기서 RootBone 위치를 강제로 imageOffset으로 맞춰준다.
-    /// </summary>
+ 
     private void OnSpineUpdateLocal(ISkeletonAnimation anim)
     {
         var skel = anim.Skeleton;
@@ -176,19 +173,14 @@ public class SyrupTornadoSkill : MonoBehaviour
         var root = skel.RootBone;
         if (root == null) return;
 
-        // 🔻 여기서 플레이어 기준 Y -0.04로 고정 (기본값)
+        //  여기서 플레이어 기준 Y -0.04로 고정 (기본값)
         root.X = imageOffset.x;   // 기본 0
         root.Y = imageOffset.y;   // 기본 -0.04
     }
 
 
 
-    /// <summary>
-    /// SkillManager에서 '트위스트 오어 트릿' 세트 효과가 발동될 때
-    /// 한 번만 호출해 주면 되는 버프 함수입니다.
-    /// rangeMultiplier : 범위 배율 (예: 1.25f = 25% 증가)
-    /// damageMultiplier: 데미지 배율 (예: 2f    = 2배 데미지)
-    /// </summary>
+    
     public void ApplyTwistOrTreatBuff(float rangeMultiplier, float damageMultiplier)
     {
         // 이미 버프가 적용되었다면 다시 적용하지 않음

@@ -1,14 +1,7 @@
 ﻿using UnityEngine;
-using Spine.Unity;   // ★ 스파인용 네임스페이스 추가
+using Spine.Unity;   
 
-/// <summary>
-/// 허니스핀 구체 1개를 관리하는 스크립트
-/// - 플레이어 주변을 원운동
-/// - Enemy(일반 몬스터 + 보스)에 닿으면
-///     → damage 만큼 데미지
-///     → slowPercent 만큼 이동속도 감소 디버프 (slowDuration초)
-/// - 스파인 애니메이션(loop) 재생 + 이동 방향에 맞춰 회전
-/// </summary>
+
 [RequireComponent(typeof(Collider2D))]
 public class HoneySpin : MonoBehaviour
 {
@@ -52,7 +45,7 @@ public class HoneySpin : MonoBehaviour
             col.isTrigger = true; // 허니스핀은 트리거 충돌
         }
 
-        // ★ SkeletonAnimation 자동 할당
+        //  SkeletonAnimation 자동 할당
         if (skeleton == null)
         {
             // 같은 오브젝트 또는 자식에서 찾아보기
@@ -75,9 +68,7 @@ public class HoneySpin : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// SkillManager에서 생성 직후 한 번 호출해서 전체 파라미터 세팅
-    /// </summary>
+    
     public void Initialize(
         Transform target,
         float radius,
@@ -114,9 +105,7 @@ public class HoneySpin : MonoBehaviour
         UpdatePositionAndRotation();
     }
 
-    /// <summary>
-    /// 현재 angle, radius를 기준으로 플레이어 주변 원운동 위치 + 회전 계산
-    /// </summary>
+    
     void UpdatePositionAndRotation()
     {
         if (target == null) return;

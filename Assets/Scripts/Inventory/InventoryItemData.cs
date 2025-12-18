@@ -9,11 +9,11 @@ public class InventoryItemData : ScriptableObject
     public string itemName;
     public Sprite icon;
 
-    // ★★★ 여기에 '스킬 타입' 변수를 추가합니다 ★★★
+    //여기에 '스킬 타입' 변수를 추가합니다
     [Header("Skill Link")]
     // (주의: ItemData.cs 파일의 ItemType enum을 참조합니다)
     public ItemData.ItemType skillType = ItemData.ItemType.None; // 'None'을 기본값으로
-    // ★★★
+    
 
     [Header("Item Shape (Tetris)")]
     public int width = 1;

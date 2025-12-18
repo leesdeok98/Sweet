@@ -28,7 +28,7 @@ public class EnemyBoss : Enemy
 
     private bool isActing = false;   // 패턴 동작 중인지(추적 off)
 
-    // ★ 추가: 돌진 관통/데미지용
+    //돌진 관통/데미지용
     private bool isCharging = false;
     private Collider2D[] bossColliders;
 
@@ -149,13 +149,12 @@ public class EnemyBoss : Enemy
         }
     }
 
-    //  패턴 1: 돌진
+   
     IEnumerator ChargePattern()
     {
         float originalDps = dps;
         dps = chargeDamage; // 돌진 중 데미지 강화
 
-        // ★ 관통 시작: 모든 콜라이더를 Trigger로 전환
         isCharging = true;
         bool[] prevIsTrigger = null;
         if (bossColliders != null && bossColliders.Length > 0)
@@ -168,7 +167,7 @@ public class EnemyBoss : Enemy
             }
         }
 
-        // 1) 돌진 방향(플레이어 기준)
+        
         Vector2 dir;
         if (target != null)
             dir = (target.position - rb.position);
@@ -181,11 +180,11 @@ public class EnemyBoss : Enemy
         dir = dir.normalized;
         vec2 = dir;  // 방향 정보(좌우 반전용)
 
-        // 2) 돌진 애니메이션 재생 (준비동작 포함)
+        
         if (skeletonAnimation != null && !string.IsNullOrEmpty(chargeAnimName))
             skeletonAnimation.AnimationState.SetAnimation(0, chargeAnimName, true);
 
-        // 3)  준비동작 동안은 "애니만 재생, 이동은 없음"
+        
         if (chargeWindupTime > 0f)
         {
             float windup = 0f;
@@ -213,7 +212,7 @@ public class EnemyBoss : Enemy
 
         float timer = 0f;
 
-        // 4) 여기부터 진짜 이동 시작 (chargeDuration 동안만)
+      
         while (timer < chargeDuration && isLive)
         {
             timer += Time.fixedDeltaTime;
@@ -235,7 +234,7 @@ public class EnemyBoss : Enemy
         if (rb != null)
             rb.velocity = Vector2.zero;
 
-        // ★ 관통 종료: 콜라이더 Trigger 상태 복구
+        // 관통 종료 콜라이더 Trigger 상태 복구
         if (bossColliders != null && prevIsTrigger != null)
         {
             for (int i = 0; i < bossColliders.Length && i < prevIsTrigger.Length; i++)
@@ -272,7 +271,7 @@ public class EnemyBoss : Enemy
         if (shootDelay > 0f)
             yield return new WaitForSeconds(shootDelay);
 
-        // 🔹 총알 발사 부분을 JellyPunk 스타일로 통일
+        // 총알 발사 부분을 JellyPunk 스타일로 통일
         if (target != null && bulletPrefab != null)
         {
             Vector2 fireDirection = (target.position - (Vector2)transform.position).normalized;
@@ -291,7 +290,7 @@ public class EnemyBoss : Enemy
         // 애니메이션 길이만큼 대기
         yield return new WaitForSeconds(waitTime);
 
-        // ★ 발사 패턴 종료: 넉백 다시 허용
+        // 발사 패턴 종료: 넉백 다시 허용
         if (rb != null)
             rb.velocity = Vector2.zero;
 
@@ -304,7 +303,7 @@ public class EnemyBoss : Enemy
         if (rb != null)
             rb.velocity = Vector2.zero;
 
-        // ★ 비활성화 시에도 안전하게 상태 원복
+        //  비활성화 시에도 안전하게 상태 원복
         isCharging = false;
         if (bossColliders != null)
         {
@@ -315,11 +314,11 @@ public class EnemyBoss : Enemy
             }
         }
 
-        // ★ 넉백 무시 플래그도 초기화
+        // 넉백 무시 플래그도 초기화
         ignoreKnockback = false;
     }
 
-    // ★ 추가: 돌진 중 플레이어 관통 순간에 chargeDamage 한 번 데미지
+    
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!isLive) return;

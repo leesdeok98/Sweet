@@ -192,9 +192,8 @@ public class SkillManager : MonoBehaviour
     private readonly Dictionary<Enemy, float> icebreakerOriginalSpeed = new Dictionary<Enemy, float>();
     private Coroutine icebreakerSlowRoutine;
 
-    // ─────────────────────────────────────────────
+   
     // 세트 조건 변화 감지용 (이전 상태 저장)
-    // ─────────────────────────────────────────────
     private bool prevHasBittermeltSet = false;
     private bool prevHasIcebreakerSet = false;
     private bool prevHasTwistOrTreatSet = false;
@@ -226,7 +225,7 @@ public class SkillManager : MonoBehaviour
         if (player == null)
             player = FindObjectOfType<Player>();
 
-        // ▶ 시작할 때 이미 hasHoneySpin이 true면 자동으로 적용
+        //  시작할 때 이미 hasHoneySpin이 true면 자동으로 적용
         if (player != null && player.hasHoneySpin)
         {
             ApplyHoneySpin();
@@ -235,7 +234,7 @@ public class SkillManager : MonoBehaviour
 
     void Update()
     {
-        // ▶ 런타임 중에 hasHoneySpin true로 바뀐 경우 자동 생성
+        //  런타임 중에 hasHoneySpin true로 바뀐 경우 자동 생성
         if (player != null && player.hasHoneySpin)
         {
             if (honeySpinInstances == null || honeySpinInstances.Count == 0)
@@ -244,8 +243,8 @@ public class SkillManager : MonoBehaviour
             }
         }
 
-        // ★ 타임스케일이 다시 1 이상으로 돌아온 순간,
-        //    인벤토리에서 세트가 완성된 상태였다면 FX/사운드를 "딱 한 번만" 재생
+        // 타임스케일이 다시 1 이상으로 돌아온 순간,
+        // 인벤토리에서 세트가 완성된 상태였다면 FX/사운드를 "딱 한 번만" 재생
         if (Time.timeScale > 0f)
         {
             if (bittermeltChaosActive && bittermeltChaosFxPending && !bittermeltChaosFxPlayed)
@@ -263,9 +262,7 @@ public class SkillManager : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// 모든 스킬 플래그와 중첩 스택을 0으로 초기화합니다.
-    /// </summary>
+  
     public void ResetAllSkills()
     {
         if (player == null) return;
@@ -311,9 +308,7 @@ public class SkillManager : MonoBehaviour
         ClearHoneySpinInstances();
     }
 
-    /// <summary>
-    /// 특정 스킬 '하나'를 활성화합니다. (InventoryManager가 호출)
-    /// </summary>
+    
     public void ActivateSkill(ItemData.ItemType type)
     {
         if (player == null) return;
@@ -359,7 +354,7 @@ public class SkillManager : MonoBehaviour
                 ApplySyrupTornado();
                 break;
 
-            // ★ 추가: 눈꽃사탕
+            
             case ItemData.ItemType.SnowflakeCandy:
                 player.hasSnowflakeCandy = true;
                 Debug.Log("[SkillManager] SnowflakeCandy 활성화");
@@ -372,10 +367,8 @@ public class SkillManager : MonoBehaviour
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // ▼▼▼ 개별 스킬 함수들 ▼▼▼
-    // ─────────────────────────────────────────────────────────────
-
+   
+    //  개별 스킬 함수들 
     void ApplySugarShield()
     {
         Debug.Log("슈가쉴드 획득!");
@@ -524,9 +517,8 @@ public class SkillManager : MonoBehaviour
         Debug.Log("[SkillManager] 허니스핀 활성화: 구체 " + honeySpinOrbCount + "개 생성");
     }
 
-    // ─────────────────────────────────────────────────────────────
+
     // 스위트아머 콤보
-    // ─────────────────────────────────────────────────────────────
 
     private void CheckSweetarmorCombo()
     {
@@ -609,8 +601,6 @@ public class SkillManager : MonoBehaviour
     }
 
 
-    /// 슈가밤 파티 세트 효과를 플레이어에게 적용하고 코루틴을 시작
-
     private void ApplySugarBombPartySet()
     {
         if (player.hasSugarBombParty) return;
@@ -625,7 +615,7 @@ public class SkillManager : MonoBehaviour
         {
             sugarBombPartyComponent.comboVisualPrefab = sugarBombPartySpinePrefab;
             // 필요하다면 오프셋도 전달
-            // sugarBombPartyComponent.visualLocalOffset = sugarBombPartyLocalOffset;
+
         }
         else
         {
@@ -666,7 +656,6 @@ public class SkillManager : MonoBehaviour
 
     // 하이퍼 캔디 러쉬 세트
 
-
     void CheckHyperCandyRushSet()
     {
         if (player == null) return;
@@ -687,7 +676,6 @@ public class SkillManager : MonoBehaviour
 
         prevHasHyperCandyRushSet = hasSet;
     }
-
     void ApplyHyperCandyRushSet()
     {
         // 이미 활성화된 상태라면 중복 실행 방지
@@ -771,10 +759,8 @@ public class SkillManager : MonoBehaviour
         honeySpinInstances.Clear();
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // 비터멜트 카오스 세트
-    // ─────────────────────────────────────────────────────────────
 
+    // 비터멜트 카오스 세트
     void CheckBittermeltChaosSet()
     {
         if (player == null) return;
@@ -825,7 +811,7 @@ public class SkillManager : MonoBehaviour
             var state = sa.AnimationState;
             TrackEntry entry = state.SetAnimation(0, bittermeltChaosAnimName, bittermeltChaosAnimLoop);
 
-            // ★ 여기서만 사운드 재생 (= 타임스케일 0일 땐 절대 안 들어옴)
+            //  여기서만 사운드 재생 (= 타임스케일 0일 땐 절대 안 들어옴)
             AudioManager.instance.PlaySfx(AudioManager.Sfx.BitterMeltChaos_SFX);
 
             if (!bittermeltChaosAnimLoop)
@@ -845,8 +831,8 @@ public class SkillManager : MonoBehaviour
         if (bittermeltChaosFxPlayed)
             return;
 
-        // ★ 인벤토리/ESC로 Time.timeScale == 0이면
-        //    지금은 FX/사운드 안 틀고 "대기"만 걸어둔다.
+        //  인벤토리/ESC로 Time.timeScale == 0이면
+        //  지금은 FX/사운드 안 틀고 "대기"만 걸어둔다.
         if (Time.timeScale == 0f)
         {
             bittermeltChaosFxPending = true;
@@ -873,9 +859,6 @@ public class SkillManager : MonoBehaviour
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // 아이스브레이커 세트
-    // ─────────────────────────────────────────────────────────────
 
     // 아이스브레이커 세트 효과 체크 (SnowflakeCandy + IcedJelly + PoppingCandy)
     void CheckIcebreakerSet()
@@ -916,7 +899,7 @@ public class SkillManager : MonoBehaviour
         // 아이스브레이커 세트 발동 시 Spine FX 1회 재생
         //  (이미 한 번 재생된 상태라면 FX는 다시 나오지 않음)
   
-        if (icebreakerFxPlayed) return;  // ★ FX는 한 번만
+        if (icebreakerFxPlayed) return;  //  FX는 한 번만
         icebreakerFxPlayed = true;
 
         if (player == null) return;
@@ -972,9 +955,8 @@ public class SkillManager : MonoBehaviour
         icebreakerFxPlayed = false;   // 세트 다시 맞추면 FX 재생 가능
     }
 
-    // ─────────────────────────────────────────────────────────────
+ 
     // 트위스트 오어 트릿 세트
-    // ─────────────────────────────────────────────────────────────
 
     void CheckTwistOrTreatSet()
     {
@@ -1068,7 +1050,7 @@ public class SkillManager : MonoBehaviour
 
             TrackEntry entry = state.SetAnimation(0, animName, loop);
 
-            // ★ 사운드는 FX 시작 후 1초 뒤 (타임스케일 0일 땐 아예 여기까지 안 옴)
+            // 사운드는 FX 시작 후 1초 뒤 (타임스케일 0일 땐 아예 여기까지 안 옴)
             Invoke(nameof(TwistorTreatSound), 1f);
 
             if (!loop)
@@ -1179,9 +1161,8 @@ public class SkillManager : MonoBehaviour
         Debug.Log("[SkillManager] 트위스트 오어 트릿: 시럽 토네이도 강화 적용");
     }
 
-    // ─────────────────────────────────────────────────────────────
+    
     // 아이스브레이커 슬로우 루프
-    // ─────────────────────────────────────────────────────────────
 
     // 세트가 유지되는 동안 주기적으로 모든 Enemy 이동속도 10% 감소 적용
     IEnumerator ApplyIcebreakerSlowLoop()
@@ -1256,10 +1237,10 @@ public class SkillManager : MonoBehaviour
         AudioManager.instance.PlaySfx(AudioManager.Sfx.TwistOatNut_SFX);
     }
 
-    // ─────────────────────────────────────────────────────────────
+
     //  현재 플레이어 스킬 상태를 기준으로 세트 효과를 한 번에 검사하는 함수
     //  (InventoryManager.UpdateActiveSkills / Player.TryApplyStartingSkills 에서 호출)
-    // ─────────────────────────────────────────────────────────────
+
     public void CheckAllSetEffects()
     {
         CheckBittermeltChaosSet();   // DarkChip + CocoaPowder + RollingChocolateBar

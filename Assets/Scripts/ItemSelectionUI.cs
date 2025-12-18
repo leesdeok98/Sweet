@@ -84,9 +84,9 @@ public class ItemSelectionUI : MonoBehaviour
 
         Time.timeScale = 0f; // 게임 시간 정지
 
-        // ─────────────────────────────────────────────────────────────
-        //  [핵심 수정] 창이 열릴 때 해금 로직을 미리 실행합니다! 
-        // ─────────────────────────────────────────────────────────────
+       
+        // 창이 열릴 때 해금 로직을 미리 실행
+       
         openCount++; // 창 열린 횟수 증가 (아이템 선택 횟수와 동일)
 
         // 짝수 번째(2, 4, 6...)로 열릴 때마다 해금 시도
@@ -96,7 +96,7 @@ public class ItemSelectionUI : MonoBehaviour
             {
                 unlockTriggerCount++;
 
-                //  [수정됨] 기본적으로 3칸씩 해금 ★★★
+                //  [수정됨] 기본적으로 3칸씩 해금 
                 int amountToUnlock = 3;
 
                 // 5번째 해금(총 10회차 오픈)일 때는 4칸 해금 (테두리 총 16칸을 맞추기 위함: 3+3+3+3+4 = 16)
@@ -105,7 +105,7 @@ public class ItemSelectionUI : MonoBehaviour
                     amountToUnlock = 4;
                 }
 
-                // 해금 실행 (화면 뒤의 인벤토리에서 미리 열립니다)
+                // 해금 실행 (화면 뒤의 인벤토리에서 미리 열림)
                 InventoryManager.instance.UnlockRandomOuterCells(amountToUnlock);
             }
         }
@@ -115,7 +115,7 @@ public class ItemSelectionUI : MonoBehaviour
 
         if (panelRoot != null) panelRoot.SetActive(true);
 
-        // 선택할 때 인벤토리 상황을 보면서 고를 수 있게 같이 켜줍니다.
+        // 선택할 때 인벤토리 상황을 보면서 고를 수 있게 같이 켜줌
         if (tetrisInventoryPanel != null) tetrisInventoryPanel.SetActive(true);
 
         // 버튼 다시 활성화

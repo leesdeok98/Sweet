@@ -1,4 +1,3 @@
-// PoppingCandyBurst.cs
 using UnityEngine;
 
 public class PoppingCandyBurst : MonoBehaviour
@@ -9,7 +8,7 @@ public class PoppingCandyBurst : MonoBehaviour
     int damage;
 
     GameObject defaultShardPrefab;
-    GameObject[] shardPrefabs; // 기대 길이 8
+    GameObject[] shardPrefabs; 
 
     bool spawned;
 
@@ -46,11 +45,11 @@ public class PoppingCandyBurst : MonoBehaviour
             if (prefab != null)
             {
                 shardGO = Instantiate(prefab, transform.position, Quaternion.identity, transform);
-                // 프리팹에 CircleCollider2D가 없다면 아래에서 자동 추가됨 (PoppingCandyShard.Awake)
+                
             }
             else
             {
-                // 최소 동작 보장: 비가시 샤드 자동 생성
+                
                 shardGO = new GameObject($"PC_Sh{i}");
                 shardGO.transform.SetParent(transform);
                 var col = shardGO.AddComponent<CircleCollider2D>();

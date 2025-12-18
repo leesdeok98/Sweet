@@ -1,8 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// 씬 시작 시 플레이어를 지정한 스폰 지점으로 옮겨주는 스크립트
-/// </summary>
+
 public class PlayerSpawn : MonoBehaviour
 {
     [Header("스폰 지점 (빈 오브젝트)")]

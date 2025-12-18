@@ -87,7 +87,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         if (itemImage != null && item != null)
         {
             itemImage.sprite = item.icon;
-            // itemImage.SetNativeSize();  // ← 이 줄 삭제
+           
         }
 
         // 아이템 레이어 Rect 연결
@@ -123,15 +123,15 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     private void Rotate()
     {
-        // 1. 각도 증가
+        //각도 증가
         rotationAngle = (rotationAngle + 90) % 360;
 
-        // 2. 논리적 데이터 교체 (그리드 계산용)
+        //(그리드 계산용)
         int tempW = currentWidth;
         currentWidth = currentHeight;
         currentHeight = tempW;
 
-        // 3. 모양 배열 회전 (currentShape가 null일 가능성 방어)
+        //모양 배열 회전 (currentShape가 null일 가능성 방어)
         if (currentShape == null)
         {
             currentShape = new bool[currentWidth * currentHeight];
@@ -158,7 +158,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         }
         currentShape = newShape;
 
-        // 4. 시각적 처리
+        //시각적 처리
         if (rectTransform != null)
         {
             rectTransform.localRotation = Quaternion.Euler(0, 0, -rotationAngle);
@@ -293,7 +293,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         Destroy(gameObject);
     }
 
-    // ★ ESC 메뉴에서 한 번에 정리할 때 사용하는 static 메서드
+    //  ESC 메뉴에서 한 번에 정리할 때 사용하는 static 메서드
     public static void CancelAllDragsAndRestore()
     {
         // Destroy가 들어가 있으니 뒤에서부터 순회

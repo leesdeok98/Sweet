@@ -54,18 +54,18 @@ public class Enemy : MonoBehaviour
     public bool isStunned = false;
     public bool isFrozen = false;
 
-    // ★ 추가: 넉백 무시용 플래그 (보스 발사 패턴 등에서 사용)
+    // 추가: 넉백 무시용 플래그 (보스 발사 패턴 등에서 사용)
     public bool ignoreKnockback = false;
 
     private Coroutine removeSlowRoutine;
 
-    // 🔸 처치수 중복 집계 방지용
+    // 처치수 중복 집계 방지용
     private bool hasCountedKill = false;
 
     public Vector2 vec2;
     private float spineInitialScaleX = 1f;
 
-    // ★ 추가: 죽을 때 물리 끄기용 콜라이더 모음
+    // 죽을 때 물리 끄기용 콜라이더 모음
     private Collider2D[] colliders;
 
     //스파인 컬러
@@ -92,11 +92,11 @@ public class Enemy : MonoBehaviour
         // 자기 자신 + 자식에 붙은 Collider2D 모두 미리 저장
         colliders = GetComponentsInChildren<Collider2D>();
 
-        // 🔹 그림자(SpriteRenderer) 찾기
+        //  그림자(SpriteRenderer) 찾기
         if (shadowRenderer == null)
             shadowRenderer = GetComponentInChildren<SpriteRenderer>();
 
-        // 🔹 원래 그림자 색 저장
+        //  원래 그림자 색 저장
         if (shadowRenderer != null)
             shadowOriginalColor = shadowRenderer.color;
 
@@ -206,7 +206,7 @@ public class Enemy : MonoBehaviour
         speed = originalSpeed;
         isSlowed = false;
 
-        //  처치 집계 플래그 초기화 (오브젝트 풀 대비)
+        //  처치 집계 플래그 초기화 
         hasCountedKill = false;
 
         isFrozen = false;          // 빙결 상태 해제
@@ -217,10 +217,9 @@ public class Enemy : MonoBehaviour
 
         if (skeletonAnimation != null)
             skeletonAnimation.timeScale = 1f;
-        //if (anim != null) anim.speed = originalAnimSpeed;   // 애니메이션 재생속도 원복
-        //if (spriter != null) spriter.color = originalColor; // 파란 틴트 등 색상 원복
+       
 
-        // ★ 추가: 다시 살아날 때 물리 복구
+        
         if (rb != null)
         {
             rb.simulated = true;
@@ -283,9 +282,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 스폰 시 외부에서 스탯 일괄 설정 (스폰러가 호출)
-    /// </summary>
+
     public void Init(SpawnData data)
     {
         speed = data.speed;
@@ -315,10 +312,8 @@ public class Enemy : MonoBehaviour
             skeletonAnimation.AnimationState.SetAnimation(0, runAnimName, true);
         }
 
-        //if (anim != null) anim.speed = originalAnimSpeed;   // 애니메이션 재생속도 원복
-        //if (spriter != null) spriter.color = originalColor; // 파란 틴트 등 색상 원복
+     
 
-        // ★ 추가: 스폰 시에도 물리 복구 (안전빵)
         if (rb != null)
         {
             rb.simulated = true;
@@ -338,12 +333,9 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // ★★ 중요: 플레이어에게 데미지는 Player.cs에서만 처리하도록 유지
-    // (OnCollisionStay2D/OnTriggerStay2D는 Player.cs에서 처리 중복 방지)
+   
 
-    /// <summary>
-    /// 외부(총알/스킬 등)에서 호출하는 데미지 처리
-    /// </summary>
+
     public void TakeDamage(float damage)
     {
         if (!isLive) return;
@@ -381,9 +373,7 @@ public class Enemy : MonoBehaviour
         hitFlashRoutine = null;
     }
 
-    /// <summary>
-    /// 사망 처리 (애니메이션 트리거 + 처치 이벤트 + 비활성)
-    /// </summary>
+   
     protected virtual void Die()
     {
         if (!isLive) return;
@@ -417,18 +407,18 @@ public class Enemy : MonoBehaviour
             // 혹시 이전에 얼음/스턴 등으로 바뀐 timeScale을 정속으로 맞춰줌
             skeletonAnimation.timeScale = 1f;
 
-            // 죽음 애니메이션 재생
+        
             TrackEntry entry =
                 skeletonAnimation.AnimationState.SetAnimation(0, deadAnimName, false);
 
-            // ★ 실제 죽음 애니메이션 길이를 가져와서 딜레이로 사용
+            // 실제 죽음 애니메이션 길이를 가져와서 딜레이로 사용
             if (entry != null && entry.Animation != null)
             {
                 deactivateDelay = entry.Animation.Duration;
             }
         }
 
-        // 🔸 처치수는 정확히 한 번만 증가
+        //  처치수는 정확히 한 번만 증가
         if (!hasCountedKill)
         {
             hasCountedKill = true;
@@ -491,17 +481,7 @@ public class Enemy : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public virtual void OnCollisionStay2D(Collision2D collision)
-    {
-        //if (isLive && collision.gameObject.CompareTag("Player"))
-        //{
-        //    collision.gameObject.GetComponent<Player>().TakeDamage(dps * Time.deltaTime);
-        //}
-    }
 
-    /// <summary>
-    /// 슬로우 적용 (slowAmount: 0~1, duration초 후 원복)
-    /// </summary>
     public void ApplySlow(float slowAmount, float duration)
     {
         slowAmount = Mathf.Clamp01(slowAmount);

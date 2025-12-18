@@ -43,7 +43,7 @@ public class HyperCandyRush : MonoBehaviour
 
     public void ActivateSetEffect()
     {
-        // ★ 이미 세트 효과가 발동된 상태라면 다시 실행하지 않음 (FX 1회만 표시)
+        // 이미 세트 효과가 발동된 상태라면 다시 실행하지 않음 (FX 1회만 표시)
         if (hasPlayedOnce)
         {
             Debug.Log("[HyperCandyRush] 이미 세트 효과가 발동된 상태입니다. 다시 실행하지 않습니다.");
@@ -84,7 +84,7 @@ public class HyperCandyRush : MonoBehaviour
         Debug.Log("[HyperCandyRush] Set Effect Activated!");
     }
 
-    // ★ 실제 Spine 애니 + 사운드 재생 함수
+    
     private void PlayRushFx()
     {
         if (skeleton != null)
@@ -105,7 +105,7 @@ public class HyperCandyRush : MonoBehaviour
         Debug.Log("[HyperCandyRush] Movement Check Loop 시작.");
     }
 
-    public void StopMovementCheck()    // CheckPlayerMovementLoop 코루틴을 관리하고 공격 속도 증가 효과를 중단하거나 초기화하는 메서드
+    public void StopMovementCheck()    
     {
         if (movingAttackSpeedCoroutine != null)
         {
@@ -116,7 +116,7 @@ public class HyperCandyRush : MonoBehaviour
         Debug.Log("[HyperCandyRush] Movement Check Loop 정지.");
     }
 
-    private IEnumerator CheckPlayerMovementLoop()    // 플레이어의 이동 상태에 따라 공격속도를 다르게 해주는 코루틴
+    private IEnumerator CheckPlayerMovementLoop()    
     {
         var wait = new WaitForSeconds(1.0f);
         float currentIncrease = 0f;

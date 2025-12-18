@@ -12,10 +12,10 @@ public class Bullet : MonoBehaviour
     public GameObject icedJellySpinePrefab;
     [Range(0f, 1f)] public float icedJellyChance = 0.8f;
 
-    // 눈꽃사탕 오라 내부용 참조
+    
     private SpriteRenderer auraSR;
 
-    // ─────────────────────────────────────────────────────────────
+    
     //  비터멜트 카오스 세트 효과 설정값
     [Header("Bittermelt Chaos Set Settings")]
     [Tooltip("세트 효과 지속 피해 (초당)")]
@@ -30,7 +30,7 @@ public class Bullet : MonoBehaviour
     [Header("Knockback Settings")]
     public float knockbackForce = 2f;
 
-    //  Enemy 레이어 번호 캐싱
+    
     private int enemyLayer;
 
     void Awake()
@@ -82,10 +82,10 @@ public class Bullet : MonoBehaviour
             // 1) 기본 데미지
             float finalDamageFloat = baseDamage * damageMultiplier;
 
-            // ─────────────────────────────────────────────────────
+            
             // 비터멜트 카오스 세트 효과: HP 50% 이상이면 공격력 +30%
             //  (DarkChip + CocoaPowder + RollingChocolateBar 세트가 활성화된 상태에서만 동작)
-            // ─────────────────────────────────────────────────────
+           
             var smSet = SkillManager.Instance;
             if (smSet != null && smSet.IsBittermeltChaosActive)
             {
@@ -100,11 +100,10 @@ public class Bullet : MonoBehaviour
                     }
                 }
 
-                // ─────────────────────────────────────────────
+                
                 // 비터멜트 카오스 세트 효과: 5초간 초당 2의 지속 피해
                 //  Enemy 오브젝트에 BittermeltChaosDot 컴포넌트를 붙여서 Tick
                 //  이미 걸려있으면 남은 시간을 5초로 갱신
-                // ─────────────────────────────────────────────
                 if (bittermeltChaosDps > 0f && bittermeltChaosDuration > 0f)
                 {
                     var dot = hitEnemy.GetComponent<BittermeltChaosDot>();
@@ -120,11 +119,8 @@ public class Bullet : MonoBehaviour
                 }
             }
 
-            // ─────────────────────────────────────────────
-            //   아이스브레이커 세트 효과:
-            //   SnowflakeCandy + IcedJelly + PoppingCandy 세트가 활성 상태라면
-            //   얼음 계열 공격에 고정 데미지 +5 추가 (finalDamageFloat에 더함)
-            // ─────────────────────────────────────────────
+
+            //   아이스브레이커 세트 효과
             var smIce = SkillManager.Instance;
             if (smIce != null && smIce.IsIcebreakerActive)
             {
@@ -134,7 +130,7 @@ public class Bullet : MonoBehaviour
             int finalDamage = Mathf.RoundToInt(finalDamageFloat);
             hitEnemy.TakeDamage(finalDamage);
 
-            // (옵션) 2) 아이스젤리 스파인 확률 발동
+            // 아이스젤리 확률 발동
             if (SkillManager.Instance != null && SkillManager.Instance.player != null)
             {
                 if (SkillManager.Instance.player.hasIcedJellySkill && icedJellySpinePrefab != null)
@@ -156,7 +152,7 @@ public class Bullet : MonoBehaviour
                 }
             }
 
-            //  4) 팝핑캔디: 적 맞은 지점에서 8방향 버스트
+            //  4) 팝핑캔디: 적 맞은 지점에서 8방향 발사
             if (sm != null && sm.player != null && sm.player.hasPoppingCandy)
             {
                 // 발동 확률 체크 (확률 쓰기 싫으면 이 if는 지워도 됨)
@@ -184,12 +180,12 @@ public class Bullet : MonoBehaviour
                 }
             }
 
-            //  넉백 적용 (Bullet 전용 넉백 세기 사용)
+            //  넉백 적용
             Vector2 knockDir = (hitEnemy.transform.position - transform.position).normalized;
             hitEnemy.ApplyKnockback(knockDir, knockbackForce);
         }
 
-        // 총알 소멸
+        // 총알 제거
         Destroy(gameObject);
     }
 }

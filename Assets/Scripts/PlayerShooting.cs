@@ -54,7 +54,7 @@ public class PlayerShooting : MonoBehaviour
             return;
         }
 
-        // 2. 다음 쿨타임 설정: 발사 시간이 되었으므로, 다음 쿨타임을 먼저 계산하여 설정합니다.
+        // 2. 다음 쿨타임 설정: 발사 시간이 되었으므로, 다음 쿨타임을 먼저 계산하여 설정
         if (player != null && player.hasHyperCandyRushActive)
         {
             nextFireTime = Time.time + GetCurrentFireCoolDown();
@@ -99,7 +99,7 @@ public class PlayerShooting : MonoBehaviour
     {
         // 마우스 방향 계산
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePos.z = firePoint.position.z; // 🔹 Z값을 같게 설정
+        mousePos.z = firePoint.position.z; //  Z값을 같게 설정
 
         Vector2 direction = ((Vector2)(mousePos - firePoint.position)).normalized;
 
@@ -192,7 +192,7 @@ public class PlayerShooting : MonoBehaviour
         // 0% ~ 30% 범위로 제한
         hcrMovingAttackSpeedIncrease = Mathf.Clamp(increase, 0f, 0.30f);
 
-        // Debug.Log($"[HyperCandyRush] 이동 누적 공속: {(hcrMovingAttackSpeedIncrease * 100):0.##}%");
+        // Debug.Log($"[HyperCandyRush] 이동 누적 공속
     }
 
     public void ShootMiniPorridgeBullet(GameObject prefab, float radius, int damage)

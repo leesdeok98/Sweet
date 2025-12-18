@@ -152,7 +152,7 @@ public class SugarShieldSkill : MonoBehaviour
 
     }
 
-    // ★ 슈가 쉴드 생성 중지 + 기존 쉴드 정리
+    // 슈가 쉴드 생성 중지 + 기존 쉴드 정리
     public void StopSugarShieldGeneration(bool clearExistingShields)
     {
         // 더 이상 자동 생성 안 함
